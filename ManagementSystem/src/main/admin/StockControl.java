@@ -10,6 +10,7 @@ public interface StockControl {
     void alertForDiscrepancies(Map<String, Integer> order, Map<String, Integer> receivedStock);
     int getCurrentStock(String ingredientName);
     Map<String, Integer> getFutureStockOrders();
+    Map<String, Map<String, Double>> getDishIngredients(String dishName);
 
 }
 

@@ -1,0 +1,118 @@
+@startuml Lancaster_System_Software
+skinparam style strictuml
+
+' Define classes for Admin interfaces
+class MenuManagement {
+    +createOrUpdateMenu(dishName, ingredients, price)
+    +getMenuPricing() : Map<String, Double>
+    +updateIngredientCost(ingredient, cost)
+    +setAllergenInfo(dishName, allergens)
+    +archiveMenu(menuName)
+    +getCurrentMenu() : List<MenuDish>
+}
+
+class SalesBookingsManagement {
+    +recordSale(dishName, quantity, paymentMethod)
+    +getSalesPerformance(startDate, endDate) : Map<String, Integer>
+    +manageBooking(tableId, customerName, bookingDate, status, contactInfo, specialRequests)
+    +getBookingsForDate(date) : List<Booking>
+    +updateBookingLimitsBasedOnStaff(date)
+}
+
+class StaffManagement {
+    +scheduleStaff(staffName, scheduleDate)
+    +getStaffSchedules() : Map<Date, List<String>>
+    +recordHoliday(staffName, startDate, endDate)
+    +updateStaffRole(staffName, newRole)
+    +recordAbsence(staffName, startDate, endDate)
+}
+
+class StockControl {
+    +updateStockLevels(stockItems)
+    +getLowStockItems(currentStock, stockThresholds) : Map<String, Integer>
+    +recordWaste(item, wasteType, quantity)
+    +generateOrder(menuItems, recipes) : Map<String, Integer>
+    +alertForDiscrepancies(order, receivedStock)
+    +getCurrentStock(ingredientName) : int
+    +getFutureStockOrders() : Map<String, Integer>
+}
+
+class WineManagement {
+    +updateWineStock(wineName, quantity, type)
+    +getWineStockLevels() : Map<String, WineStockInfo>
+    +suggestWinePairing(dishName, wineName, type)
+    +reportWineUsage(type) : Map<String, Integer>
+    +getWinesByType(type) : List<String>
+}
+
+' Define classes for FOH interfaces
+class ReservationManagement {
+    +addReservation(customerName, bookingDate, numberOfGuests, specialRequests)
+    +updateReservation(reservationId, status)
+    +getReservationsForDate(date) : List<Reservation>
+    +cancelReservation(reservationId)
+}
+
+class TableManagement {
+    +updateTableStatus(tableId, status)
+    +getAvailableTables(date) : List<Table>
+    +assignTableToReservation(reservationId, tableId)
+}
+
+class SalesManagement {
+    +recordTransaction(tableId, orderItems, paymentMethod)
+    +getSalesSummary(startDate, endDate) : SalesSummary
+}
+
+class CustomerFeedbackManagement {
+    +recordFeedback(customerName, visitDate, rating, comments)
+    +getFeedbackSummary(startDate, endDate) : List<Feedback>
+}
+
+' Relationships
+MenuManagement "1" -- "1" SalesBookingsManagement : "uses >\nupdates menu for bookings"
+MenuManagement "1" -- "1" StaffManagement : "uses >\nmenu preparation depends on staff availability"
+StockControl "1" -- "1" MenuManagement : "uses >\nmenu based on stock levels"
+SalesBookingsManagement "1" -- "1" StockControl : "uses >\nupdates stock based on sales"
+StaffManagement "1" -- "1" SalesBookingsManagement : "uses >\nbookings adjusted based on staff schedules"
+WineManagement "1" -- "1" MenuManagement : "uses >\nsuggests pairings for menus"
+
+SalesBookingsManagement -- ReservationManagement : "Data flow from FOH >\nto Admin for bookings"
+SalesManagement -- SalesBookingsManagement : "Sales data flow >\nto Admin for analysis"
+CustomerFeedbackManagement -down-> SalesBookingsManagement : "Feedback influences >\nbooking management"
+
+' Supporting Classes
+class MenuDish {
+    -dishName: String
+    -ingredients: List<String>
+    -price: double
+    -allergens: List<String>
+}
+
+class Booking {
+    -tableId: int
+    -customerName: String
+    -bookingDate: Date
+    -status: String
+    -contactInfo: String
+    -specialRequests: String
+}
+
+class WineStockInfo {
+    -quantity: int
+    -type: WineType
+}
+
+enum WineType {
+    RED
+    WHITE
+    ROSE
+    SPARKLING
+}
+
+MenuManagement -- MenuDish : "determines >"
+SalesBookingsManagement -- Booking : "manages >"
+WineManagement -- WineStockInfo : "tracks >"
+WineManagement -- WineType : "categorizes >"
+
+@enduml
