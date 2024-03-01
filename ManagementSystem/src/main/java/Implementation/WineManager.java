@@ -1,6 +1,7 @@
-package main.Implementation;
+package Implementation;
 
-import main.admin.WineManagement;
+
+import admin.WineManagement;
 
 import java.util.Date;
 import java.util.HashMap;

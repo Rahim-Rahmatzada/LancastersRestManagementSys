@@ -1,6 +1,6 @@
-package main.Implementation;
+package Implementation;
 
-import main.admin.SalesBookingsManagement;
+import admin.SalesBookingsManagement;
 
 import java.util.*;
 
@@ -54,18 +54,30 @@ public class SalesManagement implements SalesBookingsManagement {
         }
     }
 
-    @Override /// cehchehcehchehce
-    public void updateBookingLimitsBasedOnStaff(Date date) {
-        // Assuming booking limits are updated based on the number of available staff
-        // and a maximum of 10 tables per staff member
-        int totalStaff = 5;  // Assuming there are 5 staff members available
-        int maxTablesPerStaff = 10;
-        int updatedBookingLimit = totalStaff * maxTablesPerStaff;
+    @Override
+    public void setDailyBookingLimit(Date date, int limit) {
 
-        // Update the booking limits for the day
-        bookingLimits.clear();
-        for (int i = 1; i <= updatedBookingLimit; i++) {
-            bookingLimits.put(i, 0);
-        }
     }
+
+    @Override
+    public int getDailyBookingLimit(Date date) {
+        return 0;
+    }
+
+    @Override
+    public void adjustBookingLimitForSpecialEvent(Date date, int newLimit) {
+
+    }
+
+    @Override
+    public List<Map<String, Object>> getBookingsForDate(Date date) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> generateBookingReport(Date startDate, Date endDate) {
+        return null;
+    }
+
+
 }

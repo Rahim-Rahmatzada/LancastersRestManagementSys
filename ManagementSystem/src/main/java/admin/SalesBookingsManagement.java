@@ -1,4 +1,4 @@
-package main.admin;
+package admin;
 
 import java.util.Date;
 import java.util.List;

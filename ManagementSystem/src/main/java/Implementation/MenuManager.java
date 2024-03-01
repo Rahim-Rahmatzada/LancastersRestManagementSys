@@ -1,6 +1,6 @@
-package main.Implementation;
+package Implementation;
 
-import main.admin.MenuManagement;
+import admin.MenuManagement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class MenuManager implements MenuManagement {
     }
 
     @Override
-    public void createOrUpdateMenu(String dishName, List<String> ingredients, double price) {
+    public void UpdateMenu(String dishName, List<String> ingredients, double price) {
         // Check if the dish already exists in the menus
         if (menus.containsKey(dishName)) {
             // If it exists, update the existing menu item

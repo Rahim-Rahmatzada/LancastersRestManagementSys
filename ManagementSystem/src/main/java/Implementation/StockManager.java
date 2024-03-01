@@ -1,6 +1,6 @@
-package main.Implementation;
+package Implementation;
 
-import main.admin.StockControl;
+import admin.StockControl;
 
 import java.util.HashMap;
 import java.util.Map;
