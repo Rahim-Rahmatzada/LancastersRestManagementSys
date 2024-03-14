@@ -2,6 +2,7 @@ package UI;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -33,8 +34,7 @@ public class MainUI extends Application implements UISwitcher {
         if (dashboardUI == null) {
             dashboardUI = new DashboardUI(this);
         }
-        VBox dashboardContent = dashboardUI.createContent();
-        switchScene(dashboardContent, "Dashboard UI");
+        switchScene(dashboardUI, "Dashboard UI");
         dashboardUI.highlightButton("Dashboard");
     }
 
@@ -43,10 +43,10 @@ public class MainUI extends Application implements UISwitcher {
         if (inventoryUI == null) {
             inventoryUI = new InventoryUI(this);
         }
-        VBox inventoryContent = inventoryUI.createContent();
-        switchScene(inventoryContent, "Inventory UI");
+        switchScene(inventoryUI, "Inventory UI"); // Use the updated switchScene method
         inventoryUI.highlightButton("Inventory");
     }
+
 
 
     @Override
@@ -54,35 +54,43 @@ public class MainUI extends Application implements UISwitcher {
         if (salesUI == null) {
             salesUI = new SalesUI(this);
         }
-        VBox inventoryContent = salesUI.createContent();
-        switchScene(inventoryContent, "Sales UI");
+        switchScene(salesUI, "Sales UI"); // Use the updated switchScene method
         salesUI.highlightButton("Sales");
-
     }
+
 
     @Override
     public void switchToBookings() {
         if (bookingsUI == null) {
             bookingsUI = new BookingsUI(this);
         }
-        VBox inventoryContent = bookingsUI.createContent();
-        switchScene(inventoryContent, "Bookings UI");
+        switchScene(bookingsUI, "Bookings UI"); // Use the updated switchScene method
         bookingsUI.highlightButton("Bookings");
     }
+
 
     @Override
     public void switchToMenus() {
         if (menusUI == null) {
             menusUI = new MenusUI(this);
         }
-        VBox inventoryContent = menusUI.createContent();
-        switchScene(inventoryContent, "Menus UI");
+        switchScene(menusUI, "Menus UI"); // Use the updated switchScene method
         menusUI.highlightButton("Menus");
     }
 
-    private void switchScene(VBox content, String title) {
-        Scene scene = new Scene(content, 1200, 700);
+
+    private void switchScene(BaseUI ui, String title) {
+        BorderPane rootLayout = ui.getRootLayout(); // Get the root layout from BaseUI
+
+        // Check if the rootLayout already has a scene, and if so, use it
+        Scene scene = rootLayout.getScene();
+        if (scene == null) {
+            // If there is no scene, create a new one
+            scene = new Scene(rootLayout, 1200, 700);
+        }
+
         primaryStage.setScene(scene);
         primaryStage.setTitle(title);
     }
+
 }

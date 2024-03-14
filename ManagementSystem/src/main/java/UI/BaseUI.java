@@ -2,9 +2,13 @@ package UI;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,13 +19,56 @@ public abstract class BaseUI {
 
     protected Map<String, Button> buttons = new LinkedHashMap<>();
 
+    private BorderPane rootLayout = new BorderPane();
+    private Label topText = new Label();
+
+    protected VBox mainContentContainer;
 
 
     public BaseUI(UISwitcher uiSwitcher) {
         this.uiSwitcher = uiSwitcher;
+        initializeLayout();
+
     }
 
-    public VBox createContent() {
+    private void initializeLayout() {
+        topText.setStyle("-fx-font-size: 32px; -fx-padding: 10px; -fx-text-fill: white;");
+
+        // Create a new container for the top text and the main content.
+        HBox topAndMainContent = new HBox();
+        topAndMainContent.setStyle("-fx-background-color: #1A1A1A;");
+        // Add the topText to the left side of the HBox
+        topAndMainContent.getChildren().add(topText);
+        // Now create a container for the main content.
+        mainContentContainer = new VBox();
+        mainContentContainer.setStyle("-fx-background-color: #1A1A1A;");
+        // Add the mainContentContainer to the right side of the HBox.
+        topAndMainContent.getChildren().add(mainContentContainer);
+
+        // Set the side menu on the left side of the BorderPane.
+        VBox buttonContainer = createSideMenuContent();
+        rootLayout.setLeft(buttonContainer);
+
+        // Set the HBox as the center content of the BorderPane.
+        rootLayout.setCenter(topAndMainContent);
+
+        System.out.println("it happened");
+    }
+
+    protected void setMainContent(Node content) {
+        mainContentContainer.getChildren().clear(); // Clear any previous content
+        mainContentContainer.getChildren().add(content); // Add new content
+    }
+
+    protected void setTopText(String text) {
+        topText.setText(text);
+    }
+
+    public BorderPane getRootLayout() {
+        return rootLayout;
+    }
+
+    public VBox createSideMenuContent() {
         VBox buttonContainer = new VBox();
         buttonContainer.setAlignment(Pos.TOP_LEFT);
         buttonContainer.setPadding(new Insets(10));
@@ -37,14 +84,15 @@ public abstract class BaseUI {
         buttonInfo.put("Menus", "book.png");
 
         for (Map.Entry<String, String> entry : buttonInfo.entrySet()) {
-            buttonContainer.getChildren().add(createButton(entry.getKey(), 10, entry.getValue()));
+            buttonContainer.getChildren().add(createSideMenuButtons(entry.getKey(), 10, entry.getValue()));
         }
 
         return buttonContainer;
     }
 
-    protected Button createButton(String label, int leftPadding, String imagePath) {
+    protected Button createSideMenuButtons(String label, int leftPadding, String imagePath) {
         Button button = new Button(label);
+
         button.setPrefSize(200, 50);
         button.setPadding(new Insets(0, 0, 0, leftPadding));
         button.setStyle("-fx-background-color: #1A1A1A; -fx-text-fill: white; -fx-font-size: 14px; " +
@@ -97,5 +145,15 @@ public abstract class BaseUI {
     }
 
 
-    protected abstract void handleButtonAction(String label);
+    protected void handleButtonAction(String label) {
+        switch (label) {
+            case "Dashboard" -> uiSwitcher.switchToDashboard();
+            case "Inventory" -> uiSwitcher.switchToInventory();
+            case "Sales" -> uiSwitcher.switchToSales();
+            case "Bookings" -> uiSwitcher.switchToBookings();
+            case "Menus" -> uiSwitcher.switchToMenus();
+
+        }
+        highlightButton(label); // Highlight the clicked button
+    }
 }

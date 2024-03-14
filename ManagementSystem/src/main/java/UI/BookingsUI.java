@@ -1,8 +1,5 @@
 package UI;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
 public class BookingsUI extends BaseUI {
@@ -10,28 +7,16 @@ public class BookingsUI extends BaseUI {
     public BookingsUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Bookings");
+
+        setTopText("Bookings Overviewwwwwwww");
+
+        // Set the main content for the DashboardUI.
+        VBox dashboardMainContent = new VBox();
+        // Add components to dashboardMainContent as needed.
+        setMainContent(dashboardMainContent);
     }
 
-    @Override
-    protected void handleButtonAction(String label) {
-        switch (label) {
-            case "Dashboard":
-                uiSwitcher.switchToDashboard();
-                break;
-            case "Inventory":
-                uiSwitcher.switchToInventory();
-                break;
-            case "Sales":
-                uiSwitcher.switchToSales();
-                break;
-            case "Bookings":
-                uiSwitcher.switchToBookings();
-                break;
-            case "Menus":
-                uiSwitcher.switchToMenus();
-                break;
-            default:
-                break;
-        }
-    }
+
+
+
 }

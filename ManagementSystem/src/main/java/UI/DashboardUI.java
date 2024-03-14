@@ -1,6 +1,8 @@
 package UI;
 
 
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 public class DashboardUI extends BaseUI {
 
@@ -9,29 +11,14 @@ public class DashboardUI extends BaseUI {
     public DashboardUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Dashboard");
+        setTopText("Dashboard Overviewwwwwwww");
+
+        // Set the main content for the DashboardUI.
+        VBox dashboardMainContent = new VBox();
+        // Add components to dashboardMainContent as needed.
+        setMainContent(dashboardMainContent);
     }
 
-    @Override
-    protected void handleButtonAction(String label) {
-        switch (label) {
-            case "Dashboard":
-                uiSwitcher.switchToDashboard();
-                break;
-            case "Inventory":
-                uiSwitcher.switchToInventory();
-                break;
-            case "Sales":
-                uiSwitcher.switchToSales();
-                break;
-            case "Bookings":
-                uiSwitcher.switchToBookings();
-                break;
-            case "Menus":
-                uiSwitcher.switchToMenus();
-                break;
-            default:
-                break;
-        }
-    }
+
 
 }
