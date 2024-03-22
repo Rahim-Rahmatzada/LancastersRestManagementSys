@@ -21,3 +21,14 @@ public class InventoryUI extends BaseUI {
 
 
 }
+
+
+//    Inventory UI
+//    Current Stock Levels: Monitor and update the quantities of ingredients and supplies currently in stock.
+//        Order Management: Automate the creation of orders based on menu requirements and track orders placed with suppliers.
+//        Waste Tracking: Record and analyze kitchen waste to improve future stock ordering accuracy.
+//        Ingredient Usage: Log the use of ingredients for each dish to manage inventory efficiently.
+//        Stock Alerts: Notification system for low stock items or discrepancies in orders.
+//        Supplier Management: Maintain supplier information and manage supplier interactions.
+
+//    Ordering Process: Review and finalize orders for produce and other supplies.
