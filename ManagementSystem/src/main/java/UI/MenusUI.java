@@ -11,9 +11,9 @@ public class MenusUI extends BaseUI {
         setTopText("MENUUU Overviewwwwwwww");
 
         // Set the main content for the DashboardUI.
-        VBox dashboardMainContent = new VBox();
+        VBox menusMainContent = new VBox();
         // Add components to dashboardMainContent as needed.
-        setMainContent(dashboardMainContent);
+        setMainContent(menusMainContent);
     }
 
 

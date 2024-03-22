@@ -18,4 +18,4 @@ public class WineUI extends BaseUI {
 }
 
 // wine vintage year
-//    Wine Cellar Management: Manage inventory of wines, suggest pairings, and track usage.
+//    Wine Cellar Management: Manage inventory of wines, see and alter wine pairings, track usage.

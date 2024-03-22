@@ -38,8 +38,8 @@ public class GraphCreator {
 
 
 
-        barChart.lookup(".chart-plot-background").setStyle("-fx-background-color: #D3D3D3;");
-        lineChart.lookup(".chart-plot-background").setStyle("-fx-background-color: #D3D3D3;");
+        barChart.lookup(".chart-plot-background").setStyle("-fx-background-color: #1A1A1A;");
+        lineChart.lookup(".chart-plot-background").setStyle("-fx-background-color: #1A1A1A;");
     }
 
     public BarChart<String, Number> getBarChart() {

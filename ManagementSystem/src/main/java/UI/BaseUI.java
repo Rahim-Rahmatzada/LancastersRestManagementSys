@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -236,5 +235,14 @@ public abstract class BaseUI {
 
         }
         highlightButton(label); // Highlight the clicked button
+    }
+
+    /**
+     * Returns the main content container.
+     *
+     * @return The main content container as a VBox.
+     */
+    protected VBox getMainContent() {
+        return mainContentContainer;
     }
 }
