@@ -1,121 +1,118 @@
-@startuml
+@startuml Lancaster_System_Software
+skinparam style strictuml
 
-class Menu {
-    + int menuID
-    + String name
-    + List<Dish> dishes
-    + Date effectiveDate
+' Define classes for Admin interfaces
+class MenuManagement {
+    +createOrUpdateMenu(dishName, ingredients, price)
+    +getMenuPricing() : Map<String, Double>
+    +updateIngredientCost(ingredient, cost)
+    +setAllergenInfo(dishName, allergens)
+    +archiveMenu(menuName)
+    +getCurrentMenu() : List<MenuDish>
 }
 
-class Dish {
-    + int dishID
-    + String name
-    + List<Ingredient> ingredients
-    + double price
+class SalesBookingsManagement {
+    +recordSale(dishName, quantity, paymentMethod)
+    +getSalesPerformance(startDate, endDate) : Map<String, Integer>
+    +manageBooking(tableId, customerName, bookingDate, status, contactInfo, specialRequests)
+    +getBookingsForDate(date) : List<Booking>
+    +updateBookingLimitsBasedOnStaff(date)
 }
 
-class Ingredient {
-    + int ingredientID
-    + String name
-    + double cost
+class StaffManagement {
+    +scheduleStaff(staffName, scheduleDate)
+    +getStaffSchedules() : Map<Date, List<String>>
+    +recordHoliday(staffName, startDate, endDate)
+    +updateStaffRole(staffName, newRole)
+    +recordAbsence(staffName, startDate, endDate)
 }
 
-class Sale {
-    + int saleID
-    + Date date
-    + Map<Dish, Integer> dishQuantities
-    + double totalCost
+class StockControl {
+    +updateStockLevels(stockItems)
+    +getLowStockItems(currentStock, stockThresholds) : Map<String, Integer>
+    +recordWaste(item, wasteType, quantity)
+    +generateOrder(menuItems, recipes) : Map<String, Integer>
+    +alertForDiscrepancies(order, receivedStock)
+    +getCurrentStock(ingredientName) : int
+    +getFutureStockOrders() : Map<String, Integer>
+}
+
+class WineManagement {
+    +updateWineStock(wineName, quantity, type)
+    +getWineStockLevels() : Map<String, WineStockInfo>
+    +suggestWinePairing(dishName, wineName, type)
+    +reportWineUsage(type) : Map<String, Integer>
+    +getWinesByType(type) : List<String>
+}
+
+' Define classes for FOH interfaces
+class ReservationManagement {
+    +addReservation(customerName, bookingDate, numberOfGuests, specialRequests)
+    +updateReservation(reservationId, status)
+    +getReservationsForDate(date) : List<Reservation>
+    +cancelReservation(reservationId)
+}
+
+class TableManagement {
+    +updateTableStatus(tableId, status)
+    +getAvailableTables(date) : List<Table>
+    +assignTableToReservation(reservationId, tableId)
+}
+
+class SalesManagement {
+    +recordTransaction(tableId, orderItems, paymentMethod)
+    +getSalesSummary(startDate, endDate) : SalesSummary
+}
+
+class CustomerFeedbackManagement {
+    +recordFeedback(customerName, visitDate, rating, comments)
+    +getFeedbackSummary(startDate, endDate) : List<Feedback>
+}
+
+' Relationships
+MenuManagement "1" -- "1" SalesBookingsManagement : "uses >\nupdates menu for bookings"
+MenuManagement "1" -- "1" StaffManagement : "uses >\nmenu preparation depends on staff availability"
+StockControl "1" -- "1" MenuManagement : "uses >\nmenu based on stock levels"
+SalesBookingsManagement "1" -- "1" StockControl : "uses >\nupdates stock based on sales"
+StaffManagement "1" -- "1" SalesBookingsManagement : "uses >\nbookings adjusted based on staff schedules"
+WineManagement "1" -- "1" MenuManagement : "uses >\nsuggests pairings for menus"
+
+SalesBookingsManagement -- ReservationManagement : "Data flow from FOH >\nto Admin for bookings"
+SalesManagement -- SalesBookingsManagement : "Sales data flow >\nto Admin for analysis"
+CustomerFeedbackManagement -down-> SalesBookingsManagement : "Feedback influences >\nbooking management"
+
+' Supporting Classes
+class MenuDish {
+    -dishName: String
+    -ingredients: List<String>
+    -price: double
+    -allergens: List<String>
 }
 
 class Booking {
-    + int bookingID
-    + Date bookingDate
-    + int tableNumber
-    + String customerName
+    -tableId: int
+    -customerName: String
+    -bookingDate: Date
+    -status: String
+    -contactInfo: String
+    -specialRequests: String
 }
 
-class Schedule {
-    + int scheduleID
-    + String staffName
-    + Date startDate
-    + Date endDate
-    + String role
+class WineStockInfo {
+    -quantity: int
+    -type: WineType
 }
 
-class Wine {
-    + int wineID
-    + String name
-    + String type
-    + int quantity
+enum WineType {
+    RED
+    WHITE
+    ROSE
+    SPARKLING
 }
 
-class Table {
-    + int tableID
-    + int numOfSeats
-}
-
-class MenuManager {
-    + List<Menu> menus
-    + void createMenu(Menu menu)
-    + void updateMenu(Menu menu)
-    + void archiveMenu(int menuId)
-    + Menu calculateMenuCosts(Menu menu)
-    + void setDishPrice(Dish dish, double price)
-}
-
-class SalesTracker {
-    + List<Sale> sales
-    + void recordSale(Sale sale)
-    + List<Sale> getSalesPerformance(Date startDate, Date endDate)
-}
-
-class BookingManager {
-    + List<Booking> bookings
-    + void addBooking(Booking booking)
-    + void updateBooking(Booking booking)
-    + void cancelBooking(int bookingId)
-    + List<Booking> getBookingsForDate(Date date)
-    + void manageBooking(Booking booking)
-    + void setDailyBookingLimit(Date date, int limit)
-    + int getDailyBookingLimit(Date date)
-    + void adjustBookingLimitForSpecialEvent(Date date, int newLimit)
-    + Map<Date, List<Booking>> generateBookingReport(Date startDate, Date endDate)
-}
-
-class StaffScheduler {
-    + List<Schedule> schedules
-    + void scheduleStaff(Schedule schedule)
-    + void updateSchedule(Schedule schedule)
-    + void recordHoliday(int staffId, Date startDate, Date endDate)
-    + List<Schedule> getStaffSchedules(Date startDate, Date endDate)
-    + void recordAbsences(List<Schedule> absences)
-    + Map<Staff, Double> getStaffPerformance(Staff staff, Date date)
-}
-
-class InventoryManager {
-    + Map<Ingredient, Integer> stockLevels
-    + void updateStockLevels(Map<Ingredient, Integer> stock)
-    + Map<Ingredient, Integer> getLowStockItems()
-    + void recordWaste(Ingredient item, int quantity)
-    + Map<Ingredient, Integer> generateOrder(List<Ingredient> ingredientsNeeded)
-    + void alertForDiscrepancies(Map<Ingredient, Integer> order, Map<Ingredient, Integer> receivedStock)
-    + int getCurrentStock(Ingredient ingredient)
-    + Map<Ingredient, Integer> getFutureStockOrders()
-}
-
-class WineCellarManager {
-    + List<Wine> wines
-    + void updateWineStock(Wine wine)
-    + List<Wine> getWineStockLevels()
-    + Wine getSuggestedWinePairing(Dish dish)
-    + Map<Wine, Integer> reportWineUsage(Wine wine, Date date)
-}
-
-MenuManager "1" -- "*" SalesTracker : "Utilizes"
-MenuManager "1" -- "*" BookingManager : "Informs"
-SalesTracker "1" -- "*" BookingManager : "Correlates Sales & Bookings"
-StaffScheduler "1" -- "*" BookingManager : "Schedules Impact Bookings"
-InventoryManager "1" -- "*" MenuManager : "Supplies Ingredients For"
-WineCellarManager "1" -- "*" MenuManager : "Pairs Wines With Menus"
+MenuManagement -- MenuDish : "determines >"
+SalesBookingsManagement -- Booking : "manages >"
+WineManagement -- WineStockInfo : "tracks >"
+WineManagement -- WineType : "categorizes >"
 
 @enduml
