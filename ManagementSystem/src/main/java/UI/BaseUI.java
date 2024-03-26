@@ -118,7 +118,7 @@ public abstract class BaseUI {
         buttonInfo.put("Dashboard", "graph.png");
         buttonInfo.put("Inventory", "box.png");
         buttonInfo.put("Sales", "money.png");
-        buttonInfo.put("Bookings", "calender.png");
+        buttonInfo.put("Restaurant Capacity", "calender.png");
         buttonInfo.put("Menus", "book.png");
         buttonInfo.put("Staff", "staff.png");
         buttonInfo.put("Wine", "wine.png");
@@ -228,7 +228,7 @@ public abstract class BaseUI {
             case "Dashboard" -> uiSwitcher.switchToDashboard();
             case "Inventory" -> uiSwitcher.switchToInventory();
             case "Sales" -> uiSwitcher.switchToSales();
-            case "Bookings" -> uiSwitcher.switchToBookings();
+            case "Restaurant Capacity" -> uiSwitcher.switchToRestaurantCapacity();
             case "Menus" -> uiSwitcher.switchToMenus();
             case "Staff" -> uiSwitcher.switchToStaff();
             case "Wine" -> uiSwitcher.switchToWine();
