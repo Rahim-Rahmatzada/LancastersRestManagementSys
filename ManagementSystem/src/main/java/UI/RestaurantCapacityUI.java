@@ -5,10 +5,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import java.sql.*;
 import model.DatabaseConnector;
+import java.sql.*;
 
-public class RestaurantCapacityUI extends BaseUI{
+
+public class RestaurantCapacityUI extends BaseUI {
     private GridPane restaurantLayout;
     private TextField maxCapacityField;
     private Label capacityUtilizationLabel;
@@ -50,6 +51,8 @@ public class RestaurantCapacityUI extends BaseUI{
         mainContent.setPadding(new Insets(20));
         mainContent.getChildren().addAll(restaurantLayout, capacityBox);
 
+        // Set the main content of the UI
+        setMainContent(mainContent);
     }
 
     /**
@@ -69,7 +72,6 @@ public class RestaurantCapacityUI extends BaseUI{
                 int tableId = resultSet.getInt("tablesID");
                 int capacity = resultSet.getInt("tablesLayout");
 
-                // Create a button for each table with its ID and capacity
                 Button tableButton = new Button("Table " + tableId + " (" + capacity + ")");
                 tableButton.setPrefSize(120, 60);
                 tableButton.setOnAction(e -> updateTableStatus(tableId));
@@ -98,6 +100,7 @@ public class RestaurantCapacityUI extends BaseUI{
     /**
      * Updates the maximum capacity based on the value entered in the text field.
      */
+
     private void updateCapacity() {
         int maxCapacity = Integer.parseInt(maxCapacityField.getText());
         // Update the maximum capacity in the database or store it in memory
@@ -112,8 +115,10 @@ public class RestaurantCapacityUI extends BaseUI{
         int maxCapacity = getMaxCapacity();
         int tableThreshold = calculateTableThreshold();
 
+        // Calculate the capacity utilization percentage
         double utilization = (double) occupiedTables / maxCapacity * 100;
 
+        // Create the capacity utilization text with percentage and threshold information
         String utilizationText = String.format("Capacity Utilization: %.2f%%", utilization);
         if (occupiedTables >= tableThreshold) {
             utilizationText += " (Threshold Reached)";
@@ -122,10 +127,16 @@ public class RestaurantCapacityUI extends BaseUI{
         capacityUtilizationLabel.setText(utilizationText);
     }
 
+    /**
+     * Retrieves the count of occupied tables from the database.
+     *
+     * @return the count of occupied tables
+     */
+
     private int getOccupiedTablesCount() {
         int occupiedTables = 0;
         try (Connection conn = DatabaseConnector.getConnection()) {
-            String query = "SELECT COUNT(*) FROM Tables WHERE status = 'occupied'"; //Think need to add this to database?
+            String query = "SELECT COUNT(*) FROM Tables WHERE status = 'occupied'"; //need to add to database i think
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
@@ -138,11 +149,10 @@ public class RestaurantCapacityUI extends BaseUI{
     }
 
     private int getMaxCapacity() {
-        // Retrieve the maximum capacity from the database or stored value, will need to add
+        // Retrieve the maximum capacity from the database or stored value
         // For simplicity, let's assume it's stored in the TextField
         return Integer.parseInt(maxCapacityField.getText());
     }
-
 
     /**
      * Calculates the table threshold based on the number of available waiters.
@@ -157,7 +167,7 @@ public class RestaurantCapacityUI extends BaseUI{
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 int numWaiters = resultSet.getInt(1);
-                tableThreshold = numWaiters * 3; // Assuming each waiter can handle 3 tables
+                tableThreshold = numWaiters * 4; // Assuming each waiter can handle 4 tables
             }
         } catch (SQLException e) {
             e.printStackTrace();
