@@ -12,4 +12,12 @@ public interface UISwitcher {
     void switchToMenus();
     void switchToStaff();
     void switchToWine();
+
+
+    void preloadInventoryUI();
+    void preloadSalesUI();
+    void preloadBookingsUI();
+    void preloadMenusUI();
+    void preloadStaffUI();
+    void preloadWineUI();
 }

@@ -24,14 +24,16 @@ public class GraphCreator {
 
         lineChart = new LineChart<>(xAxis, yAxisLineChart);
         lineChart.setCreateSymbols(false);
-        lineChart.setLegendVisible(false);
+        lineChart.setLegendVisible(true);
+
 
         CategoryAxis barXAxis = new CategoryAxis();
         barXAxis.setLabel("Date");
         barXAxis.setTickLabelFill(Color.WHITE);
         barXAxis.setStyle("-fx-text-fill: white;");
         barChart = new BarChart<>(barXAxis, yAxis);
-        barChart.setLegendVisible(false);
+        barChart.setLegendVisible(true);
+
 
         lineChart.setVerticalGridLinesVisible(false);
         barChart.setVerticalGridLinesVisible(false);

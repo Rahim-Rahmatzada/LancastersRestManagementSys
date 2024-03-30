@@ -13,6 +13,23 @@ public class DashboardUI extends BaseUI {
         VBox dashboardMainContent = new VBox();
         // Add components to dashboardMainContent as needed.
         setMainContent(dashboardMainContent);
+
+        preloadUIClasses();
+
+    }
+
+    private void preloadUIClasses() {
+        Thread preloadThread = new Thread(() -> {
+            // Preload other UI classes
+            uiSwitcher.preloadInventoryUI();
+            uiSwitcher.preloadSalesUI();
+            uiSwitcher.preloadBookingsUI();
+            uiSwitcher.preloadMenusUI();
+            uiSwitcher.preloadStaffUI();
+            uiSwitcher.preloadWineUI();
+        });
+        preloadThread.setDaemon(true); // Set the thread as a daemon thread
+        preloadThread.start();
     }
 
 }

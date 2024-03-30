@@ -98,12 +98,12 @@ public class SalesUI extends BaseUI {
 
         if (startDate != null && endDate != null) {
             if (startDate.isAfter(endDate)) {
-                System.out.println("Start date cannot be after end date.");
+                showAlert("Invalid Dates", "Start date cannot be after end date.");
                 return;
             }
 
             if (!dishCheckBox.isSelected() && !wineCheckBox.isSelected() && !totalCheckBox.isSelected()) {
-                System.out.println("Please select at least one option: Dish, Wine, or Total.");
+                showAlert("No Variable Selected", "Please select at least one option: Dish, Wine, or Total.");
                 return;
             }
 
@@ -124,7 +124,7 @@ public class SalesUI extends BaseUI {
                     updateTotalSalesGraph(startDate, endDate, conn);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                showAlert("Database Error", "An error occurred while accessing the database.");
             }
         }
     }
@@ -264,5 +264,13 @@ public class SalesUI extends BaseUI {
         box.getChildren().addAll(titleText, itemText);
 
         return box;
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

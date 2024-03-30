@@ -146,4 +146,48 @@ public class MainUI extends Application implements UISwitcher {
         primaryStage.setTitle(title);
     }
 
+
+
+    @Override
+    public void preloadInventoryUI() {
+        if (inventoryUI == null) {
+            inventoryUI = new InventoryUI(this);
+        }
+    }
+
+    @Override
+    public void preloadSalesUI() {
+        if (salesUI == null) {
+            salesUI = new SalesUI(this);
+        }
+    }
+
+    @Override
+    public void preloadBookingsUI() {
+        if (bookingsUI == null) {
+            bookingsUI = new BookingsUI(this);
+        }
+    }
+
+    @Override
+    public void preloadMenusUI() {
+        if (menusUI == null) {
+            menusUI = new MenusUI(this);
+        }
+    }
+
+    @Override
+    public void preloadStaffUI() {
+        if (staffUI == null) {
+            staffUI = new StaffUI(this);
+        }
+    }
+
+    @Override
+    public void preloadWineUI() {
+        if (wineUI == null) {
+            wineUI = new WineUI(this);
+        }
+    }
+
 }

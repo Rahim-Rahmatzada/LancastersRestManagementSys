@@ -3,21 +3,30 @@ package UI;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
+import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 import model.DatabaseConnector;
 import model.Ingredient;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 public class InventoryUI extends BaseUI {
 
     private int threshold = 100;
+    private Text topIngredientsText;
+    private Text mostExpensiveIngredientsText;
+    private Text highestQuantityIngredientsText;
 
     private TableView<Ingredient> ingredientTableView; // Store a reference to the TableView
 
@@ -37,10 +46,27 @@ public class InventoryUI extends BaseUI {
         // Create a TableView to display ingredient data
         ingredientTableView = createIngredientTableView(); // Store the reference to the TableView
 
-        // Add the TableView to the main content
-        inventoryMainContent.getChildren().addAll(ingredientTableView, createThresholdControls());
+
+
+        VBox topIngredientsBox = createTopIngredientsBox();
+        VBox mostExpensiveIngredientsBox = createMostExpensiveIngredientsBox();
+        VBox highestQuantityIngredientsBox = createHighestQuantityIngredientsBox();
+
+        HBox insightsBox = new HBox();
+        insightsBox.setSpacing(50);
+        insightsBox.setAlignment(Pos.CENTER);
+        insightsBox.getChildren().addAll(topIngredientsBox, mostExpensiveIngredientsBox, highestQuantityIngredientsBox);
+
+        HBox controlsBox = createControlsBox();
+
+        inventoryMainContent.getChildren().addAll(ingredientTableView, controlsBox, insightsBox);
 
         setMainContent(inventoryMainContent);
+
+        // Populate top ingredients
+        showTopIngredients();
+        showMostExpensiveIngredients();
+        showHighestQuantityIngredients();
     }
 
     private TableView<Ingredient> createIngredientTableView() {
@@ -52,17 +78,30 @@ public class InventoryUI extends BaseUI {
         // Create table columns
         TableColumn<Ingredient, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameColumn.setPrefWidth(50); // Set the preferred width of the name column
-
+        nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        nameColumn.setOnEditCommit(event -> {
+            Ingredient ingredient = event.getRowValue();
+            String newValue = event.getNewValue();
+            updateIngredientValue(ingredient, "ingredientName", newValue);
+        });
 
         TableColumn<Ingredient, Double> costColumn = new TableColumn<>("Cost");
         costColumn.setCellValueFactory(new PropertyValueFactory<>("cost"));
-        costColumn.setPrefWidth(20); // Set the preferred width of the cost column
-
+        costColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        costColumn.setOnEditCommit(event -> {
+            Ingredient ingredient = event.getRowValue();
+            double newValue = event.getNewValue();
+            updateIngredientValue(ingredient, "ingredientCost", newValue);
+        });
 
         TableColumn<Ingredient, Integer> quantityColumn = new TableColumn<>("Quantity");
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        quantityColumn.setPrefWidth(20); // Set the preferred width of the quantity column
+        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        quantityColumn.setOnEditCommit(event -> {
+            Ingredient ingredient = event.getRowValue();
+            int newValue = event.getNewValue();
+            updateIngredientValue(ingredient, "ingredientQuantity", newValue);
+        });
 
 
         // Set the style for table columns
@@ -121,6 +160,8 @@ public class InventoryUI extends BaseUI {
             });
 
 
+
+
             return row;
         });
 
@@ -130,7 +171,155 @@ public class InventoryUI extends BaseUI {
         // Remove the empty column
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+        // Enable cell selection and editing
+        tableView.getSelectionModel().cellSelectionEnabledProperty().set(true);
+        tableView.setEditable(true);
+
         return tableView;
+    }
+
+    private HBox createDeleteIngredientControls() {
+        HBox deleteIngredientBox = new HBox();
+        deleteIngredientBox.setSpacing(10);
+
+        TextField ingredientNameField = new TextField();
+        ingredientNameField.setPromptText("Enter Ingredient Name");
+
+        Button deleteIngredientButton = new Button("Delete Ingredient");
+        deleteIngredientButton.setOnAction(event -> {
+            String ingredientName = ingredientNameField.getText().trim();
+            if (!ingredientName.isEmpty()) {
+                deleteIngredient(ingredientName);
+                ingredientNameField.clear();
+            } else {
+                showAlert("Invalid Ingredient", "Please enter a valid ingredient name.");
+            }
+        });
+
+        deleteIngredientBox.getChildren().addAll(ingredientNameField, deleteIngredientButton);
+
+        return deleteIngredientBox;
+    }
+
+    private void deleteIngredient(String ingredientName) {
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM Ingredient WHERE ingredientName = ?")) {
+
+            stmt.setString(1, ingredientName);
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                // Refresh the table view
+                reloadIngredientTableView();
+            } else {
+                showAlert("Ingredient Not Found", "No ingredient named: " + ingredientName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to delete ingredient.");
+        }
+    }
+
+    private HBox createControlsBox() {
+        HBox controlsBox = new HBox();
+        controlsBox.setSpacing(20);
+        controlsBox.setAlignment(Pos.CENTER_LEFT);
+
+        controlsBox.getChildren().addAll(
+                createThresholdControls(),
+                createAddIngredientControls(),
+                createDeleteIngredientControls()
+        );
+
+        return controlsBox;
+    }
+
+    private HBox createAddIngredientControls() {
+        HBox addIngredientBox = new HBox();
+        addIngredientBox.setSpacing(10);
+
+        TextField ingredientNameField = new TextField();
+        ingredientNameField.setPromptText("Enter Ingredient Name");
+
+        Button addIngredientButton = new Button("Add Ingredient");
+        addIngredientButton.setOnAction(event -> {
+            String ingredientName = ingredientNameField.getText().trim();
+            if (!ingredientName.isEmpty()) {
+                addNewIngredient(ingredientName);
+                ingredientNameField.clear();
+            } else {
+                showAlert("Invalid Ingredient", "Please enter a valid ingredient name.");
+            }
+        });
+
+        addIngredientBox.getChildren().addAll(ingredientNameField, addIngredientButton);
+
+        return addIngredientBox;
+    }
+
+    private void addNewIngredient(String ingredientName) {
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO Ingredient (ingredientID, ingredientName, ingredientCost, ingredientQuantity) " +
+                             "VALUES (?, ?, ?, ?)")) {
+
+            int newIngredientID = getMaxIngredientID() + 1;
+
+            stmt.setInt(1, newIngredientID);
+            stmt.setString(2, ingredientName);
+            stmt.setDouble(3, 0.0); // Set initial cost to 0
+            stmt.setInt(4, 0); // Set initial quantity to 0
+
+            stmt.executeUpdate();
+
+            // Refresh the table view
+            reloadIngredientTableView();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to add new ingredient.");
+        }
+    }
+
+    private int getMaxIngredientID() {
+        int maxID = 0;
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT MAX(ingredientID) FROM Ingredient")) {
+
+            if (rs.next()) {
+                maxID = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return maxID;
+    }
+
+    private void updateIngredientValue(Ingredient ingredient, String column, Object newValue) {
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE Ingredient SET " + column + " = ? WHERE ingredientID = ?")) {
+
+            if (newValue instanceof String) {
+                stmt.setString(1, (String) newValue);
+            } else if (newValue instanceof Double) {
+                stmt.setDouble(1, (Double) newValue);
+            } else if (newValue instanceof Integer) {
+                stmt.setInt(1, (Integer) newValue);
+            }
+
+            stmt.setInt(2, ingredient.getIngredientID());
+            stmt.executeUpdate();
+
+            // Refresh the table view
+            reloadIngredientTableView();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to update ingredient value.");
+        } catch (Exception e) {
+            showAlert("Error", "Invalid value entered.");
+        }
     }
 
     private ObservableList<Ingredient> getIngredientDataFromDatabase() {
@@ -165,22 +354,27 @@ public class InventoryUI extends BaseUI {
         thresholdField.setPromptText("Enter Threshold");
         thresholdField.setText(String.valueOf(threshold));
 
-        Button setThresholdButton = new Button("Set Threshold");
+        Button setThresholdButton = new Button("Set Low Stock Threshold");
         setThresholdButton.setOnAction(event -> {
             try {
                 threshold = Integer.parseInt(thresholdField.getText());
                 reloadIngredientTableView();
             } catch (NumberFormatException e) {
-                System.out.println("Invalid threshold value.");
+                showAlert("Invalid Threshold", "Please enter a valid threshold value.");
             }
         });
 
-        Button showTopIngredientsButton = new Button("Show Top Ingredients");
-        showTopIngredientsButton.setOnAction(event -> showTopIngredients());
-
-        thresholdBox.getChildren().addAll(thresholdField, setThresholdButton, showTopIngredientsButton);
+        thresholdBox.getChildren().addAll(thresholdField, setThresholdButton);
 
         return thresholdBox;
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void reloadIngredientTableView() {
@@ -197,27 +391,147 @@ public class InventoryUI extends BaseUI {
                 "JOIN Ingredient I ON DI.ingredientID = I.ingredientID " +
                 "GROUP BY I.ingredientID " +
                 "ORDER BY totalUsage DESC " +
-                "LIMIT 5;";
+                "LIMIT 3;";
 
+        StringBuilder topIngredients = new StringBuilder();
         try (Connection conn = DatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
-            VBox topIngredientsBox = new VBox();
             while (rs.next()) {
                 String ingredientName = rs.getString("ingredientName");
                 int totalUsage = rs.getInt("totalUsage");
-                Label label = new Label(ingredientName + ": " + totalUsage);
-                topIngredientsBox.getChildren().add(label);
+                topIngredients.append(ingredientName).append(": ").append(totalUsage).append("\n");
             }
 
-            // Display the top ingredients below the grid
-            VBox mainContent = (VBox) getMainContent();
-            mainContent.getChildren().add(topIngredientsBox);
+            // Display the top ingredients in the Text
+            topIngredientsText.setText(topIngredients.toString());
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showMostExpensiveIngredients() {
+        String query = "SELECT ingredientName, ingredientCost " +
+                "FROM Ingredient " +
+                "ORDER BY ingredientCost DESC " +
+                "LIMIT 3;";
+
+        StringBuilder mostExpensiveIngredients = new StringBuilder();
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String ingredientName = rs.getString("ingredientName");
+                double cost = rs.getDouble("ingredientCost");
+                mostExpensiveIngredients.append(ingredientName).append(": £").append(cost).append("\n");
+            }
+
+            mostExpensiveIngredientsText.setText(mostExpensiveIngredients.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showHighestQuantityIngredients() {
+        String query = "SELECT ingredientName, ingredientQuantity " +
+                "FROM Ingredient " +
+                "ORDER BY ingredientQuantity DESC " +
+                "LIMIT 3;";
+
+        StringBuilder highestQuantityIngredients = new StringBuilder();
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String ingredientName = rs.getString("ingredientName");
+                int quantity = rs.getInt("ingredientQuantity");
+                highestQuantityIngredients.append(ingredientName).append(": ").append(quantity).append("\n");
+            }
+
+            highestQuantityIngredientsText.setText(highestQuantityIngredients.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private VBox createMostExpensiveIngredientsBox() {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
+        box.setPadding(new Insets(10));
+        box.setSpacing(5);
+        box.setAlignment(Pos.CENTER);
+
+        Text titleText = new Text("Most Expensive Ingredients");
+        titleText.setFont(Font.font(16));
+        titleText.setFill(Color.BLACK);
+
+        mostExpensiveIngredientsText = new Text();
+        mostExpensiveIngredientsText.setFont(Font.font(12));
+        mostExpensiveIngredientsText.setFill(Color.BLACK);
+        mostExpensiveIngredientsText.setTextAlignment(TextAlignment.CENTER);
+
+        box.getChildren().addAll(titleText, mostExpensiveIngredientsText);
+
+        box.setMinWidth(250);
+        box.setMaxWidth(250);
+
+        return box;
+    }
+
+    private VBox createHighestQuantityIngredientsBox() {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
+        box.setPadding(new Insets(10));
+        box.setSpacing(5);
+        box.setAlignment(Pos.CENTER);
+
+        Text titleText = new Text("Highest Quantity Ingredients");
+        titleText.setFont(Font.font(16));
+        titleText.setFill(Color.BLACK);
+
+        highestQuantityIngredientsText = new Text();
+        highestQuantityIngredientsText.setFont(Font.font(12));
+        highestQuantityIngredientsText.setFill(Color.BLACK);
+        highestQuantityIngredientsText.setTextAlignment(TextAlignment.CENTER);
+
+        box.getChildren().addAll(titleText, highestQuantityIngredientsText);
+
+        box.setMinWidth(250);
+        box.setMaxWidth(250);
+
+        return box;
+    }
+
+    private VBox createTopIngredientsBox() {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
+        box.setPadding(new Insets(10));
+        box.setSpacing(5);
+        box.setAlignment(Pos.CENTER);
+
+        Text titleText = new Text("Most Used Ingredients");
+        titleText.setFont(Font.font(16));
+        titleText.setFill(Color.BLACK);
+
+        topIngredientsText = new Text();
+        topIngredientsText.setFont(Font.font(12));
+        topIngredientsText.setFill(Color.BLACK);
+        topIngredientsText.setTextAlignment(TextAlignment.CENTER);
+
+        box.getChildren().addAll(titleText, topIngredientsText);
+
+        // Set the position and size of the top ingredients box
+
+        box.setMinWidth(250);
+        box.setMaxWidth(250);
+
+        return box;
     }
 
 
