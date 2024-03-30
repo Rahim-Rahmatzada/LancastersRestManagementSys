@@ -1,5 +1,6 @@
 package UI;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -29,6 +30,11 @@ public class StaffUI extends BaseUI {
     private CheckBox scheduleCheckBox;
     private CheckBox absencesCheckBox;
     private CheckBox holidaysCheckBox;
+    private TextField nameField;
+    private DatePicker dateField;
+    private TextField startTimeField;
+    private TextField endTimeField;
+
 
     public StaffUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
@@ -52,6 +58,16 @@ public class StaffUI extends BaseUI {
         // Create a button to generate the schedule
         Button generateScheduleButton = new Button("Generate Schedule");
         generateScheduleButton.setOnAction(event -> generateSchedule());
+
+        // Initialize input fields
+        nameField = new TextField();
+        dateField = new DatePicker();
+        startTimeField = new TextField();
+        endTimeField = new TextField();
+
+        // Create a button to Add/Modify Shifts
+        Button addButton = new Button("Add/Modify Shift");
+        addButton.setOnAction(event -> addOrModifyShift());
 
         // Create the schedule table
         scheduleTable = new TableView<>();
@@ -89,10 +105,66 @@ public class StaffUI extends BaseUI {
                 generateScheduleButton,
                 scheduleTable
         );
+        staffSchedulingMainContent.getChildren().addAll(
+                new Text("Name:"),
+                nameField,
+                new Text("Date:"),
+                dateField,
+                new Text("Start Time:"),
+                startTimeField,
+                new Text("End Time:"),
+                endTimeField,
+                addButton
+        );
 
         setMainContent(staffSchedulingMainContent);
     }
 
+    private void addOrModifyShift() {
+        String name = nameField.getText();
+        LocalDate date = dateField.getValue();
+        LocalTime startTime = LocalTime.parse(startTimeField.getText());
+        LocalTime endTime = LocalTime.parse(endTimeField.getText());
+
+        // Validate input
+        if (name.isEmpty() || date == null || startTime == null || endTime == null || startTime.isAfter(endTime)) {
+            // Show error message if input is invalid
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText(null);
+            alert.setContentText("Please enter valid data.");
+            alert.showAndWait();
+            return;
+        }
+
+        // Check if the employee already has a shift on the selected date
+        boolean existingEntry = false;
+        for (ScheduleEntry entry : scheduleTable.getItems()) {
+            if (entry.getDate().equals(date) && entry.getEmployeeName().equals(name)) {
+                // Update existing entry
+                entry.setStartTime(startTime);
+                entry.setEndTime(endTime);
+                entry.setDuration(calculateDuration(startTime, endTime));
+                existingEntry = true;
+                break;
+            }
+        }
+
+        if (!existingEntry) {
+            // Create a new ScheduleEntry with the input data
+            ScheduleEntry entry = new ScheduleEntry(date, startTime, endTime, calculateDuration(startTime, endTime), name);
+
+            // Add the entry to the schedule table
+            scheduleTable.getItems().add(entry);
+        }
+    }
+
+    // Helper method to calculate duration
+    private String calculateDuration(LocalTime startTime, LocalTime endTime) {
+        long durationHours = startTime.until(endTime, ChronoUnit.HOURS);
+        long durationMinutes = startTime.until(endTime, ChronoUnit.MINUTES) % 60;
+        return durationHours + " hours " + durationMinutes + " minutes";
+    }
     private void generateSchedule() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -157,16 +229,16 @@ public class StaffUI extends BaseUI {
 
     private static class ScheduleEntry {
         private final LocalDate date;
-        private final LocalTime startTime;
-        private final LocalTime endTime;
-        private final String duration;
         private final SimpleStringProperty employeeName;
+        private final SimpleObjectProperty<LocalTime> startTime;
+        private final SimpleObjectProperty<LocalTime> endTime;
+        private final SimpleStringProperty duration;
 
         public ScheduleEntry(LocalDate date, LocalTime startTime, LocalTime endTime, String duration, String employeeName) {
             this.date = date;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.duration = duration;
+            this.startTime = new SimpleObjectProperty<>(startTime);
+            this.endTime = new SimpleObjectProperty<>(endTime);
+            this.duration = new SimpleStringProperty(duration);
             this.employeeName = new SimpleStringProperty(employeeName);
         }
 
@@ -175,31 +247,52 @@ public class StaffUI extends BaseUI {
         }
 
         public LocalTime getStartTime() {
-            return startTime;
+            return startTime.get();
+        }
+
+        public void setStartTime(LocalTime startTime) {
+            this.startTime.set(startTime);
         }
 
         public LocalTime getEndTime() {
-            return endTime;
+            return endTime.get();
+        }
+
+        public void setEndTime(LocalTime endTime) {
+            this.endTime.set(endTime);
         }
 
         public String getDuration() {
-            return duration;
+            return duration.get();
         }
+
+        public void setDuration(String duration) {
+            this.duration.set(duration);
+        }
+
+        public String getEmployeeName() {
+            return employeeName.get();
+        }
+
+        public void setEmployeeName(String employeeName) {
+            this.employeeName.set(employeeName);
+        }
+
         // Property methods for TableView
         public javafx.beans.property.ObjectProperty<LocalDate> dateProperty() {
             return new javafx.beans.property.SimpleObjectProperty<>(date);
         }
 
         public javafx.beans.property.ObjectProperty<LocalTime> startTimeProperty() {
-            return new javafx.beans.property.SimpleObjectProperty<>(startTime);
+            return startTime;
         }
 
         public javafx.beans.property.ObjectProperty<LocalTime> endTimeProperty() {
-            return new javafx.beans.property.SimpleObjectProperty<>(endTime);
+            return endTime;
         }
 
         public javafx.beans.property.SimpleStringProperty durationProperty() {
-            return new javafx.beans.property.SimpleStringProperty(duration);
+            return duration;
         }
 
         public SimpleStringProperty employeeNameProperty() {
