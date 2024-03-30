@@ -17,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.sql.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -34,6 +35,8 @@ public class StaffUI extends BaseUI {
     private DatePicker dateField;
     private TextField startTimeField;
     private TextField endTimeField;
+    private ComboBox<String> statusComboBox;
+
 
 
     public StaffUI(UISwitcher uiSwitcher) {
@@ -45,6 +48,9 @@ public class StaffUI extends BaseUI {
         VBox staffSchedulingMainContent = new VBox();
         staffSchedulingMainContent.setPadding(new Insets(10));
         staffSchedulingMainContent.setSpacing(10);
+
+        statusComboBox = new ComboBox<>();
+        statusComboBox.getItems().addAll("ON", "OFF", "HOLIDAY", "ABSENT");
 
         // Create date pickers for start and end dates
         startDatePicker = new DatePicker();
@@ -90,6 +96,10 @@ public class StaffUI extends BaseUI {
         employeeColumn.setCellValueFactory(cellData -> cellData.getValue().employeeNameProperty());
         employeeColumn.setCellFactory(column -> new ComboBoxTableCell<>(FXCollections.observableArrayList("Alice", "Bob", "Charlie", "David")));
 
+        TableColumn<ScheduleEntry, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        scheduleTable.getColumns().add(statusColumn);
+
         scheduleTable.getColumns().addAll(dateColumn, startColumn, endColumn, durationColumn, employeeColumn);
 
         // Add components to the main content VBox
@@ -108,6 +118,8 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.getChildren().addAll(
                 new Text("Name:"),
                 nameField,
+                new Text("Status:"),
+                statusComboBox,
                 new Text("Date:"),
                 dateField,
                 new Text("Start Time:"),
@@ -125,9 +137,10 @@ public class StaffUI extends BaseUI {
         LocalDate date = dateField.getValue();
         LocalTime startTime = LocalTime.parse(startTimeField.getText());
         LocalTime endTime = LocalTime.parse(endTimeField.getText());
+        String status = statusComboBox.getValue();
 
         // Validate input
-        if (name.isEmpty() || date == null || startTime == null || endTime == null || startTime.isAfter(endTime)) {
+        if (name.isEmpty() || date == null || startTime == null || endTime == null || startTime.isAfter(endTime) || status == null) {
             // Show error message if input is invalid
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Invalid Input");
@@ -145,6 +158,7 @@ public class StaffUI extends BaseUI {
                 entry.setStartTime(startTime);
                 entry.setEndTime(endTime);
                 entry.setDuration(calculateDuration(startTime, endTime));
+                entry.setStatus(status); // Set status
                 existingEntry = true;
                 break;
             }
@@ -152,7 +166,7 @@ public class StaffUI extends BaseUI {
 
         if (!existingEntry) {
             // Create a new ScheduleEntry with the input data
-            ScheduleEntry entry = new ScheduleEntry(date, startTime, endTime, calculateDuration(startTime, endTime), name);
+            ScheduleEntry entry = new ScheduleEntry(date, startTime, endTime, calculateDuration(startTime, endTime), name, status); // Add status
 
             // Add the entry to the schedule table
             scheduleTable.getItems().add(entry);
@@ -210,8 +224,10 @@ public class StaffUI extends BaseUI {
                 long durationMinutes = startTime.until(endTime, ChronoUnit.MINUTES) % 60;
                 String duration = durationHours + " hours " + durationMinutes + " minutes";
 
+                String status = "ON"; // Default status
+
                 // Add entry to data list
-                data.add(new ScheduleEntry(date, startTime, endTime, duration, employee));
+                data.add(new ScheduleEntry(date, startTime, endTime, duration, employee,status));
             }
             date = date.plusDays(1);
         }
@@ -233,13 +249,16 @@ public class StaffUI extends BaseUI {
         private final SimpleObjectProperty<LocalTime> startTime;
         private final SimpleObjectProperty<LocalTime> endTime;
         private final SimpleStringProperty duration;
+        private final SimpleStringProperty status;
+        private ComboBox<String> statusComboBox;
 
-        public ScheduleEntry(LocalDate date, LocalTime startTime, LocalTime endTime, String duration, String employeeName) {
+        public ScheduleEntry(LocalDate date, LocalTime startTime, LocalTime endTime, String duration, String employeeName, String status) {
             this.date = date;
             this.startTime = new SimpleObjectProperty<>(startTime);
             this.endTime = new SimpleObjectProperty<>(endTime);
             this.duration = new SimpleStringProperty(duration);
             this.employeeName = new SimpleStringProperty(employeeName);
+            this.status = new SimpleStringProperty(status);
         }
 
         public LocalDate getDate() {
@@ -269,6 +288,13 @@ public class StaffUI extends BaseUI {
         public void setDuration(String duration) {
             this.duration.set(duration);
         }
+        public String getStatus() {
+            return status.get();
+        }
+
+        public void setStatus(String status) {
+            this.status.set(status);
+        }
 
         public String getEmployeeName() {
             return employeeName.get();
@@ -276,6 +302,9 @@ public class StaffUI extends BaseUI {
 
         public void setEmployeeName(String employeeName) {
             this.employeeName.set(employeeName);
+        }
+        public SimpleStringProperty statusProperty() {
+            return status;
         }
 
         // Property methods for TableView
