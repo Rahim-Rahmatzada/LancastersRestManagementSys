@@ -202,3 +202,6 @@ public class RestaurantCapacityUI extends BaseUI {
         return tableThreshold;
     }
 }
+
+//    when user clicks on a table it should show what dishes+wines the table is having butttt i looked
+//    at database don't think that's possible unless u make some changes so ignore this for now
