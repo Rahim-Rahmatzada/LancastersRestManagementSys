@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class StaffUI extends BaseUI {
@@ -161,11 +162,47 @@ public class StaffUI extends BaseUI {
             return;
         }
 
-        // Check if the employee already has a shift on the selected date
+        // Update or insert the shift into the database
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            // Check if the employee already has a shift on the selected date
+            String query = "SELECT * FROM StaffSchedule WHERE scheduleDate = ? AND employeeName = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setDate(1, Date.valueOf(date));
+            pstmt.setString(2, name);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Update existing entry
+                String updateQuery = "UPDATE StaffSchedule SET startTime = ?, endTime = ?, status = ? WHERE scheduleDate = ? AND employeeName = ?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+                updateStmt.setTime(1, Time.valueOf(startTime));
+                updateStmt.setTime(2, Time.valueOf(endTime));
+                updateStmt.setString(3, status);
+                updateStmt.setDate(4, Date.valueOf(date));
+                updateStmt.setString(5, name);
+                updateStmt.executeUpdate();
+            } else {
+                // Insert new entry
+                String insertQuery = "INSERT INTO StaffSchedule (startTime, endTime, scheduleDate, employeeName, status) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+                insertStmt.setTime(1, Time.valueOf(startTime));
+                insertStmt.setTime(2, Time.valueOf(endTime));
+                insertStmt.setDate(3, Date.valueOf(date));
+                insertStmt.setString(4, name);
+                insertStmt.setString(5, status);
+                insertStmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error accessing database: " + e.getMessage());
+            // Handle the error appropriately (e.g., show an alert to the user)
+            return;
+        }
+
+        // Update the UI
         boolean existingEntry = false;
         for (ScheduleEntry entry : scheduleTable.getItems()) {
             if (entry.getDate().equals(date) && entry.getEmployeeName().equals(name)) {
-                // Update existing entry
+                // Update existing entry in UI
                 entry.setStartTime(startTime);
                 entry.setEndTime(endTime);
                 entry.setDuration(calculateDuration(startTime, endTime));
@@ -223,123 +260,95 @@ public class StaffUI extends BaseUI {
     }
 
     private void generateScheduleData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
-        // Generate schedule data (dummy data for demonstration)
-        LocalDate date = startDate;
-        while (!date.isAfter(endDate)) {
-            for (String employee : new String[]{"Alice", "Bob", "Charlie", "David"}) {
-                LocalTime startTime = LocalTime.of(9, 0); // Example start time
-                LocalTime endTime = LocalTime.of(17, 0); // Example end time
+        // Connect to the SQLite database
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String query = "SELECT staffName, startTime, endTime, scheduleDate FROM StaffInfo INNER JOIN StaffSchedule ON StaffInfo.staffScheduleID = StaffSchedule.scheduleID";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery();
 
-                // Calculate duration
-                long durationHours = startTime.until(endTime, ChronoUnit.HOURS);
-                long durationMinutes = startTime.until(endTime, ChronoUnit.MINUTES) % 60;
-                String duration = durationHours + " hours " + durationMinutes + " minutes";
+            // Loop through the result set and populate the schedule data
+            while (rs.next()) {
+                String employee = rs.getString("staffName");
+                LocalTime startTime = LocalTime.parse(rs.getString("startTime"));
+                LocalTime endTime = LocalTime.parse(rs.getString("endTime"));
+                LocalDate scheduleDate = LocalDate.parse(rs.getString("scheduleDate"));
 
-                String status = "ON"; // Default status
+                // Check if the schedule date is within the specified range
+                if (!scheduleDate.isBefore(startDate) && !scheduleDate.isAfter(endDate)) {
+                    // Calculate duration
+                    long durationHours = startTime.until(endTime, ChronoUnit.HOURS);
+                    long durationMinutes = startTime.until(endTime, ChronoUnit.MINUTES) % 60;
+                    String duration = durationHours + " hours " + durationMinutes + " minutes";
 
-                // Add entry to data list
-                data.add(new ScheduleEntry(date, startTime, endTime, duration, employee,status));
+                    String status = "ON"; // Default status
+
+                    // Add entry to data list
+                    data.add(new ScheduleEntry(scheduleDate, startTime, endTime, duration, employee, status));
+                }
             }
-            date = date.plusDays(1);
+        } catch (SQLException e) {
+            System.out.println("Error accessing database: " + e.getMessage());
         }
     }
 
     private void generateAbsencesData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
-        // Generate absences data (dummy data for demonstration)
-        // For simplicity, let's assume there are no absences in this period
+        // Connect to the SQLite database
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String query = "SELECT StaffInfo.staffName, StaffHoliday.startDate, StaffHoliday.endDate FROM StaffHoliday " +
+                    "INNER JOIN StaffHoliday_StaffInfo ON StaffHoliday.holidayID = StaffHoliday_StaffInfo.holidayID " +
+                    "INNER JOIN StaffInfo ON StaffHoliday_StaffInfo.staffID = StaffInfo.staffID " +
+                    "WHERE (StaffHoliday.startDate BETWEEN ? AND ?) OR (StaffHoliday.endDate BETWEEN ? AND ?)";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, startDate.toString());
+            pstmt.setString(2, endDate.toString());
+            pstmt.setString(3, startDate.toString());
+            pstmt.setString(4, endDate.toString());
+            ResultSet rs = pstmt.executeQuery();
+
+            // Loop through the result set and populate the absences data
+            while (rs.next()) {
+                String employee = rs.getString("staffName");
+                LocalDate absenceStartDate = LocalDate.parse(rs.getString("startDate"));
+                LocalDate absenceEndDate = LocalDate.parse(rs.getString("endDate"));
+
+                // Check if the absence period intersects with the specified date range
+                LocalDate rangeStart = startDate.isAfter(absenceStartDate) ? startDate : absenceStartDate;
+                LocalDate rangeEnd = endDate.isBefore(absenceEndDate) ? endDate : absenceEndDate;
+
+                // Generate entries for each day of absence within the date range
+                LocalDate date = rangeStart;
+                while (!date.isAfter(rangeEnd)) {
+                    // Add entry to data list
+                    data.add(new ScheduleEntry(date, null, null, "Absent", employee, "OFF"));
+                    date = date.plusDays(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error accessing database: " + e.getMessage());
+        }
     }
 
     private void generateHolidaysData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
-        // Generate holidays data (dummy data for demonstration)
-        // For simplicity, let's assume there are no holidays in this period
-    }
+        // Connect to the SQLite database
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String query = "SELECT * FROM StaffHoliday WHERE startDate BETWEEN ? AND ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, startDate.toString());
+            pstmt.setString(2, endDate.toString());
+            ResultSet rs = pstmt.executeQuery();
 
+            // Loop through the result set and populate the holidays data
+            while (rs.next()) {
+                LocalDate holidayDate = LocalDate.parse(rs.getString("startDate"));
 
-    private static class ScheduleEntry {
-        private final LocalDate date;
-        private final SimpleStringProperty employeeName;
-        private final SimpleObjectProperty<LocalTime> startTime;
-        private final SimpleObjectProperty<LocalTime> endTime;
-        private final SimpleStringProperty duration;
-        private final SimpleStringProperty status;
-        private ComboBox<String> statusComboBox;
-
-        public ScheduleEntry(LocalDate date, LocalTime startTime, LocalTime endTime, String duration, String employeeName, String status) {
-            this.date = date;
-            this.startTime = new SimpleObjectProperty<>(startTime);
-            this.endTime = new SimpleObjectProperty<>(endTime);
-            this.duration = new SimpleStringProperty(duration);
-            this.employeeName = new SimpleStringProperty(employeeName);
-            this.status = new SimpleStringProperty(status);
-        }
-
-        public LocalDate getDate() {
-            return date;
-        }
-
-        public LocalTime getStartTime() {
-            return startTime.get();
-        }
-
-        public void setStartTime(LocalTime startTime) {
-            this.startTime.set(startTime);
-        }
-
-        public LocalTime getEndTime() {
-            return endTime.get();
-        }
-
-        public void setEndTime(LocalTime endTime) {
-            this.endTime.set(endTime);
-        }
-
-        public String getDuration() {
-            return duration.get();
-        }
-
-        public void setDuration(String duration) {
-            this.duration.set(duration);
-        }
-        public String getStatus() {
-            return status.get();
-        }
-
-        public void setStatus(String status) {
-            this.status.set(status);
-        }
-
-        public String getEmployeeName() {
-            return employeeName.get();
-        }
-
-        public void setEmployeeName(String employeeName) {
-            this.employeeName.set(employeeName);
-        }
-        public SimpleStringProperty statusProperty() {
-            return status;
-        }
-
-        // Property methods for TableView
-        public javafx.beans.property.ObjectProperty<LocalDate> dateProperty() {
-            return new javafx.beans.property.SimpleObjectProperty<>(date);
-        }
-
-        public javafx.beans.property.ObjectProperty<LocalTime> startTimeProperty() {
-            return startTime;
-        }
-
-        public javafx.beans.property.ObjectProperty<LocalTime> endTimeProperty() {
-            return endTime;
-        }
-
-        public javafx.beans.property.SimpleStringProperty durationProperty() {
-            return duration;
-        }
-
-        public SimpleStringProperty employeeNameProperty() {
-            return employeeName;
+                // Add entry to data list
+                data.add(new ScheduleEntry(holidayDate, null, null, "Holiday", "N/A", "OFF"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error accessing database: " + e.getMessage());
         }
     }
+
     private Button createDeleteScheduleButton() {
         Button deleteScheduleButton = new Button("Delete Schedule");
         deleteScheduleButton.setOnAction(event -> {
@@ -360,51 +369,37 @@ public class StaffUI extends BaseUI {
         return deleteScheduleButton;
     }
 
-
-    public class StaffPerformanceEntry {
-        private final LocalDate date;
-        private final SimpleStringProperty employeeName;
-        private final SimpleStringProperty performanceRating;
-
-        public StaffPerformanceEntry(LocalDate date, String employeeName, String performanceRating) {
-            this.date = date;
-            this.employeeName = new SimpleStringProperty(employeeName);
-            this.performanceRating = new SimpleStringProperty(performanceRating);
+    private void deleteSchedule(LocalDate date, String name) {
+        // Delete the schedule from the database
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String deleteQuery = "DELETE FROM StaffSchedule WHERE scheduleDate = ? AND employeeName = ?";
+            PreparedStatement pstmt = conn.prepareStatement(deleteQuery);
+            pstmt.setDate(1, Date.valueOf(date));
+            pstmt.setString(2, name);
+            int rowsDeleted = pstmt.executeUpdate();
+            if (rowsDeleted > 0) {
+                // Schedule deleted successfully from the database
+                System.out.println("Schedule deleted successfully.");
+            } else {
+                // No schedule found for the specified date and employee
+                System.out.println("No schedule found for the specified date and employee.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error deleting schedule from the database: " + e.getMessage());
+            // Handle the error appropriately (e.g., show an alert to the user)
         }
 
-        public LocalDate getDate() {
-            return date;
-        }
-
-        public String getEmployeeName() {
-            return employeeName.get();
-        }
-
-        public void setEmployeeName(String employeeName) {
-            this.employeeName.set(employeeName);
-        }
-
-        public String getPerformanceRating() {
-            return performanceRating.get();
-        }
-
-        public void setPerformanceRating(String performanceRating) {
-            this.performanceRating.set(performanceRating);
-        }
-
-        // Property methods for TableView
-        public javafx.beans.property.ObjectProperty<LocalDate> dateProperty() {
-            return new javafx.beans.property.SimpleObjectProperty<>(date);
-        }
-
-        public SimpleStringProperty employeeNameProperty() {
-            return employeeName;
-        }
-
-        public SimpleStringProperty performanceRatingProperty() {
-            return performanceRating;
+        // Remove the schedule from the UI
+        Iterator<ScheduleEntry> iterator = scheduleTable.getItems().iterator();
+        while (iterator.hasNext()) {
+            ScheduleEntry entry = iterator.next();
+            if (entry.getDate().equals(date) && entry.getEmployeeName().equals(name)) {
+                iterator.remove();
+                break;
+            }
         }
     }
+
     // Define method to switch to staff performance view
     private void switchToStaffPerformanceView() {
         // Clear existing content
@@ -420,7 +415,7 @@ public class StaffUI extends BaseUI {
         TableColumn<StaffPerformanceEntry, String> employeeColumn = new TableColumn<>("Employee Name");
         employeeColumn.setCellValueFactory(cellData -> cellData.getValue().employeeNameProperty());
 
-        TableColumn<StaffPerformanceEntry, String> performanceColumn = new TableColumn<>("Performance Rating");
+        TableColumn<StaffPerformanceEntry, String> performanceColumn = new TableColumn<>("Tables assisted");
         performanceColumn.setCellValueFactory(cellData -> cellData.getValue().performanceRatingProperty());
 
         staffPerformanceTable.getColumns().addAll(dateColumn, employeeColumn, performanceColumn);
@@ -445,19 +440,24 @@ public class StaffUI extends BaseUI {
             }
         });
         // Button to add or modify performance
-        Button addModifyPerformanceButton = new Button("Add/Modify Performance");
-        addModifyPerformanceButton.setOnAction(event -> {
+        Button modifyPerformanceButton = new Button("Modify Performance");
+        modifyPerformanceButton.setOnAction(event -> {
             LocalDate selectedDate = selectDatePicker.getValue();
             String selectedName = selectEmployeeName.getText();
-            if (selectedDate != null) {
-                // Call method to add or modify performance
-                addOrModifyPerformance(selectedDate, selectedName);
+            String newPerformanceRating = null; // Retrieve the new performance rating from your UI component, e.g., textField.getText();
+
+            if (selectedDate != null && !selectedName.isEmpty() && !newPerformanceRating.isEmpty()) {
+                StaffPerformanceEntry performanceEntry = new StaffPerformanceEntry(selectedDate, selectedName, newPerformanceRating);
+                // Call method to update performance in the database
+                updatePerformance(performanceEntry);
+                // Refresh performance data in the UI
+                fetchPerformanceData(selectedDate, selectedName, staffPerformanceTable);
             } else {
-                // Show error message if date is not selected
+                // Show error message if any required field is empty
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
-                alert.setContentText("Please select a date.");
+                alert.setContentText("Please fill in all the fields.");
                 alert.showAndWait();
             }
         });
@@ -484,7 +484,7 @@ public class StaffUI extends BaseUI {
                 selectDatePicker,
                 selectEmployeeName,
                 showPerformanceButton,
-                addModifyPerformanceButton,
+                modifyPerformanceButton,
                 deletePerformanceButton,
                 staffPerformanceTable
         );
@@ -523,11 +523,10 @@ public class StaffUI extends BaseUI {
                 createDeleteScheduleButton()
         );
     }
-    private void fetchPerformanceData(LocalDate selectedDate, String selectedName, TableView<StaffPerformanceEntry> performanceTable) {
-        // Fetch performance data based on selected date and employee name
-        // You need to implement the logic to retrieve the performance data from your database or any other data source
-        // Here, I'm assuming you have a method to retrieve performance data based on date and employee name
-        List<StaffPerformanceEntry> performanceData = getPerformanceData(selectedDate, selectedName);
+    // Method to fetch performance data based on selected date and employee name
+    public void fetchPerformanceData(LocalDate selectedDate, String selectedName, TableView<StaffPerformanceEntry> performanceTable) {
+        // Fetch performance data from the database
+        List<StaffPerformanceEntry> performanceData = getPerformanceDataFromDB(selectedDate, selectedName);
 
         // Clear existing data in the table
         performanceTable.getItems().clear();
@@ -536,45 +535,90 @@ public class StaffUI extends BaseUI {
         performanceTable.getItems().addAll(performanceData);
     }
 
-    // Method to retrieve performance data based on date and employee name
-    private List<StaffPerformanceEntry> getPerformanceData(LocalDate selectedDate, String selectedName) {
-        // Implement your logic to fetch performance data from the database or any other data source
-        // This is just a placeholder method; you need to replace it with your actual implementation
-        // Here, I'm assuming you have a method to fetch performance data from the database
-        // You can use JDBC or any ORM framework to interact with the database
-
-        // If no employee name is provided, fetch performance data for all employees who worked on the selected date
-        if (selectedName == null || selectedName.isEmpty()) {
-            // Implement your logic to fetch performance data for all employees who worked on the selected date
-            // Populate performanceData with the fetched data
-        } else {
-            // Implement your logic to fetch performance data for the specified employee who worked on the selected date
-            // Populate performanceData with the fetched data
-        }
-
+    // Method to retrieve performance data from the database
+    private List<StaffPerformanceEntry> getPerformanceDataFromDB(LocalDate selectedDate, String selectedName) {
         List<StaffPerformanceEntry> performanceData = new ArrayList<>();
-        // Populate performanceData with the fetched data
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String query;
+            if (selectedName == null || selectedName.isEmpty()) {
+                // If no employee name is provided, fetch performance data for all employees who worked on the selected date
+                query = "SELECT * FROM StaffPerformance WHERE performanceDate = ?";
+            } else {
+                // Fetch performance data for the specified employee who worked on the selected date
+                query = "SELECT * FROM StaffPerformance WHERE performanceDate = ? AND employeeName = ?";
+            }
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, selectedDate.toString());
+            if (selectedName != null && !selectedName.isEmpty()) {
+                pstmt.setString(2, selectedName);
+            }
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                LocalDate date = LocalDate.parse(rs.getString("performanceDate"));
+                String employeeName = rs.getString("employeeName");
+                String performanceRating = rs.getString("performanceRating");
+                StaffPerformanceEntry entry = new StaffPerformanceEntry(date, employeeName, performanceRating);
+                performanceData.add(entry);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions (e.g., show an alert to the user)
+        }
         return performanceData;
     }
-    // Method to add or modify performance
-    private void addOrModifyPerformance(LocalDate selectedDate, String selectedName) {
-        // Implement the logic to add or modify performance for the specified date and employee
-        // This method will open a new window or dialog to input or modify performance details
-        // You need to implement this method based on your application's requirements
-        // For example, you can create a dialog box where the user can input or modify performance details
-        // Once the details are entered or modified, update the performance entry in the database or data source
+
+    // Method to update performance entry in the database
+    public void updatePerformance(StaffPerformanceEntry performanceEntry) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String query = "UPDATE StaffPerformance SET performanceRating = ? WHERE performanceDate = ? AND employeeName = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, performanceEntry.getPerformanceRating());
+            pstmt.setString(2, performanceEntry.getDate().toString());
+            pstmt.setString(3, performanceEntry.getEmployeeName());
+            int rowsUpdated = pstmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                // Performance entry updated successfully in the database
+                System.out.println("Performance entry updated successfully.");
+            } else {
+                // No performance entry found for the specified date and employee
+                System.out.println("No performance entry found for the specified date and employee.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions (e.g., show an alert to the user)
+        }
     }
-    // Method to delete schedule for the specified date and employee
-    private void deleteSchedule(LocalDate selectedDate, String selectedName) {
-        // Implement the logic to delete schedule entry for the specified date and employee
-        // This method will remove the schedule entry from the database or data source
-        // Once the entry is deleted, refresh the schedule table to reflect the changes
-    }
+
     // Method to delete performance entry for the specified date and employee
-    private void deletePerformance(LocalDate selectedDate, String selectedName) {
+    public void deletePerformance(LocalDate selectedDate, String selectedName) {
         // Implement the logic to delete performance entry for the specified date and employee
-        // This method will remove the performance entry from the database or data source
-        // Once the entry is deleted, refresh the performance table to reflect the changes
+        // This method will remove the performance entry from the database
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+            String query;
+            if (selectedName == null || selectedName.isEmpty()) {
+                // If no employee name is provided, delete all performance entries for the selected date
+                query = "DELETE FROM StaffPerformance WHERE performanceDate = ?";
+            } else {
+                // Delete performance entry for the specified date and employee
+                query = "DELETE FROM StaffPerformance WHERE performanceDate = ? AND employeeName = ?";
+            }
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, selectedDate.toString());
+            if (selectedName != null && !selectedName.isEmpty()) {
+                pstmt.setString(2, selectedName);
+            }
+            int rowsDeleted = pstmt.executeUpdate();
+            if (rowsDeleted > 0) {
+                // Performance entry deleted successfully from the database
+                System.out.println("Performance entry deleted successfully.");
+            } else {
+                // No performance entry found for the specified date and employee
+                System.out.println("No performance entry found for the specified date and employee.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions (e.g., show an alert to the user)
+        }
     }
 }
 
