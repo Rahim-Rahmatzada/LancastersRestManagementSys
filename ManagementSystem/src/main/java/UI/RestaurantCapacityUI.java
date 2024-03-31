@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import model.DatabaseConnector;
 import java.sql.*;
 import java.time.LocalDate;
@@ -15,6 +16,11 @@ public class RestaurantCapacityUI extends BaseUI {
     private Label totalTablesLabel;
     private Label availableTablesLabel;
 
+    /**
+     * Constructs a new RestaurantCapacityUI instance.
+     *
+     * @param uiSwitcher the UISwitcher instance for navigating between UI screens
+     */
     public RestaurantCapacityUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         setTopText("Restaurant Capacity Management");
@@ -24,7 +30,6 @@ public class RestaurantCapacityUI extends BaseUI {
     /**
      * Initializes the user interface components and layout.
      */
-
     private void initializeUI() {
         tableLayout = new GridPane();
         tableLayout.setHgap(10);
@@ -32,13 +37,21 @@ public class RestaurantCapacityUI extends BaseUI {
         tableLayout.setPadding(new Insets(10));
 
         totalTablesLabel = new Label();
+        totalTablesLabel.setTextFill(Color.WHITE); // Set the text color to white
         availableTablesLabel = new Label();
+        availableTablesLabel.setTextFill(Color.WHITE); // Set the text color to white
 
         VBox capacityBox = new VBox(10);
         capacityBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label totalTablesTitle = new Label("Total Tables:");
+        totalTablesTitle.setTextFill(Color.WHITE); // Set the text color to white
+        Label availableTablesTitle = new Label("Available Tables:");
+        availableTablesTitle.setTextFill(Color.WHITE); // Set the text color to white
+
         capacityBox.getChildren().addAll(
-                new Label("Total Tables:"), totalTablesLabel,
-                new Label("Available Tables:"), availableTablesLabel
+                totalTablesTitle, totalTablesLabel,
+                availableTablesTitle, availableTablesLabel
         );
 
         createTableLayout();
@@ -54,7 +67,6 @@ public class RestaurantCapacityUI extends BaseUI {
      * Creates the table layout by retrieving table information from the database
      * and displaying table buttons in a grid layout.
      */
-
     private void createTableLayout() {
         try (Connection conn = DatabaseConnector.getConnection()) {
             String query = "SELECT tablesID, tablesLayout FROM Tables";
@@ -70,13 +82,19 @@ public class RestaurantCapacityUI extends BaseUI {
                 int tableId = resultSet.getInt("tablesID");
                 int capacity = resultSet.getInt("tablesLayout");
 
-                Button tableButton = new Button("Table " + tableId + " (" + capacity + ")");
-                tableButton.setPrefSize(120, 60);
+                Button tableButton = ButtonCreator.createButton(
+                        "Table " + tableId + " (" + capacity + ")",
+                        14, // Font size
+                        "#FFFFFF", // Text color (black)
+                        e -> {} // Empty click action
 
+                );
+                tableButton.setPrefSize(120, 60);
+                tableButton.setStyle("-fx-background-color: white;"); // Set button background to white
 
                 int tableThreshold = calculateTableThreshold();
                 if (availableTables >= tableThreshold) {
-                    tableButton.setDisable(true);
+                    tableButton.setDisable(true); // Disable the table button if the threshold is reached
                 } else {
                     availableTables++;
                 }
@@ -105,7 +123,6 @@ public class RestaurantCapacityUI extends BaseUI {
      *
      * @return the table threshold
      */
-
     private int calculateTableThreshold() {
         int tableThreshold = 0;
         try (Connection conn = DatabaseConnector.getConnection()) {
@@ -119,7 +136,7 @@ public class RestaurantCapacityUI extends BaseUI {
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 int numWaiters = resultSet.getInt(1);
-                tableThreshold = numWaiters * 3; // Assuming each waiter can handle 4 tables
+                tableThreshold = numWaiters * 4; // Assuming each waiter can handle 4 tables
             }
         } catch (SQLException e) {
             e.printStackTrace();
