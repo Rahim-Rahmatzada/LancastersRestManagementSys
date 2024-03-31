@@ -19,6 +19,7 @@ public class MainUI extends Application implements UISwitcher {
     private MenusUI menusUI;
     private StaffUI staffUI;
     private WineUI wineUI;
+    private StockOrdersUI stockOrdersUI;
 
     /**
      * Launches the application.
@@ -125,6 +126,15 @@ public class MainUI extends Application implements UISwitcher {
         wineUI.highlightButton("Wine");
     }
 
+    @Override
+    public void switchToStockOrders() {
+        if (stockOrdersUI == null) {
+            stockOrdersUI = new StockOrdersUI(this);
+        }
+        switchScene(stockOrdersUI, "Stock Orders UI");
+        stockOrdersUI.highlightButton("Stock Orders");
+    }
+
     /**
      * Helper method to switch the scene on the primary stage.
      *
@@ -187,6 +197,13 @@ public class MainUI extends Application implements UISwitcher {
     public void preloadWineUI() {
         if (wineUI == null) {
             wineUI = new WineUI(this);
+        }
+    }
+
+    @Override
+    public void preloadStockOrdersUI() {
+        if (stockOrdersUI == null) {
+            stockOrdersUI = new StockOrdersUI(this);
         }
     }
 

@@ -1,6 +1,20 @@
 package UI;
 
-public class OrdersUI {
+import javafx.scene.layout.VBox;
+
+public class StockOrdersUI extends BaseUI {
+
+    
+    public StockOrdersUI(UISwitcher uiSwitcher) {
+        super(uiSwitcher);
+        highlightButton("Stock Orders");
+        setTopText("Stock Orders Overview");
+
+        // Set the main content for the WineUI.
+        VBox ordersMainContent = new VBox();
+        // Add components to wineMainContent as needed.
+        setMainContent(ordersMainContent);
+    }
 }
 
 //    Include a section or a separate tab to store and manage supplier information.
