@@ -36,6 +36,11 @@ public class StaffUI extends BaseUI {
     private TextField startTimeField;
     private TextField endTimeField;
     private ComboBox<String> statusComboBox;
+    private Button staffPerformanceButton;
+    private Button staffScheduleButton;
+    private VBox staffSchedulingMainContent = new VBox();
+    private Button generateScheduleButton;
+    private Button addButton;
 
 
 
@@ -45,12 +50,16 @@ public class StaffUI extends BaseUI {
         setTopText("Staff Overview");
 
         // Set the main content for the StaffSchedulingUI.
-        VBox staffSchedulingMainContent = new VBox();
         staffSchedulingMainContent.setPadding(new Insets(10));
         staffSchedulingMainContent.setSpacing(10);
 
         statusComboBox = new ComboBox<>();
         statusComboBox.getItems().addAll("ON", "OFF", "HOLIDAY", "ABSENT");
+
+        staffPerformanceButton = new Button("Staff Performance");
+        staffScheduleButton = new Button("Staff Schedule");
+        staffPerformanceButton.setOnAction(event -> switchToStaffPerformanceView());
+        staffScheduleButton.setOnAction(event -> switchToSchedulingView());
 
         // Create date pickers for start and end dates
         startDatePicker = new DatePicker();
@@ -62,7 +71,7 @@ public class StaffUI extends BaseUI {
         holidaysCheckBox = new CheckBox("Holidays");
 
         // Create a button to generate the schedule
-        Button generateScheduleButton = new Button("Generate Schedule");
+        generateScheduleButton = new Button("Generate Schedule");
         generateScheduleButton.setOnAction(event -> generateSchedule());
 
         // Initialize input fields
@@ -72,7 +81,7 @@ public class StaffUI extends BaseUI {
         endTimeField = new TextField();
 
         // Create a button to Add/Modify Shifts
-        Button addButton = new Button("Add/Modify Shift");
+        addButton = new Button("Add/Modify Shift");
         addButton.setOnAction(event -> addOrModifyShift());
 
         // Create the schedule table
@@ -104,6 +113,7 @@ public class StaffUI extends BaseUI {
 
         // Add components to the main content VBox
         staffSchedulingMainContent.getChildren().addAll(
+                staffPerformanceButton,
                 new Text("Start Date:"),
                 startDatePicker,
                 new Text("End Date:"),
@@ -126,7 +136,8 @@ public class StaffUI extends BaseUI {
                 startTimeField,
                 new Text("End Time:"),
                 endTimeField,
-                addButton
+                addButton,
+                createDeleteScheduleButton()
         );
 
         setMainContent(staffSchedulingMainContent);
@@ -243,6 +254,7 @@ public class StaffUI extends BaseUI {
         // For simplicity, let's assume there are no holidays in this period
     }
 
+
     private static class ScheduleEntry {
         private final LocalDate date;
         private final SimpleStringProperty employeeName;
@@ -327,6 +339,242 @@ public class StaffUI extends BaseUI {
         public SimpleStringProperty employeeNameProperty() {
             return employeeName;
         }
+    }
+    private Button createDeleteScheduleButton() {
+        Button deleteScheduleButton = new Button("Delete Schedule");
+        deleteScheduleButton.setOnAction(event -> {
+            LocalDate selectedDate = dateField.getValue();
+            String selectedName = nameField.getText();
+            if (selectedDate != null && !selectedName.isEmpty()) {
+                // Call method to delete schedule for the specified date and employee
+                deleteSchedule(selectedDate, selectedName);
+            } else {
+                // Show error message if date or name is not selected
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select both a date and an employee name.");
+                alert.showAndWait();
+            }
+        });
+        return deleteScheduleButton;
+    }
+
+
+    public class StaffPerformanceEntry {
+        private final LocalDate date;
+        private final SimpleStringProperty employeeName;
+        private final SimpleStringProperty performanceRating;
+
+        public StaffPerformanceEntry(LocalDate date, String employeeName, String performanceRating) {
+            this.date = date;
+            this.employeeName = new SimpleStringProperty(employeeName);
+            this.performanceRating = new SimpleStringProperty(performanceRating);
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        public String getEmployeeName() {
+            return employeeName.get();
+        }
+
+        public void setEmployeeName(String employeeName) {
+            this.employeeName.set(employeeName);
+        }
+
+        public String getPerformanceRating() {
+            return performanceRating.get();
+        }
+
+        public void setPerformanceRating(String performanceRating) {
+            this.performanceRating.set(performanceRating);
+        }
+
+        // Property methods for TableView
+        public javafx.beans.property.ObjectProperty<LocalDate> dateProperty() {
+            return new javafx.beans.property.SimpleObjectProperty<>(date);
+        }
+
+        public SimpleStringProperty employeeNameProperty() {
+            return employeeName;
+        }
+
+        public SimpleStringProperty performanceRatingProperty() {
+            return performanceRating;
+        }
+    }
+    // Define method to switch to staff performance view
+    private void switchToStaffPerformanceView() {
+        // Clear existing content
+        staffSchedulingMainContent.getChildren().clear();
+
+        // Create table for staff performance
+        TableView<StaffPerformanceEntry> staffPerformanceTable = new TableView<>();
+        staffPerformanceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<StaffPerformanceEntry, LocalDate> dateColumn = new TableColumn<>("Date");
+        dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
+
+        TableColumn<StaffPerformanceEntry, String> employeeColumn = new TableColumn<>("Employee Name");
+        employeeColumn.setCellValueFactory(cellData -> cellData.getValue().employeeNameProperty());
+
+        TableColumn<StaffPerformanceEntry, String> performanceColumn = new TableColumn<>("Performance Rating");
+        performanceColumn.setCellValueFactory(cellData -> cellData.getValue().performanceRatingProperty());
+
+        staffPerformanceTable.getColumns().addAll(dateColumn, employeeColumn, performanceColumn);
+
+        // Create buttons to select date and employee name
+        DatePicker selectDatePicker = new DatePicker();
+        TextField selectEmployeeName = new TextField();
+        Button showPerformanceButton = new Button("Show Performance");
+        showPerformanceButton.setOnAction(event -> {
+            LocalDate selectedDate = selectDatePicker.getValue();
+            String selectedName = selectEmployeeName.getText();
+            if (selectedDate != null && !selectedName.isEmpty()) {
+                // Call method to fetch performance data based on selected date and employee name
+                fetchPerformanceData(selectedDate, selectedName, staffPerformanceTable);
+            } else {
+                // Show error message if date or name is not selected
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select both date and employee name.");
+                alert.showAndWait();
+            }
+        });
+        // Button to add or modify performance
+        Button addModifyPerformanceButton = new Button("Add/Modify Performance");
+        addModifyPerformanceButton.setOnAction(event -> {
+            LocalDate selectedDate = selectDatePicker.getValue();
+            String selectedName = selectEmployeeName.getText();
+            if (selectedDate != null) {
+                // Call method to add or modify performance
+                addOrModifyPerformance(selectedDate, selectedName);
+            } else {
+                // Show error message if date is not selected
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select a date.");
+                alert.showAndWait();
+            }
+        });
+
+        // Button to delete performance entry
+        Button deletePerformanceButton = new Button("Delete Performance");
+        deletePerformanceButton.setOnAction(event -> {
+            LocalDate selectedDate = selectDatePicker.getValue();
+            String selectedName = selectEmployeeName.getText();
+            if (selectedDate != null && !selectedName.isEmpty()) {
+                // Call method to delete performance entry for the specified date and employee
+                deletePerformance(selectedDate, selectedName);
+            } else {
+                // Show error message if date or name is not selected
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select both a date and an employee name.");
+                alert.showAndWait();
+            }
+        });
+        staffSchedulingMainContent.getChildren().addAll(
+                staffScheduleButton,
+                selectDatePicker,
+                selectEmployeeName,
+                showPerformanceButton,
+                addModifyPerformanceButton,
+                deletePerformanceButton,
+                staffPerformanceTable
+        );
+    }
+    // Define method to switch back to scheduling view
+    private void switchToSchedulingView() {
+        // Clear existing content
+        staffSchedulingMainContent.getChildren().clear();
+
+        // Re-add scheduling components
+        staffSchedulingMainContent.getChildren().addAll(
+                staffPerformanceButton,
+                new Text("Start Date:"),
+                startDatePicker,
+                new Text("End Date:"),
+                endDatePicker,
+                new Text("Select Data Types:"),
+                scheduleCheckBox,
+                absencesCheckBox,
+                holidaysCheckBox,
+                generateScheduleButton,
+                scheduleTable
+        );
+        staffSchedulingMainContent.getChildren().addAll(
+                new Text("Name:"),
+                nameField,
+                new Text("Status:"),
+                statusComboBox,
+                new Text("Date:"),
+                dateField,
+                new Text("Start Time:"),
+                startTimeField,
+                new Text("End Time:"),
+                endTimeField,
+                addButton,
+                createDeleteScheduleButton()
+        );
+    }
+    private void fetchPerformanceData(LocalDate selectedDate, String selectedName, TableView<StaffPerformanceEntry> performanceTable) {
+        // Fetch performance data based on selected date and employee name
+        // You need to implement the logic to retrieve the performance data from your database or any other data source
+        // Here, I'm assuming you have a method to retrieve performance data based on date and employee name
+        List<StaffPerformanceEntry> performanceData = getPerformanceData(selectedDate, selectedName);
+
+        // Clear existing data in the table
+        performanceTable.getItems().clear();
+
+        // Add fetched data to the table
+        performanceTable.getItems().addAll(performanceData);
+    }
+
+    // Method to retrieve performance data based on date and employee name
+    private List<StaffPerformanceEntry> getPerformanceData(LocalDate selectedDate, String selectedName) {
+        // Implement your logic to fetch performance data from the database or any other data source
+        // This is just a placeholder method; you need to replace it with your actual implementation
+        // Here, I'm assuming you have a method to fetch performance data from the database
+        // You can use JDBC or any ORM framework to interact with the database
+
+        // If no employee name is provided, fetch performance data for all employees who worked on the selected date
+        if (selectedName == null || selectedName.isEmpty()) {
+            // Implement your logic to fetch performance data for all employees who worked on the selected date
+            // Populate performanceData with the fetched data
+        } else {
+            // Implement your logic to fetch performance data for the specified employee who worked on the selected date
+            // Populate performanceData with the fetched data
+        }
+
+        List<StaffPerformanceEntry> performanceData = new ArrayList<>();
+        // Populate performanceData with the fetched data
+        return performanceData;
+    }
+    // Method to add or modify performance
+    private void addOrModifyPerformance(LocalDate selectedDate, String selectedName) {
+        // Implement the logic to add or modify performance for the specified date and employee
+        // This method will open a new window or dialog to input or modify performance details
+        // You need to implement this method based on your application's requirements
+        // For example, you can create a dialog box where the user can input or modify performance details
+        // Once the details are entered or modified, update the performance entry in the database or data source
+    }
+    // Method to delete schedule for the specified date and employee
+    private void deleteSchedule(LocalDate selectedDate, String selectedName) {
+        // Implement the logic to delete schedule entry for the specified date and employee
+        // This method will remove the schedule entry from the database or data source
+        // Once the entry is deleted, refresh the schedule table to reflect the changes
+    }
+    // Method to delete performance entry for the specified date and employee
+    private void deletePerformance(LocalDate selectedDate, String selectedName) {
+        // Implement the logic to delete performance entry for the specified date and employee
+        // This method will remove the performance entry from the database or data source
+        // Once the entry is deleted, refresh the performance table to reflect the changes
     }
 }
 
