@@ -260,34 +260,37 @@ public class StaffUI extends BaseUI {
     }
 
     private void generateScheduleData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
-        // Connect to the SQLite database
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        // Connect to the database using DatabaseConnector
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String query = "SELECT staffName, startTime, endTime, scheduleDate FROM StaffInfo INNER JOIN StaffSchedule ON StaffInfo.staffScheduleID = StaffSchedule.scheduleID";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            ResultSet rs = pstmt.executeQuery();
+            try (PreparedStatement pstmt = conn.prepareStatement(query);
+                 ResultSet rs = pstmt.executeQuery()) {
 
-            // Loop through the result set and populate the schedule data
-            while (rs.next()) {
-                String employee = rs.getString("staffName");
-                LocalTime startTime = LocalTime.parse(rs.getString("startTime"));
-                LocalTime endTime = LocalTime.parse(rs.getString("endTime"));
-                LocalDate scheduleDate = LocalDate.parse(rs.getString("scheduleDate"));
+                // Loop through the result set and populate the schedule data
+                while (rs.next()) {
+                    String employee = rs.getString("staffName");
+                    LocalTime startTime = LocalTime.parse(rs.getString("startTime"));
+                    LocalTime endTime = LocalTime.parse(rs.getString("endTime"));
+                    LocalDate scheduleDate = LocalDate.parse(rs.getString("scheduleDate"));
 
-                // Check if the schedule date is within the specified range
-                if (!scheduleDate.isBefore(startDate) && !scheduleDate.isAfter(endDate)) {
-                    // Calculate duration
-                    long durationHours = startTime.until(endTime, ChronoUnit.HOURS);
-                    long durationMinutes = startTime.until(endTime, ChronoUnit.MINUTES) % 60;
-                    String duration = durationHours + " hours " + durationMinutes + " minutes";
+                    // Check if the schedule date is within the specified range
+                    if (!scheduleDate.isBefore(startDate) && !scheduleDate.isAfter(endDate)) {
+                        // Calculate duration
+                        long durationHours = startTime.until(endTime, ChronoUnit.HOURS);
+                        long durationMinutes = startTime.until(endTime, ChronoUnit.MINUTES) % 60;
+                        String duration = durationHours + " hours " + durationMinutes + " minutes";
 
-                    String status = "ON"; // Default status
+                        String status = "ON"; // Default status
 
-                    // Add entry to data list
-                    data.add(new ScheduleEntry(scheduleDate, startTime, endTime, duration, employee, status));
+                        // Add entry to data list
+                        data.add(new ScheduleEntry(scheduleDate, startTime, endTime, duration, employee, status));
+                    }
                 }
+            } catch (SQLException e) {
+                System.out.println("Error executing query: " + e.getMessage());
             }
         } catch (SQLException e) {
-            System.out.println("Error accessing database: " + e.getMessage());
+            System.out.println("Error connecting to database: " + e.getMessage());
         }
     }
 
