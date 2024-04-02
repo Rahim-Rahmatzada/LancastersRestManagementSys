@@ -173,9 +173,9 @@ public class MainUI extends Application implements UISwitcher {
     }
 
     @Override
-    public void preloadBookingsUI() {
-        if (bookingsUI == null) {
-            bookingsUI = new BookingsUI(this);
+    public void preloadRestaurantCapacityUI() {
+        if (restaurantCapacityUI == null) {
+            restaurantCapacityUI = new RestaurantCapacityUI(this);
         }
     }
 

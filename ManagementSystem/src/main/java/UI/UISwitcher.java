@@ -17,7 +17,7 @@ public interface UISwitcher {
 
     void preloadInventoryUI();
     void preloadSalesUI();
-    void preloadBookingsUI();
+    void preloadRestaurantCapacityUI();
     void preloadMenusUI();
     void preloadStaffUI();
     void preloadWineUI();
