@@ -43,7 +43,7 @@ public class StaffUI extends BaseUI {
     private Button generateScheduleButton;
     private Button addButton;
 
-
+//addding smth
 
     public StaffUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
