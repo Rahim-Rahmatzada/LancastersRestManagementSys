@@ -34,7 +34,7 @@ public class InventoryUI extends BaseUI {
     public InventoryUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Inventory");
-        setTopText("Inventory Overviewwwwwwww");
+        setTopText("Inventory Overview");
 
 
 

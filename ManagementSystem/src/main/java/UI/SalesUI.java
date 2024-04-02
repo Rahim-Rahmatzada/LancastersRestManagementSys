@@ -42,7 +42,10 @@ public class SalesUI extends BaseUI {
 
         // Create date pickers for start and end dates
         startDatePicker = new DatePicker();
+        startDatePicker.setPromptText("Starting Date");
+
         endDatePicker = new DatePicker();
+        endDatePicker.setPromptText("Ending date");
 
         // Create check boxes for selecting dish, wine, or total
         dishCheckBox = new CheckBox("Dish");

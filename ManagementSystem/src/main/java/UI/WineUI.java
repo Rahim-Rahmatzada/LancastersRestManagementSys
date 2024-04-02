@@ -7,7 +7,7 @@ public class WineUI extends BaseUI {
     public WineUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Wine");
-        setTopText("Wine Overview");
+        setTopText("Wine Overvieeew");
 
         // Set the main content for the WineUI.
         VBox wineMainContent = new VBox();
