@@ -54,6 +54,10 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.setPadding(new Insets(10));
         staffSchedulingMainContent.setSpacing(10);
 
+        nameField.setPromptText("Enter Employee Name");
+        startTimeField.setPromptText("Enter Starting Time HH:MM");
+        endTimeField.setPromptText("Enter Ending Time HH:MM");
+
         statusComboBox = new ComboBox<>();
         statusComboBox.getItems().addAll("ON", "OFF", "HOLIDAY", "ABSENT");
 
@@ -115,11 +119,11 @@ public class StaffUI extends BaseUI {
         // Add components to the main content VBox
         staffSchedulingMainContent.getChildren().addAll(
                 staffPerformanceButton,
-                new Text(<span style="color: white;">"Start Date:"</span>),
+                new Text("Start Date:"),
                 startDatePicker,
-                new Text(<span style="color: white;">"End Date:"</span>),
+                new Text("End Date:"),
                 endDatePicker,
-                new Text(<span style="color: white;">"Select Data Types:"</span>)),
+                new Text("Select Data Types:"),
                 scheduleCheckBox,
                 absencesCheckBox,
                 holidaysCheckBox,
@@ -127,19 +131,16 @@ public class StaffUI extends BaseUI {
                 scheduleTable
         );
         staffSchedulingMainContent.getChildren().addAll(
-                new Text(<span style="color: white;">"Name:"</span>),
+                new Text("Name:"),
                 nameField,
-                nameField.setPromptText("Enter Employee Name");
-                new Text(<span style="color: white;">"Status:"</span>),
+                new Text("Status:"),
                 statusComboBox,
-                new Text(<span style="color: white;">"Date:"</span>),
+                new Text("Date:"),
                 dateField,
-                new Text(<span style="color: white;">"Start Time:"</span>),
+                new Text("Start Time:"),
                 startTimeField,
-                        startTimeField.setPromptText("Enter Starting Time HH:MM");
-                new Text(<span style="color: white;">"End Time:"</span>),
+                new Text("End Time:"),
                 endTimeField,
-                        endTimeField.setPromptText("Enter Ending Time HH:MM");
                 addButton,
                 createDeleteScheduleButton()
         );
@@ -429,6 +430,7 @@ public class StaffUI extends BaseUI {
         // Create buttons to select date and employee name
         DatePicker selectDatePicker = new DatePicker();
         TextField selectEmployeeName = new TextField();
+        selectEmployeeName.setPromptText("Enter Employee Name");
         Button showPerformanceButton = new Button("Show Performance");
         showPerformanceButton.setOnAction(event -> {
             LocalDate selectedDate = selectDatePicker.getValue();
@@ -488,9 +490,8 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.getChildren().addAll(
                 staffScheduleButton,
                 selectDatePicker,
-                new Text(<span style="color: white;">"Employee Name"</span>)
+                new Text("Employee Name"),
                 selectEmployeeName,
-                selectEmployeeName.setPromptText("Enter Employee Name");
                 showPerformanceButton,
                 modifyPerformanceButton,
                 deletePerformanceButton,
@@ -505,11 +506,11 @@ public class StaffUI extends BaseUI {
         // Re-add scheduling components
         staffSchedulingMainContent.getChildren().addAll(
                 staffPerformanceButton,
-                new Text(<span style="color: white;">"Start Date:"</span>),
+                new Text("Start Date:"),
                 startDatePicker,
-                new Text(<span style="color: white;">"End Date:"</span>),
+                new Text("End Date:"),
                 endDatePicker,
-                new Text(<span style="color: white;">"Select Data Types:"</span>)),
+                new Text("Select Data Types:"),
                 scheduleCheckBox,
                 absencesCheckBox,
                 holidaysCheckBox,
@@ -517,19 +518,16 @@ public class StaffUI extends BaseUI {
                 scheduleTable
         );
         staffSchedulingMainContent.getChildren().addAll(
-                new Text(<span style="color: white;">"Name:"</span>),
+                new Text("Name:"),
                 nameField,
-                        nameField.setPromptText("Enter Employee Name");
-                new Text(<span style="color: white;">"Status:"</span>),
+                new Text("Status:"),
                 statusComboBox,
-                new Text(<span style="color: white;">"Date:"</span>),
+                new Text("Date:"),
                 dateField,
-                new Text(<span style="color: white;">"Start Time:"</span>),
+                new Text("Start Time:"),
                 startTimeField,
-                        startField.setPromptText("Enter Starting Time HH:MM");
-                new Text(<span style="color: white;">"End Time:"</span>),
+                new Text("End Time:"),
                 endTimeField,
-                        endField.setPromptText("Enter Ending Time HH:MM");
                 addButton,
                 createDeleteScheduleButton()
         );
