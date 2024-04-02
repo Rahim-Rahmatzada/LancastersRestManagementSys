@@ -1,6 +1,19 @@
 package UI;
 
+
+
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.layout.HBox;
+
 import javafx.scene.layout.VBox;
+
+//testing comment to be removed
 
 public class StaffUI extends BaseUI {
 
