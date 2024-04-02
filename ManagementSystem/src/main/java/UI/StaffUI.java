@@ -32,10 +32,10 @@ public class StaffUI extends BaseUI {
     private CheckBox scheduleCheckBox;
     private CheckBox absencesCheckBox;
     private CheckBox holidaysCheckBox;
-    private TextField nameField;
+    private TextField nameField = new TextField();
     private DatePicker dateField;
-    private TextField startTimeField;
-    private TextField endTimeField;
+    private TextField startTimeField= new TextField();
+    private TextField endTimeField= new TextField();
     private ComboBox<String> statusComboBox;
     private Button staffPerformanceButton;
     private Button staffScheduleButton;
@@ -54,10 +54,6 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.setPadding(new Insets(10));
         staffSchedulingMainContent.setSpacing(10);
 
-        nameField.setPromptText("Enter Employee Name");
-        startTimeField.setPromptText("Enter Starting Time HH:MM");
-        endTimeField.setPromptText("Enter Ending Time HH:MM");
-
         statusComboBox = new ComboBox<>();
         statusComboBox.getItems().addAll("ON", "OFF", "HOLIDAY", "ABSENT");
 
@@ -74,6 +70,9 @@ public class StaffUI extends BaseUI {
         scheduleCheckBox = new CheckBox("Schedule");
         absencesCheckBox = new CheckBox("Absences");
         holidaysCheckBox = new CheckBox("Holidays");
+        scheduleCheckBox.setStyle("-fx-text-fill: white;");
+        absencesCheckBox.setStyle("-fx-text-fill: white;");
+        holidaysCheckBox.setStyle("-fx-text-fill: white;");
 
         // Create a button to generate the schedule
         generateScheduleButton = new Button("Generate Schedule");
@@ -144,8 +143,12 @@ public class StaffUI extends BaseUI {
                 addButton,
                 createDeleteScheduleButton()
         );
+        nameField.setPromptText("Enter Employee Name");
+        startTimeField.setPromptText("Enter Starting Time HH:MM");
+        endTimeField.setPromptText("Enter Ending Time HH:MM");
 
         setMainContent(staffSchedulingMainContent);
+        setTextColor(staffSchedulingMainContent);
     }
 
     private void addOrModifyShift() {
@@ -430,7 +433,6 @@ public class StaffUI extends BaseUI {
         // Create buttons to select date and employee name
         DatePicker selectDatePicker = new DatePicker();
         TextField selectEmployeeName = new TextField();
-        selectEmployeeName.setPromptText("Enter Employee Name");
         Button showPerformanceButton = new Button("Show Performance");
         showPerformanceButton.setOnAction(event -> {
             LocalDate selectedDate = selectDatePicker.getValue();
@@ -497,6 +499,8 @@ public class StaffUI extends BaseUI {
                 deletePerformanceButton,
                 staffPerformanceTable
         );
+        selectEmployeeName.setPromptText("Enter Employee Name");
+        setTextColor(staffSchedulingMainContent);
     }
     // Define method to switch back to scheduling view
     private void switchToSchedulingView() {
@@ -627,6 +631,16 @@ public class StaffUI extends BaseUI {
         } catch (SQLException e) {
             e.printStackTrace();
             // Handle exceptions (e.g., show an alert to the user)
+        }
+    }
+    // Method to set white color for all text nodes
+    private void setTextColor(VBox vbox) {
+        for (javafx.scene.Node node : vbox.getChildren()) {
+            if (node instanceof Text) {
+                ((Text) node).setFill(Color.WHITE);
+            } else if (node instanceof VBox) {
+                setTextColor((VBox) node);
+            }
         }
     }
 }
