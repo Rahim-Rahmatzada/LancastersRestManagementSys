@@ -29,8 +29,6 @@ public class StaffUI extends BaseUI {
     private TextField startTimeField= new TextField();
     private TextField endTimeField= new TextField();
     private ComboBox<String> statusComboBox;
-    private Button staffPerformanceButton;
-    private Button staffScheduleButton;
     private VBox staffSchedulingMainContent = new VBox();
     private Button generateScheduleButton;
     private Button addButton;
@@ -48,11 +46,6 @@ public class StaffUI extends BaseUI {
 
         statusComboBox = new ComboBox<>();
         statusComboBox.getItems().addAll("ON", "OFF", "HOLIDAY", "ABSENT");
-
-        staffPerformanceButton = new Button("Staff Performance");
-        staffScheduleButton = new Button("Staff Schedule");
-        staffPerformanceButton.setOnAction(event -> switchToStaffPerformanceView());
-        staffScheduleButton.setOnAction(event -> switchToSchedulingView());
 
         // Create date pickers for start and end dates
         startDatePicker = new DatePicker();
@@ -109,7 +102,6 @@ public class StaffUI extends BaseUI {
 
         // Add components to the main content VBox
         staffSchedulingMainContent.getChildren().addAll(
-                staffPerformanceButton,
                 new Text("Start Date:"),
                 startDatePicker,
                 new Text("End Date:"),
@@ -402,229 +394,6 @@ public class StaffUI extends BaseUI {
         }
     }
 
-    // Define method to switch to staff performance view
-    private void switchToStaffPerformanceView() {
-        // Clear existing content
-        staffSchedulingMainContent.getChildren().clear();
-
-        // Create table for staff performance
-        TableView<StaffPerformanceEntry> staffPerformanceTable = new TableView<>();
-        staffPerformanceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<StaffPerformanceEntry, LocalDate> dateColumn = new TableColumn<>("Date");
-        dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-
-        TableColumn<StaffPerformanceEntry, String> employeeColumn = new TableColumn<>("Employee Name");
-        employeeColumn.setCellValueFactory(cellData -> cellData.getValue().employeeNameProperty());
-
-        TableColumn<StaffPerformanceEntry, String> performanceColumn = new TableColumn<>("Tables assisted");
-        performanceColumn.setCellValueFactory(cellData -> cellData.getValue().performanceRatingProperty());
-
-        staffPerformanceTable.getColumns().addAll(dateColumn, employeeColumn, performanceColumn);
-
-        // Create buttons to select date and employee name
-        DatePicker selectDatePicker = new DatePicker();
-        TextField selectEmployeeName = new TextField();
-        Button showPerformanceButton = new Button("Show Performance");
-        showPerformanceButton.setOnAction(event -> {
-            LocalDate selectedDate = selectDatePicker.getValue();
-            String selectedName = selectEmployeeName.getText();
-            if (selectedDate != null && !selectedName.isEmpty()) {
-                // Call method to fetch performance data based on selected date and employee name
-                fetchPerformanceData(selectedDate, selectedName, staffPerformanceTable);
-            } else {
-                // Show error message if date or name is not selected
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText(null);
-                alert.setContentText("Please select both date and employee name.");
-                alert.showAndWait();
-            }
-        });
-        // Button to add or modify performance
-        Button modifyPerformanceButton = new Button("Modify Performance");
-        modifyPerformanceButton.setOnAction(event -> {
-            LocalDate selectedDate = selectDatePicker.getValue();
-            String selectedName = selectEmployeeName.getText();
-            String newPerformanceRating = null; // Retrieve the new performance rating from your UI component, e.g., textField.getText();
-
-            if (selectedDate != null && !selectedName.isEmpty() && !newPerformanceRating.isEmpty()) {
-                StaffPerformanceEntry performanceEntry = new StaffPerformanceEntry(selectedDate, selectedName, newPerformanceRating);
-                // Call method to update performance in the database
-                updatePerformance(performanceEntry);
-                // Refresh performance data in the UI
-                fetchPerformanceData(selectedDate, selectedName, staffPerformanceTable);
-            } else {
-                // Show error message if any required field is empty
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText(null);
-                alert.setContentText("Please fill in all the fields.");
-                alert.showAndWait();
-            }
-        });
-
-        // Button to delete performance entry
-        Button deletePerformanceButton = new Button("Delete Performance");
-        deletePerformanceButton.setOnAction(event -> {
-            LocalDate selectedDate = selectDatePicker.getValue();
-            String selectedName = selectEmployeeName.getText();
-            if (selectedDate != null && !selectedName.isEmpty()) {
-                // Call method to delete performance entry for the specified date and employee
-                deletePerformance(selectedDate, selectedName);
-            } else {
-                // Show error message if date or name is not selected
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText(null);
-                alert.setContentText("Please select both a date and an employee name.");
-                alert.showAndWait();
-            }
-        });
-        staffSchedulingMainContent.getChildren().addAll(
-                staffScheduleButton,
-                selectDatePicker,
-                new Text("Employee Name"),
-                selectEmployeeName,
-                showPerformanceButton,
-                modifyPerformanceButton,
-                deletePerformanceButton,
-                staffPerformanceTable
-        );
-        selectEmployeeName.setPromptText("Enter Employee Name");
-        setTextColor(staffSchedulingMainContent);
-    }
-    // Define method to switch back to scheduling view
-    private void switchToSchedulingView() {
-        // Clear existing content
-        staffSchedulingMainContent.getChildren().clear();
-
-        // Re-add scheduling components
-        staffSchedulingMainContent.getChildren().addAll(
-                staffPerformanceButton,
-                new Text("Start Date:"),
-                startDatePicker,
-                new Text("End Date:"),
-                endDatePicker,
-                new Text("Select Data Types:"),
-                scheduleCheckBox,
-                absencesCheckBox,
-                holidaysCheckBox,
-                generateScheduleButton,
-                scheduleTable
-        );
-        staffSchedulingMainContent.getChildren().addAll(
-                new Text("Name:"),
-                nameField,
-                new Text("Status:"),
-                statusComboBox,
-                new Text("Date:"),
-                dateField,
-                new Text("Start Time:"),
-                startTimeField,
-                new Text("End Time:"),
-                endTimeField,
-                addButton,
-                createDeleteScheduleButton()
-        );
-    }
-    // Method to fetch performance data based on selected date and employee name
-    public void fetchPerformanceData(LocalDate selectedDate, String selectedName, TableView<StaffPerformanceEntry> performanceTable) {
-        // Fetch performance data from the database
-        List<StaffPerformanceEntry> performanceData = getPerformanceDataFromDB(selectedDate, selectedName);
-
-        // Clear existing data in the table
-        performanceTable.getItems().clear();
-
-        // Add fetched data to the table
-        performanceTable.getItems().addAll(performanceData);
-    }
-
-    // Method to retrieve performance data from the database
-    private List<StaffPerformanceEntry> getPerformanceDataFromDB(LocalDate selectedDate, String selectedName) {
-        List<StaffPerformanceEntry> performanceData = new ArrayList<>();
-        try (Connection conn = DatabaseConnector.getConnection()) {
-            String query;
-            if (selectedName == null || selectedName.isEmpty()) {
-                // If no employee name is provided, fetch performance data for all employees who worked on the selected date
-                query = "SELECT * FROM StaffPerformance WHERE performanceDate = ?";
-            } else {
-                // Fetch performance data for the specified employee who worked on the selected date
-                query = "SELECT * FROM StaffPerformance WHERE performanceDate = ? AND employeeName = ?";
-            }
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, selectedDate.toString());
-            if (selectedName != null && !selectedName.isEmpty()) {
-                pstmt.setString(2, selectedName);
-            }
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                LocalDate date = LocalDate.parse(rs.getString("performanceDate"));
-                String employeeName = rs.getString("employeeName");
-                String performanceRating = rs.getString("performanceRating");
-                StaffPerformanceEntry entry = new StaffPerformanceEntry(date, employeeName, performanceRating);
-                performanceData.add(entry);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle exceptions (e.g., show an alert to the user)
-        }
-        return performanceData;
-    }
-
-    // Method to update performance entry in the database
-    public void updatePerformance(StaffPerformanceEntry performanceEntry) {
-        try (Connection conn = DatabaseConnector.getConnection()) {
-            String query = "UPDATE StaffPerformance SET performanceRating = ? WHERE performanceDate = ? AND employeeName = ?";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, performanceEntry.getPerformanceRating());
-            pstmt.setString(2, performanceEntry.getDate().toString());
-            pstmt.setString(3, performanceEntry.getEmployeeName());
-            int rowsUpdated = pstmt.executeUpdate();
-            if (rowsUpdated > 0) {
-                // Performance entry updated successfully in the database
-                System.out.println("Performance entry updated successfully.");
-            } else {
-                // No performance entry found for the specified date and employee
-                System.out.println("No performance entry found for the specified date and employee.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle exceptions (e.g., show an alert to the user)
-        }
-    }
-
-    // Method to delete performance entry for the specified date and employee
-    public void deletePerformance(LocalDate selectedDate, String selectedName) {
-        // Implement the logic to delete performance entry for the specified date and employee
-        // This method will remove the performance entry from the database
-        try (Connection conn = DatabaseConnector.getConnection()) {
-            String query;
-            if (selectedName == null || selectedName.isEmpty()) {
-                // If no employee name is provided, delete all performance entries for the selected date
-                query = "DELETE FROM StaffPerformance WHERE performanceDate = ?";
-            } else {
-                // Delete performance entry for the specified date and employee
-                query = "DELETE FROM StaffPerformance WHERE performanceDate = ? AND employeeName = ?";
-            }
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, selectedDate.toString());
-            if (selectedName != null && !selectedName.isEmpty()) {
-                pstmt.setString(2, selectedName);
-            }
-            int rowsDeleted = pstmt.executeUpdate();
-            if (rowsDeleted > 0) {
-                // Performance entry deleted successfully from the database
-                System.out.println("Performance entry deleted successfully.");
-            } else {
-                // No performance entry found for the specified date and employee
-                System.out.println("No performance entry found for the specified date and employee.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle exceptions (e.g., show an alert to the user)
-        }
-    }
     // Method to set white color for all text nodes
     private void setTextColor(VBox vbox) {
         for (javafx.scene.Node node : vbox.getChildren()) {
