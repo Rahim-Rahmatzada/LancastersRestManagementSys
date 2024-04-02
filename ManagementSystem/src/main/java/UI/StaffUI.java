@@ -115,11 +115,11 @@ public class StaffUI extends BaseUI {
         // Add components to the main content VBox
         staffSchedulingMainContent.getChildren().addAll(
                 staffPerformanceButton,
-                new Text("Start Date:"),
+                new Text(<span style="color: white;">"Start Date:"</span>),
                 startDatePicker,
-                new Text("End Date:"),
+                new Text(<span style="color: white;">"End Date:"</span>),
                 endDatePicker,
-                new Text("Select Data Types:"),
+                new Text(<span style="color: white;">"Select Data Types:"</span>)),
                 scheduleCheckBox,
                 absencesCheckBox,
                 holidaysCheckBox,
@@ -127,15 +127,15 @@ public class StaffUI extends BaseUI {
                 scheduleTable
         );
         staffSchedulingMainContent.getChildren().addAll(
-                new Text("Name:"),
+                new Text(<span style="color: white;">"Name:"</span>),
                 nameField,
-                new Text("Status:"),
+                new Text(<span style="color: white;">"Status:"</span>),
                 statusComboBox,
-                new Text("Date:"),
+                new Text(<span style="color: white;">"Date:"</span>),
                 dateField,
-                new Text("Start Time:"),
+                new Text(<span style="color: white;">"Start Time:"</span>),
                 startTimeField,
-                new Text("End Time:"),
+                new Text(<span style="color: white;">"End Time:"</span>),
                 endTimeField,
                 addButton,
                 createDeleteScheduleButton()
@@ -163,7 +163,7 @@ public class StaffUI extends BaseUI {
         }
 
         // Update or insert the shift into the database
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             // Check if the employee already has a shift on the selected date
             String query = "SELECT * FROM StaffSchedule WHERE scheduleDate = ? AND employeeName = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -485,6 +485,7 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.getChildren().addAll(
                 staffScheduleButton,
                 selectDatePicker,
+                new Text(<span style="color: white;">"Employee Name"</span>)
                 selectEmployeeName,
                 showPerformanceButton,
                 modifyPerformanceButton,
@@ -500,11 +501,11 @@ public class StaffUI extends BaseUI {
         // Re-add scheduling components
         staffSchedulingMainContent.getChildren().addAll(
                 staffPerformanceButton,
-                new Text("Start Date:"),
+                new Text(<span style="color: white;">"Start Date:"</span>),
                 startDatePicker,
-                new Text("End Date:"),
+                new Text(<span style="color: white;">"End Date:"</span>),
                 endDatePicker,
-                new Text("Select Data Types:"),
+                new Text(<span style="color: white;">"Select Data Types:"</span>)),
                 scheduleCheckBox,
                 absencesCheckBox,
                 holidaysCheckBox,
@@ -512,15 +513,15 @@ public class StaffUI extends BaseUI {
                 scheduleTable
         );
         staffSchedulingMainContent.getChildren().addAll(
-                new Text("Name:"),
+                new Text(<span style="color: white;">"Name:"</span>),
                 nameField,
-                new Text("Status:"),
+                new Text(<span style="color: white;">"Status:"</span>),
                 statusComboBox,
-                new Text("Date:"),
+                new Text(<span style="color: white;">"Date:"</span>),
                 dateField,
-                new Text("Start Time:"),
+                new Text(<span style="color: white;">"Start Time:"</span>),
                 startTimeField,
-                new Text("End Time:"),
+                new Text(<span style="color: white;">"End Time:"</span>),
                 endTimeField,
                 addButton,
                 createDeleteScheduleButton()
