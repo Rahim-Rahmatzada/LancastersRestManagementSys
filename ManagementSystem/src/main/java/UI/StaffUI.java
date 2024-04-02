@@ -17,6 +17,26 @@ import javafx.scene.layout.VBox;
 
 public class StaffUI extends BaseUI {
 
+    private DatePicker startDatePicker;
+    private DatePicker endDatePicker;
+    private TableView<ScheduleEntry> scheduleTable;
+    private CheckBox scheduleCheckBox;
+    private CheckBox absencesCheckBox;
+    private CheckBox holidaysCheckBox;
+    private TextField nameField;
+    private DatePicker dateField;
+    private TextField startTimeField;
+    private TextField endTimeField;
+    private ComboBox<String> statusComboBox;
+    private Button staffPerformanceButton;
+    private Button staffScheduleButton;
+    private VBox staffSchedulingMainContent = new VBox();
+    private Button generateScheduleButton;
+    private Button addButton;
+
+//addding smth
+
+
     public StaffUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Staff");
