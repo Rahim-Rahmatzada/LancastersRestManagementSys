@@ -129,14 +129,17 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.getChildren().addAll(
                 new Text(<span style="color: white;">"Name:"</span>),
                 nameField,
+                nameField.setPromptText("Enter Employee Name");
                 new Text(<span style="color: white;">"Status:"</span>),
                 statusComboBox,
                 new Text(<span style="color: white;">"Date:"</span>),
                 dateField,
                 new Text(<span style="color: white;">"Start Time:"</span>),
                 startTimeField,
+                        startTimeField.setPromptText("Enter Starting Time HH:MM");
                 new Text(<span style="color: white;">"End Time:"</span>),
                 endTimeField,
+                        endTimeField.setPromptText("Enter Ending Time HH:MM");
                 addButton,
                 createDeleteScheduleButton()
         );
@@ -487,6 +490,7 @@ public class StaffUI extends BaseUI {
                 selectDatePicker,
                 new Text(<span style="color: white;">"Employee Name"</span>)
                 selectEmployeeName,
+                selectEmployeeName.setPromptText("Enter Employee Name");
                 showPerformanceButton,
                 modifyPerformanceButton,
                 deletePerformanceButton,
@@ -515,14 +519,17 @@ public class StaffUI extends BaseUI {
         staffSchedulingMainContent.getChildren().addAll(
                 new Text(<span style="color: white;">"Name:"</span>),
                 nameField,
+                        nameField.setPromptText("Enter Employee Name");
                 new Text(<span style="color: white;">"Status:"</span>),
                 statusComboBox,
                 new Text(<span style="color: white;">"Date:"</span>),
                 dateField,
                 new Text(<span style="color: white;">"Start Time:"</span>),
                 startTimeField,
+                        startField.setPromptText("Enter Starting Time HH:MM");
                 new Text(<span style="color: white;">"End Time:"</span>),
                 endTimeField,
+                        endField.setPromptText("Enter Ending Time HH:MM");
                 addButton,
                 createDeleteScheduleButton()
         );
