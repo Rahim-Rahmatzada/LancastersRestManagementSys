@@ -296,7 +296,7 @@ public class StaffUI extends BaseUI {
 
     private void generateAbsencesData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
         // Connect to the SQLite database
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String query = "SELECT StaffInfo.staffName, StaffHoliday.startDate, StaffHoliday.endDate FROM StaffHoliday " +
                     "INNER JOIN StaffHoliday_StaffInfo ON StaffHoliday.holidayID = StaffHoliday_StaffInfo.holidayID " +
                     "INNER JOIN StaffInfo ON StaffHoliday_StaffInfo.staffID = StaffInfo.staffID " +
@@ -333,7 +333,7 @@ public class StaffUI extends BaseUI {
 
     private void generateHolidaysData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
         // Connect to the SQLite database
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String query = "SELECT * FROM StaffHoliday WHERE startDate BETWEEN ? AND ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, startDate.toString());
@@ -374,7 +374,7 @@ public class StaffUI extends BaseUI {
 
     private void deleteSchedule(LocalDate date, String name) {
         // Delete the schedule from the database
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String deleteQuery = "DELETE FROM StaffSchedule WHERE scheduleDate = ? AND employeeName = ?";
             PreparedStatement pstmt = conn.prepareStatement(deleteQuery);
             pstmt.setDate(1, Date.valueOf(date));
@@ -541,7 +541,7 @@ public class StaffUI extends BaseUI {
     // Method to retrieve performance data from the database
     private List<StaffPerformanceEntry> getPerformanceDataFromDB(LocalDate selectedDate, String selectedName) {
         List<StaffPerformanceEntry> performanceData = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String query;
             if (selectedName == null || selectedName.isEmpty()) {
                 // If no employee name is provided, fetch performance data for all employees who worked on the selected date
@@ -572,7 +572,7 @@ public class StaffUI extends BaseUI {
 
     // Method to update performance entry in the database
     public void updatePerformance(StaffPerformanceEntry performanceEntry) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String query = "UPDATE StaffPerformance SET performanceRating = ? WHERE performanceDate = ? AND employeeName = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, performanceEntry.getPerformanceRating());
@@ -596,7 +596,7 @@ public class StaffUI extends BaseUI {
     public void deletePerformance(LocalDate selectedDate, String selectedName) {
         // Implement the logic to delete performance entry for the specified date and employee
         // This method will remove the performance entry from the database
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:restaurant.db")) {
+        try (Connection conn = DatabaseConnector.getConnection()) {
             String query;
             if (selectedName == null || selectedName.isEmpty()) {
                 // If no employee name is provided, delete all performance entries for the selected date
