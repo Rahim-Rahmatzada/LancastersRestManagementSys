@@ -15,7 +15,7 @@ public class MainUI extends Application implements UISwitcher {
     private DashboardUI dashboardUI;
     private InventoryUI inventoryUI;
     private SalesUI salesUI;
-    private BookingsUI bookingsUI;
+    private RestaurantCapacityUI restaurantCapacityUI;
     private MenusUI menusUI;
     private StaffUI staffUI;
     private WineUI wineUI;
@@ -87,12 +87,12 @@ public class MainUI extends Application implements UISwitcher {
      */
 
     @Override
-    public void switchToBookings() {
-        if (bookingsUI == null) {
-            bookingsUI = new BookingsUI(this);
+    public void switchToRestaurantCapacity() {
+        if (restaurantCapacityUI == null) {
+            restaurantCapacityUI = new RestaurantCapacityUI(this);
         }
-        switchScene(bookingsUI, "Bookings UI"); // Use the updated switchScene method
-        bookingsUI.highlightButton("Bookings");
+        switchScene(restaurantCapacityUI, "Restaurant Capacity UI"); // Use the updated switchScene method
+        restaurantCapacityUI.highlightButton("Restaurant Capacity");
     }
 
     /**
