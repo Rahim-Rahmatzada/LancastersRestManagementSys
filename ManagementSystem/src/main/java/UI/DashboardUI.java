@@ -1,21 +1,248 @@
 package UI;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import model.DatabaseConnector;
+import model.LoginManager;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DashboardUI extends BaseUI {
+    private LoginManager loginManager;
+    private boolean isLoggedIn = false;
+
+    private TextField loginUsernameField;
+    private PasswordField loginPasswordField;
+    private Button loginButton;
+    private Button logoutButton;
+    private Button createAccountButton;
+
+    private TextField createUsernameField;
+    private PasswordField createPasswordField;
+    private PasswordField confirmPasswordField;
+    private Button createButton;
+    private Button backToLoginButton;
 
     public DashboardUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Dashboard");
         setTopText("Dashboard Overview");
 
+        loginManager = new LoginManager();
+
         // Set the main content for the DashboardUI.
         VBox dashboardMainContent = new VBox();
-        // Add components to dashboardMainContent as needed.
+        dashboardMainContent.setPadding(new Insets(20));
+        dashboardMainContent.setSpacing(20);
+        dashboardMainContent.setStyle("-fx-background-color: #1A1A1A;");
+
+        // Create login form
+        loginUsernameField = new TextField();
+        loginUsernameField.setPromptText("Username");
+
+        loginPasswordField = new PasswordField();
+        loginPasswordField.setPromptText("Password");
+
+        loginButton = new Button("Login");
+        loginButton.setOnAction(e -> handleLogin());
+
+        logoutButton = new Button("Logout");
+        logoutButton.setOnAction(e -> handleLogout());
+
+        createAccountButton = new Button("Create Account");
+        createAccountButton.setOnAction(e -> handleCreateAccountButtonClick());
+
+        VBox loginForm = new VBox();
+        loginForm.setSpacing(5);
+        loginForm.setAlignment(Pos.CENTER);
+        loginForm.getChildren().addAll(loginUsernameField, loginPasswordField);
+
+        HBox buttonBox = new HBox();
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(loginButton, createAccountButton);
+
+        VBox loginContainer = new VBox();
+        loginContainer.setAlignment(Pos.CENTER);
+        loginContainer.setFillWidth(false);
+        loginContainer.setSpacing(15);
+        loginContainer.getChildren().addAll(loginForm, buttonBox);
+
+        VBox.setMargin(loginContainer, new Insets(100, 0, 0, 0));
+
+        dashboardMainContent.getChildren().add(loginContainer);
+
         setMainContent(dashboardMainContent);
 
         preloadUIClasses();
+    }
 
+    private void handleLogin() {
+        if (isLoggedIn) {
+            showAlert("Already Logged In", "You are already logged in.");
+        } else {
+            String username = loginUsernameField.getText();
+            String password = loginPasswordField.getText();
+            if (loginManager.authenticate(username, password)) {
+                isLoggedIn = true;
+                showAlert("Login Successful", "You have successfully logged in.");
+                showLoggedInView();
+            } else {
+                showAlert("Login Failed", "Invalid username or password.");
+            }
+        }
+    }
+
+    private void handleLogout() {
+        isLoggedIn = false;
+        showAlert("Logout Successful", "You have been logged out.");
+        showLoginForm();
+    }
+
+    private void handleCreateAccountButtonClick() {
+        if (isLoggedIn) {
+            showCreateAccountForm();
+        } else {
+            showAlert("Login Required", "Please log in to create an account.");
+        }
+    }
+
+    private void showCreateAccountForm() {
+        VBox createAccountForm = new VBox();
+        createAccountForm.setSpacing(5);
+        createAccountForm.setAlignment(Pos.CENTER);
+
+        createUsernameField = new TextField();
+        createUsernameField.setPromptText("Username");
+
+        createPasswordField = new PasswordField();
+        createPasswordField.setPromptText("Password");
+
+        confirmPasswordField = new PasswordField();
+        confirmPasswordField.setPromptText("Confirm Password");
+
+        createButton = new Button("Create");
+        createButton.setOnAction(e -> handleCreateAccount());
+
+        backToLoginButton = new Button("Go Back to Login");
+        backToLoginButton.setOnAction(e -> showLoginForm());
+
+        HBox buttonBox = new HBox();
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(createButton, backToLoginButton);
+
+        createAccountForm.getChildren().addAll(createUsernameField, createPasswordField, confirmPasswordField, buttonBox);
+
+        VBox createAccountContainer = new VBox();
+        createAccountContainer.setAlignment(Pos.CENTER);
+        createAccountContainer.setFillWidth(false);
+        createAccountContainer.setSpacing(15);
+        createAccountContainer.getChildren().add(createAccountForm);
+
+        VBox.setMargin(createAccountContainer, new Insets(100, 0, 0, 0));
+
+        getMainContent().getChildren().clear();
+        getMainContent().getChildren().add(createAccountContainer);
+    }
+
+    private void handleCreateAccount() {
+        String username = createUsernameField.getText().trim();
+        String password = createPasswordField.getText().trim();
+        String confirmPassword = confirmPasswordField.getText().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert("Missing Information", "Both username and password are required.");
+            return; // Exit the method early if validation fails
+        }
+
+        if (password.equals(confirmPassword)) {
+            if (loginManager.createAccount(username, password)) {
+                showAlert("Account Created", "Your account has been successfully created.");
+                showLoginForm();
+            } else {
+                showAlert("Account Creation Failed", "Failed to create the account. Please try again.");
+            }
+        } else {
+            showAlert("Password Mismatch", "The passwords do not match. Please try again.");
+        }
+    }
+
+    private void showLoginForm() {
+        loginUsernameField.clear();
+        loginPasswordField.clear();
+
+        VBox loginForm = new VBox();
+        loginForm.setSpacing(5);
+        loginForm.setAlignment(Pos.CENTER);
+        loginForm.getChildren().addAll(loginUsernameField, loginPasswordField);
+
+        HBox buttonBox = new HBox();
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(loginButton, createAccountButton);
+
+        VBox loginContainer = new VBox();
+        loginContainer.setAlignment(Pos.CENTER);
+        loginContainer.setFillWidth(false);
+        loginContainer.setSpacing(15);
+        loginContainer.getChildren().addAll(loginForm, buttonBox);
+
+        VBox.setMargin(loginContainer, new Insets(100, 0, 0, 0));
+
+        getMainContent().getChildren().clear();
+        getMainContent().getChildren().add(loginContainer);
+    }
+
+    private void showLoggedInView() {
+
+        loginUsernameField.clear();
+        loginPasswordField.clear();
+
+        VBox loginForm = new VBox();
+        loginForm.setSpacing(5);
+        loginForm.setAlignment(Pos.CENTER);
+        loginForm.getChildren().addAll(loginUsernameField, loginPasswordField);
+
+        HBox buttonBox = new HBox();
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(logoutButton, createAccountButton);
+
+        VBox loginContainer = new VBox();
+        loginContainer.setAlignment(Pos.CENTER);
+        loginContainer.setFillWidth(false);
+        loginContainer.setSpacing(15);
+        loginContainer.getChildren().addAll(loginForm, buttonBox);
+
+        VBox.setMargin(loginContainer, new Insets(100, 0, 0, 0));
+
+        getMainContent().getChildren().clear();
+        getMainContent().getChildren().add(loginContainer);
+    }
+
+    @Override
+    protected void handleButtonAction(String label) {
+        if (isLoggedIn) {
+            super.handleButtonAction(label);
+        } else {
+            showAlert("Login Required", "Please log in to access other pages.");
+        }
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void preloadUIClasses() {
@@ -32,62 +259,4 @@ public class DashboardUI extends BaseUI {
         preloadThread.setDaemon(true); // Set the thread as a daemon thread
         preloadThread.start();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-//    Welcome Message:
-//    Display a personalized welcome message to greet the user when they log in or access the dashboard.
-//    Include the user's name or role to make the message more engaging.
-//    Key Metrics and Statistics:
-//    Show important metrics and statistics related to your application's domain.
-//    For example, you can display the total number of sales, revenue, customers, or any other relevant data.
-//    Use visual elements like cards, tiles, or widgets to present the metrics in an easy-to-understand format.
-//    Charts and Graphs:
-//    Include charts and graphs to visually represent data and trends.
-//    Use line charts to show sales trends over time, bar charts to compare different categories, or pie charts to show distribution.
-//    Provide interactive features like zooming, panning, or tooltips to allow users to explore the data further.
-//    Recent Activity or Notifications:
-//    Display a list or feed of recent activities or notifications relevant to the user.
-//    Show the latest orders, customer inquiries, system alerts, or any other important updates.
-//    Use a scrollable list or a paginated table to present the information in a clear and concise manner.
-//    Quick Actions or Shortcuts:
-//    Provide quick action buttons or shortcuts to commonly used features or tasks.
-//    For example, you can have buttons to quickly create a new order, view pending tasks, or navigate to frequently accessed pages.
-//    Use intuitive icons and labels to make the actions easily recognizable.
-//    Calendar or Upcoming Events:
-//    Integrate a calendar component to display upcoming events, meetings, or deadlines.
-//    Highlight important dates or milestones relevant to the user or the application's domain.
-//    Allow users to click on events to view more details or navigate to related pages.
-//    Performance Indicators or Progress Bars:
-//    Use progress bars or performance indicators to visualize the progress of key metrics or goals.
-//    For example, you can show the percentage of sales targets achieved, customer satisfaction ratings, or project completion status.
-//    Use colors and labels to clearly communicate the current status and progress.
-//    News or Announcements:
-//    Include a section for displaying important news, announcements, or updates related to your application or industry.
-//    Keep users informed about new features, system maintenance, or any other relevant information.
-//    Use a collapsible or expandable panel to show the full content of the announcements.
-//    User Profile or Settings:
-//    Provide a quick access to the user's profile or settings.
-//    Display the user's name, profile picture, or any other relevant information.
-//    Include links or buttons to allow users to edit their profile, change preferences, or log out.
-//    Navigation or Menu:
-//    Include a navigation menu or sidebar to provide easy access to different sections or modules of your application.
-//    Use clear and concise labels to guide users to the desired pages or features.
-//    Consider using icons or tooltips to enhance the usability and visual appeal of the navigation.
-
 }

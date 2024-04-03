@@ -217,6 +217,9 @@ public abstract class BaseUI {
                 "-fx-background-radius: 15; -fx-alignment: center-left;");
     }
 
+    //java doc this
+
+
 
     /**
      * Handles the action when a button is clicked.
