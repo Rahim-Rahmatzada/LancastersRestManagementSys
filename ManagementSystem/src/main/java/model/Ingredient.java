@@ -5,12 +5,23 @@ public class Ingredient {
     private String name;
     private double cost;
     private int quantity;
+    private int threshold;
 
-    public Ingredient(int ingredientID, String name, double cost, int quantity) {
+
+    public Ingredient(int ingredientID, String name, double cost, int quantity, int threshold) {
         this.ingredientID = ingredientID;
         this.name = name;
         this.cost = cost;
         this.quantity = quantity;
+        this.threshold = threshold;
+    }
+
+    public int getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
     }
 
     public int getIngredientID() {

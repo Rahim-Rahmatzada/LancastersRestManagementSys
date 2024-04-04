@@ -16,7 +16,7 @@ import java.sql.SQLException;
 
 public class DashboardUI extends BaseUI {
     private LoginManager loginManager;
-    private boolean isLoggedIn = false;
+    private boolean isLoggedIn = true;
 
     private TextField loginUsernameField;
     private PasswordField loginPasswordField;

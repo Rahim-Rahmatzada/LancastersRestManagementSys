@@ -23,7 +23,7 @@ import javafx.scene.text.Text;
 
 public class InventoryUI extends BaseUI {
 
-    private int threshold = 100;
+
     private Text topIngredientsText;
     private Text mostExpensiveIngredientsText;
     private Text highestQuantityIngredientsText;
@@ -85,7 +85,7 @@ public class InventoryUI extends BaseUI {
             updateIngredientValue(ingredient, "ingredientName", newValue);
         });
 
-        TableColumn<Ingredient, Double> costColumn = new TableColumn<>("Cost");
+        TableColumn<Ingredient, Double> costColumn = new TableColumn<>("Price per unit (£)");
         costColumn.setCellValueFactory(new PropertyValueFactory<>("cost"));
         costColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         costColumn.setOnEditCommit(event -> {
@@ -103,6 +103,16 @@ public class InventoryUI extends BaseUI {
             updateIngredientValue(ingredient, "ingredientQuantity", newValue);
         });
 
+        TableColumn<Ingredient, Integer> thresholdColumn = new TableColumn<>("Low Stock Threshold");
+        thresholdColumn.setCellValueFactory(new PropertyValueFactory<>("threshold"));
+        thresholdColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        thresholdColumn.setOnEditCommit(event -> {
+            Ingredient ingredient = event.getRowValue();
+            int newValue = event.getNewValue();
+            updateIngredientValue(ingredient, "ingredientThreshold", newValue);
+        });
+        thresholdColumn.setStyle("-fx-text-fill: white;");
+
 
         // Set the style for table columns
         nameColumn.setStyle("-fx-text-fill: white;");
@@ -110,7 +120,7 @@ public class InventoryUI extends BaseUI {
         quantityColumn.setStyle("-fx-text-fill: white;");
 
         // Add columns to the table view
-        tableView.getColumns().addAll(nameColumn, costColumn, quantityColumn);
+        tableView.getColumns().addAll(nameColumn, costColumn, quantityColumn, thresholdColumn);
 
         // Load ingredient data from the database
         ObservableList<Ingredient> ingredientData = getIngredientDataFromDatabase();
@@ -120,26 +130,26 @@ public class InventoryUI extends BaseUI {
 
 
 
-            nameColumn.setCellFactory(column -> new TableCell<Ingredient, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
+        nameColumn.setCellFactory(column -> new TableCell<Ingredient, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+
+                    Ingredient ingredient = getTableView().getItems().get(getIndex());
+                    if (ingredient.getQuantity() < ingredient.getThreshold()) {
+                        setStyle("-fx-text-fill: red;");
                     } else {
-                        setText(item);
-
-                        Ingredient ingredient = getTableView().getItems().get(getIndex());
-                        if (ingredient.getQuantity() < threshold) {
-                            setStyle("-fx-text-fill: red;");
-                        } else {
-                            setStyle("-fx-text-fill: white;");
-                        }
+                        setStyle("-fx-text-fill: white;");
                     }
                 }
-            });
+            }
+        });
 
         // Set the cell factory to style table cells
         tableView.setRowFactory(tv -> {
@@ -225,9 +235,9 @@ public class InventoryUI extends BaseUI {
         HBox controlsBox = new HBox();
         controlsBox.setSpacing(20);
         controlsBox.setAlignment(Pos.CENTER_LEFT);
+        controlsBox.setPadding(new Insets(0, 0, 0, 200)); // Add left padding to shift the controls to the right
 
         controlsBox.getChildren().addAll(
-                createThresholdControls(),
                 createAddIngredientControls(),
                 createDeleteIngredientControls()
         );
@@ -261,20 +271,13 @@ public class InventoryUI extends BaseUI {
     private void addNewIngredient(String ingredientName) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO Ingredient (ingredientID, ingredientName, ingredientCost, ingredientQuantity) " +
-                             "VALUES (?, ?, ?, ?)")) {
+                     "INSERT INTO Ingredient (ingredientID, ingredientName, ingredientCost, ingredientQuantity, ingredientThreshold) " +
+                             "VALUES (?, ?, ?, ?, ?)")) {
 
-            int newIngredientID = getMaxIngredientID() + 1;
+            // ...
+            stmt.setInt(5, 0); // Set initial threshold to 0
 
-            stmt.setInt(1, newIngredientID);
-            stmt.setString(2, ingredientName);
-            stmt.setDouble(3, 0.0); // Set initial cost to 0
-            stmt.setInt(4, 0); // Set initial quantity to 0
-
-            stmt.executeUpdate();
-
-            // Refresh the table view
-            reloadIngredientTableView();
+            // ...
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to add new ingredient.");
@@ -327,15 +330,16 @@ public class InventoryUI extends BaseUI {
 
         try (Connection conn = DatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT ingredientID, ingredientName, ingredientCost, ingredientQuantity FROM Ingredient")) {
+             ResultSet rs = stmt.executeQuery("SELECT ingredientID, ingredientName, ingredientCost, ingredientQuantity, ingredientThreshold FROM Ingredient")) {
 
             while (rs.next()) {
                 int ingredientID = rs.getInt("ingredientID");
                 String name = rs.getString("ingredientName");
                 double cost = rs.getDouble("ingredientCost");
                 int quantity = rs.getInt("ingredientQuantity");
+                int threshold = rs.getInt("ingredientThreshold");
 
-                Ingredient ingredient = new Ingredient(ingredientID, name, cost, quantity);
+                Ingredient ingredient = new Ingredient(ingredientID, name, cost, quantity, threshold);
                 ingredientList.add(ingredient);
             }
 
@@ -346,28 +350,7 @@ public class InventoryUI extends BaseUI {
         return ingredientList;
     }
 
-    private HBox createThresholdControls() {
-        HBox thresholdBox = new HBox();
-        thresholdBox.setSpacing(10);
 
-        TextField thresholdField = new TextField();
-        thresholdField.setPromptText("Enter Threshold");
-        thresholdField.setText(String.valueOf(threshold));
-
-        Button setThresholdButton = new Button("Set Low Stock Threshold");
-        setThresholdButton.setOnAction(event -> {
-            try {
-                threshold = Integer.parseInt(thresholdField.getText());
-                reloadIngredientTableView();
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Threshold", "Please enter a valid threshold value.");
-            }
-        });
-
-        thresholdBox.getChildren().addAll(thresholdField, setThresholdButton);
-
-        return thresholdBox;
-    }
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

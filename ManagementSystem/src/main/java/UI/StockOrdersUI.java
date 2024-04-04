@@ -199,7 +199,7 @@ public class StockOrdersUI extends BaseUI {
             while (rs.next()) {
                 int ingredientID = rs.getInt("ingredientID");
                 String name = rs.getString("ingredientName");
-                Ingredient ingredient = new Ingredient(ingredientID, name, 0, 0);
+                Ingredient ingredient = new Ingredient(ingredientID, name, 0, 0,0);
                 ingredientList.add(ingredient);
             }
 
