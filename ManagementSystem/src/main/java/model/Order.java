@@ -1,48 +1,39 @@
 package model;
 
+import java.time.LocalDate;
+
 public class Order {
-    private String ingredient;
-    private int quantity;
-    private double cost;
-    private String status;
+    private int orderID;
+    private LocalDate dateOrdered;
+    private LocalDate expectedDeliveryDate;
 
-
-    public Order(String ingredient, int quantity, double cost) {
-        this.ingredient = ingredient;
-        this.quantity = quantity;
-        this.cost = cost;
-        this.status = "Pending"; // Set default status to "Pending"
+    public Order(int orderID, LocalDate dateOrdered, LocalDate expectedDeliveryDate) {
+        this.orderID = orderID;
+        this.dateOrdered = dateOrdered;
+        this.expectedDeliveryDate = expectedDeliveryDate;
     }
 
-    public String getStatus() {
-        return status;
+    public int getOrderID() {
+        return orderID;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setOrderID(int orderID) {
+        this.orderID = orderID;
     }
 
-    public String getIngredient() {
-        return ingredient;
+    public LocalDate getDateOrdered() {
+        return dateOrdered;
     }
 
-    public void setIngredient(String ingredient) {
-        this.ingredient = ingredient;
+    public void setDateOrdered(LocalDate dateOrdered) {
+        this.dateOrdered = dateOrdered;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public LocalDate getExpectedDeliveryDate() {
+        return expectedDeliveryDate;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public double getCost() {
-        return cost;
-    }
-
-    public void setCost(double cost) {
-        this.cost = cost;
+    public void setExpectedDeliveryDate(LocalDate expectedDeliveryDate) {
+        this.expectedDeliveryDate = expectedDeliveryDate;
     }
 }
