@@ -13,7 +13,6 @@ public interface MenuManagement {
     void setAllergenInfo(String dishName, List<String> allergens);
     void archiveMenu(String menuName);
 
-    void setDishPrice(String dishName, List<String> ingredients);
 
 
 
