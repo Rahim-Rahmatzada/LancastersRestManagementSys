@@ -8,27 +8,25 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.util.converter.IntegerStringConverter;
 import model.DatabaseConnector;
 import model.Ingredient;
 import model.Order;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import model.Menu;
-// TO DO: show ingredients of low stock as red in place order UI
+
+/**
+ * The StockOrdersUI class represents the user interface for managing stock orders.
+ * It provides functionality for viewing and placing stock orders.
+ */
 
 
 public class StockOrdersUI extends BaseUI {
 
-    private DatePicker orderDatePicker;
     private TableView<Order> orderTableView;
-    private ComboBox<String> orderStatusComboBox;
     private boolean isPlacingOrder = false;
 
     private DatePicker startDatePicker;
@@ -38,6 +36,12 @@ public class StockOrdersUI extends BaseUI {
     private TableView<Menu> menuTableView;
     private TableView<Ingredient> ingredientTableView;
     private DatePicker placementDatePicker;
+
+    /**
+     * Constructs a new instance of the StockOrdersUI class.
+     *
+     * @param uiSwitcher The UISwitcher instance for navigating between different UI screens.
+     */
 
     public StockOrdersUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
@@ -58,6 +62,11 @@ public class StockOrdersUI extends BaseUI {
         setMainContent(ordersMainContent);
     }
 
+    /**
+     * Initializes the order viewing UI.
+     *
+     * @param ordersMainContent The main content VBox for the orders UI.
+     */
     private void initializeOrderViewingUI(VBox ordersMainContent) {
         // Create date pickers for selecting the start and end dates
         startDatePicker = new DatePicker();
@@ -89,6 +98,10 @@ public class StockOrdersUI extends BaseUI {
         ordersMainContent.getChildren().addAll(dateSelectionBox, orderTableView, orderDetailsBox);
     }
 
+    /**
+     * Retrieves orders based on the selected date range.
+     */
+
     private void getOrders() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -110,6 +123,14 @@ public class StockOrdersUI extends BaseUI {
         orderTableView.getItems().setAll(orders);
         orderDetailsBox.getChildren().clear();
     }
+
+    /**
+     * Retrieves orders from the database based on the specified date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @return A list of orders within the specified date range.
+     */
 
     private List<Order> getOrdersFromDatabase(LocalDate startDate, LocalDate endDate) {
         List<Order> orders = new ArrayList<>();
@@ -140,6 +161,11 @@ public class StockOrdersUI extends BaseUI {
         return orders;
     }
 
+    /**
+     * Creates a TableView for displaying orders.
+     *
+     * @return The created TableView for orders.
+     */
 
     private TableView<Order> createOrderTableView() {
         TableView<Order> tableView = new TableView<>();
@@ -200,6 +226,12 @@ public class StockOrdersUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Displays the details of the selected order.
+     *
+     * @param order The selected order.
+     */
+
     private void viewOrderDetails(Order order) {
         // Clear previous order details
         orderDetailsBox.getChildren().clear();
@@ -217,6 +249,13 @@ public class StockOrdersUI extends BaseUI {
         // Add the table view and "Back" button to the order details box
         orderDetailsBox.getChildren().addAll(ingredientTableView, backButton);
     }
+
+    /**
+     * Retrieves the ingredients of an order from the database.
+     *
+     * @param orderID The ID of the order.
+     * @return A list of ingredients for the specified order.
+     */
 
     private List<Ingredient> getOrderIngredientsFromDatabase(int orderID) {
         List<Ingredient> ingredients = new ArrayList<>();
@@ -246,6 +285,12 @@ public class StockOrdersUI extends BaseUI {
 
         return ingredients;
     }
+
+    /**
+     * Initializes the order placement UI.
+     *
+     * @param ordersMainContent The main content VBox for the orders UI.
+     */
 
     private void initializeOrderPlacementUI(VBox ordersMainContent) {
         // Create a DatePicker for selecting the order date
@@ -277,6 +322,11 @@ public class StockOrdersUI extends BaseUI {
         ordersMainContent.getChildren().addAll(buttonBox, menuTableView, ingredientDetailsBox);
     }
 
+    /**
+     * Creates a TableView for displaying menus.
+     *
+     * @return The created TableView for menus.
+     */
     private TableView<Menu> createMenuTableView() {
         TableView<Menu> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -339,6 +389,11 @@ public class StockOrdersUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Displays the ingredient details for the selected menu.
+     *
+     * @param menu The selected menu.
+     */
     private void viewIngredientDetails(Menu menu) {
         // Clear previous ingredient details
         VBox ingredientDetailsBox = (VBox) getMainContent().getChildren().get(2);
@@ -353,6 +408,13 @@ public class StockOrdersUI extends BaseUI {
         // Add the table view to the ingredient details box
         ingredientDetailsBox.getChildren().add(ingredientTableView);
     }
+
+    /**
+     * Creates a TableView for displaying ingredients.
+     *
+     * @param ingredients The list of ingredients to display.
+     * @return The created TableView for ingredients.
+     */
 
     private TableView<Ingredient> createIngredientTableView(List<Ingredient> ingredients) {
         TableView<Ingredient> tableView = new TableView<>();
@@ -435,6 +497,13 @@ public class StockOrdersUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Retrieves the current quantity of an ingredient from the database.
+     *
+     * @param ingredientID The ID of the ingredient.
+     * @return The current quantity of the ingredient.
+     */
+
     private int getIngredientQuantityFromDatabase(int ingredientID) {
         int quantity = 0;
 
@@ -458,6 +527,13 @@ public class StockOrdersUI extends BaseUI {
     }
 
 
+    /**
+     * Retrieves the threshold of an ingredient from the database.
+     *
+     * @param ingredientID The ID of the ingredient.
+     * @return The threshold of the ingredient.
+     */
+
     private int getIngredientThresholdFromDatabase(int ingredientID) {
         int threshold = 0;
 
@@ -480,6 +556,12 @@ public class StockOrdersUI extends BaseUI {
         return threshold;
     }
 
+    /**
+     * Retrieves the ingredients of a menu from the database.
+     *
+     * @param menuID The ID of the menu.
+     * @return A list of ingredients for the specified menu.
+     */
     private List<Ingredient> getIngredientsFromDatabase(int menuID) {
         List<Ingredient> ingredients = new ArrayList<>();
 
@@ -509,6 +591,11 @@ public class StockOrdersUI extends BaseUI {
         return ingredients;
     }
 
+    /**
+     * Retrieves the menus from the database.
+     *
+     * @return A list of menus.
+     */
     private List<Menu> getMenusFromDatabase() {
         List<Menu> menus = new ArrayList<>();
 
@@ -530,6 +617,10 @@ public class StockOrdersUI extends BaseUI {
 
         return menus;
     }
+
+    /**
+     * Generates an order based on the selected ingredients and quantities.
+     */
 
     private void generateOrder() {
         LocalDate orderDate = placementDatePicker.getValue();
@@ -568,6 +659,11 @@ public class StockOrdersUI extends BaseUI {
         switchToOrderViewingUI();
     }
 
+    /**
+     * Retrieves the last order ID from the database.
+     *
+     * @return The last order ID.
+     */
     private int getLastOrderID() {
         int lastOrderID = 0;
 
@@ -585,6 +681,15 @@ public class StockOrdersUI extends BaseUI {
 
         return lastOrderID;
     }
+
+    /**
+     * Saves an order and its associated ingredients to the database.
+     *
+     * @param orderID The ID of the order.
+     * @param orderDate The date of the order.
+     * @param expectedDeliveryDate The expected delivery date of the order.
+     * @param ingredients The list of ingredients in the order.
+     */
 
     private void saveOrderToDatabase(int orderID, LocalDate orderDate, LocalDate expectedDeliveryDate,
                                      List<Ingredient> ingredients) {
@@ -616,6 +721,9 @@ public class StockOrdersUI extends BaseUI {
     }
 
 
+    /**
+     * Switches to the order placement UI.
+     */
     private void switchToOrderPlacementUI() {
         isPlacingOrder = true;
         VBox ordersMainContent = (VBox) getMainContent();
@@ -623,6 +731,9 @@ public class StockOrdersUI extends BaseUI {
         initializeOrderPlacementUI(ordersMainContent);
     }
 
+    /**
+     * Switches to the order viewing UI.
+     */
     private void switchToOrderViewingUI() {
         isPlacingOrder = false;
         VBox ordersMainContent = (VBox) getMainContent();
@@ -630,134 +741,12 @@ public class StockOrdersUI extends BaseUI {
         initializeOrderViewingUI(ordersMainContent);
     }
 
-
-
-
-
-
-
-
-
-//    private TableView<Order> createTableView() {
-//        TableView<Order> tableView = new TableView<>();
-//        tableView.setEditable(true);
-//        tableView.setStyle("-fx-background-color: #1A1A1A;");
-//
-//        // Create table columns
-//        TableColumn<Order, String> ingredientColumn = new TableColumn<>("Ingredient");
-//        ingredientColumn.setCellValueFactory(new PropertyValueFactory<>("ingredient"));
-//        ingredientColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-//        ingredientColumn.setOnEditCommit(event -> {
-//            Order order = event.getRowValue();
-//            String newValue = event.getNewValue();
-//            order.setIngredient(newValue);
-//        });
-//
-//        TableColumn<Order, Integer> quantityColumn = new TableColumn<>("Quantity");
-//        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-//        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-//        quantityColumn.setOnEditCommit(event -> {
-//            Order order = event.getRowValue();
-//            int newValue = event.getNewValue();
-//            order.setQuantity(newValue);
-//        });
-//
-//        TableColumn<Order, Double> costColumn = new TableColumn<>("Cost");
-//        costColumn.setCellValueFactory(new PropertyValueFactory<>("cost"));
-//        costColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-//        costColumn.setOnEditCommit(event -> {
-//            Order order = event.getRowValue();
-//            double newValue = event.getNewValue();
-//            order.setCost(newValue);
-//        });
-//
-//        // Set the style for table columns
-//        ingredientColumn.setStyle("-fx-text-fill: white;");
-//        quantityColumn.setStyle("-fx-text-fill: white;");
-//        costColumn.setStyle("-fx-text-fill: white;");
-//
-//        // Add columns to the table view
-//        tableView.getColumns().addAll(ingredientColumn, quantityColumn, costColumn);
-//
-//        // Set the cell factory to style table cells
-//        tableView.setRowFactory(tv -> {
-//            TableRow<Order> row = new TableRow<>();
-//            row.setStyle("-fx-background-color: #1A1A1A;");
-//
-//            // Change the highlight color of the selected cell to red
-//            row.setOnMouseEntered(event -> {
-//                if (!row.isEmpty()) {
-//                    row.setStyle("-fx-background-color: #333333;");
-//                }
-//            });
-//
-//            row.setOnMouseExited(event -> {
-//                if (!row.isEmpty()) {
-//                    row.setStyle("-fx-background-color: #1A1A1A;");
-//                }
-//            });
-//
-//            return row;
-//        });
-//
-//        // Set the column resize policy to remove the empty column
-//        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-//
-//        return tableView;
-//    }
-
-//    private void getOrder() {
-//        LocalDate selectedDate = orderDatePicker.getValue();
-//        if (selectedDate == null) {
-//            // Show an alert when no date is selected
-//            showAlert("No Date Selected", "Please select a date to get the order.");
-//            return;
-//        }
-//
-//
-//        // TODO: Retrieve the order information for the selected date from the external API
-//        // For testing purposes, you can use dummy data
-//        List<Order> orders = getDummyOrders();
-//
-//        // Set the retrieved orders to the table view
-//        orderTableView.getItems().setAll(orders);
-//
-//        // Set the initial order status based on the retrieved order
-//        String orderStatus = orders.isEmpty() ? "Pending" : orders.get(0).getStatus();
-//        orderStatusComboBox.setValue(orderStatus);
-//    }
-
-//    private void updateOrderStatus() {
-//        LocalDate selectedDate = orderDatePicker.getValue();
-//        if (selectedDate == null) {
-//            showAlert("No Date Selected", "Please select a date to update the order status.");
-//            return;
-//        }
-//
-//        String selectedStatus = orderStatusComboBox.getValue();
-//        if (selectedStatus == null) {
-//            showAlert("No Status Selected", "Please select a status to update the order.");
-//            return;
-//        }
-//
-//        // TODO: Update the order status in the external API or database
-//
-//        // Update the status of all orders in the table view
-//        for (Order order : orderTableView.getItems()) {
-//            order.setStatus(selectedStatus);
-//        }
-//        showSuccessAlert("Status Updated", "Order status successfully changed to " + selectedStatus);
-//
-//    }
-
-//    private List<Order> getDummyOrders() {
-//        // Create dummy orders for testing purposes
-//        List<Order> orders = new ArrayList<>();
-//        orders.add(new Order("Ingredient 1", 10, 50.0));
-//        orders.add(new Order("Ingredient 2", 5, 30.0));
-//        orders.add(new Order("Ingredient 3", 8, 40.0));
-//        return orders;
-//    }
+    /**
+     * Shows an alert dialog with the specified title and content.
+     *
+     * @param title The title of the alert.
+     * @param content The content of the alert.
+     */
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -766,6 +755,13 @@ public class StockOrdersUI extends BaseUI {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    /**
+     * Shows a success alert dialog with the specified title and content.
+     *
+     * @param title The title of the success alert.
+     * @param content The content of the success alert.
+     */
 
     private void showSuccessAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -776,4 +772,3 @@ public class StockOrdersUI extends BaseUI {
     }
 }
 
-//    currently the stock order page works by user entering a date then seeing the ingredients from that order but what if user dosent know the exact date for order, so i want u to change the UI page. Instead the user should be ablee to enter a start and end date in date picker boxes. Then an sql query is to be made it should list all orders where the expectedDelivieryDate is within the range the user entered, then user should be able to click on the order and see what ingredients were bought in that order and the quanity of the ingredients. Futhermore they should be able to go back incase they clicked on the wrong order
