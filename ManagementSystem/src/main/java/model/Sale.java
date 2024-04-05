@@ -17,5 +17,35 @@ public class Sale {
         this.dishQuantities = new HashMap<>();
     }
 
-    // Getters and setters...
+    public int getSaleID() {
+        return saleID;
+    }
+
+    public void setSaleID(int saleID) {
+        this.saleID = saleID;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Map<Dish, Integer> getDishQuantities() {
+        return dishQuantities;
+    }
+
+    public void setDishQuantities(Map<Dish, Integer> dishQuantities) {
+        this.dishQuantities = dishQuantities;
+    }
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
 }

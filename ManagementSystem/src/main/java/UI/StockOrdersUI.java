@@ -357,8 +357,7 @@ public class StockOrdersUI extends BaseUI {
     private TableView<Ingredient> createIngredientTableView(List<Ingredient> ingredients) {
         TableView<Ingredient> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
-        tableView.setEditable(true); // Make the table view editable
-
+        tableView.setEditable(true);
 
         // Create table columns
         TableColumn<Ingredient, String> nameColumn = new TableColumn<>("Ingredient");
@@ -375,14 +374,6 @@ public class StockOrdersUI extends BaseUI {
         });
         quantityColumn.setStyle("-fx-text-fill: white;");
 
-        // Set the cell factory for the quantity column to allow editing
-        quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        quantityColumn.setOnEditCommit(event -> {
-            Ingredient ingredient = event.getRowValue();
-            int newValue = event.getNewValue();
-            ingredient.setQuantity(newValue);
-        });
-
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         ScrollPane scrollPane = new ScrollPane(tableView);
@@ -395,7 +386,32 @@ public class StockOrdersUI extends BaseUI {
         // Set the items to the list of ingredients
         tableView.getItems().addAll(ingredients);
 
-        // Set the cell factory to style table cells
+        // Set the cell factory to style table cells based on the low stock threshold
+        nameColumn.setCellFactory(column -> new TableCell<Ingredient, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+
+                    Ingredient ingredient = getTableView().getItems().get(getIndex());
+                    int currentQuantity = getIngredientQuantityFromDatabase(ingredient.getIngredientID());
+                    int threshold = getIngredientThresholdFromDatabase(ingredient.getIngredientID());
+
+                    if (currentQuantity < threshold) {
+                        setStyle("-fx-text-fill: red;");
+                    } else {
+                        setStyle("-fx-text-fill: white;");
+                    }
+                }
+            }
+        });
+
+        // Set the row factory to style table rows
         tableView.setRowFactory(tv -> {
             TableRow<Ingredient> row = new TableRow<>();
             row.setStyle("-fx-background-color: #1A1A1A;");
@@ -417,6 +433,51 @@ public class StockOrdersUI extends BaseUI {
         });
 
         return tableView;
+    }
+
+    private int getIngredientQuantityFromDatabase(int ingredientID) {
+        int quantity = 0;
+
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT ingredientQuantity FROM Ingredient WHERE ingredientID = ?")) {
+
+            stmt.setInt(1, ingredientID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    quantity = rs.getInt("ingredientQuantity");
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return quantity;
+    }
+
+
+    private int getIngredientThresholdFromDatabase(int ingredientID) {
+        int threshold = 0;
+
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT ingredientThreshold FROM Ingredient WHERE ingredientID = ?")) {
+
+            stmt.setInt(1, ingredientID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    threshold = rs.getInt("ingredientThreshold");
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return threshold;
     }
 
     private List<Ingredient> getIngredientsFromDatabase(int menuID) {
