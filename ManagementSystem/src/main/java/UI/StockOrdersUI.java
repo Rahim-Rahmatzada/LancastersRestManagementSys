@@ -194,12 +194,22 @@ public class StockOrdersUI extends BaseUI {
         orderStatusColumn.setOnEditCommit(event -> {
             Order order = event.getRowValue();
             String newStatus = event.getNewValue();
+            
+            if (newStatus.matches(".*\\d.*")) { // Regex to check for any digit
+                showAlert("Invalid Input", "Order status cannot contain numbers.");
+                return; // Do not proceed with the update
+            }
+
             order.setOrderStatus(newStatus);
             updateOrderStatusInDatabase(order.getOrderID(), newStatus);
         });
         orderStatusColumn.setStyle("-fx-text-fill: white;");
 
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Enable cell selection and editing
+        tableView.getSelectionModel().cellSelectionEnabledProperty().set(true);
+        tableView.setEditable(true);
 
         ScrollPane scrollPane = new ScrollPane(tableView);
         scrollPane.setFitToWidth(true);
