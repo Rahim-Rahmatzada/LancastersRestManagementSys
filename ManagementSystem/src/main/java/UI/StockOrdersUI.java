@@ -1,5 +1,6 @@
 package UI;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -22,6 +23,8 @@ import model.Menu;
  * The StockOrdersUI class represents the user interface for managing stock orders.
  * It provides functionality for viewing and placing stock orders.
  */
+
+//TO DO LET USER CHANGE STATUS
 
 
 public class StockOrdersUI extends BaseUI {
@@ -137,7 +140,7 @@ public class StockOrdersUI extends BaseUI {
 
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT orderID, dateOrdered, expectedDeliveryDate " +
+                     "SELECT orderID, dateOrdered, expectedDeliveryDate, orderStatus " +
                              "FROM StockOrders " +
                              "WHERE expectedDeliveryDate BETWEEN ? AND ?")) {
 
@@ -149,7 +152,8 @@ public class StockOrdersUI extends BaseUI {
                     int orderID = rs.getInt("orderID");
                     LocalDate dateOrdered = rs.getDate("dateOrdered").toLocalDate();
                     LocalDate expectedDeliveryDate = rs.getDate("expectedDeliveryDate").toLocalDate();
-                    Order order = new Order(orderID, dateOrdered, expectedDeliveryDate);
+                    String orderStatus = rs.getString("orderStatus");
+                    Order order = new Order(orderID, dateOrdered, expectedDeliveryDate, orderStatus);
                     orders.add(order);
                 }
             }
@@ -184,6 +188,17 @@ public class StockOrdersUI extends BaseUI {
         expectedDeliveryDateColumn.setCellValueFactory(new PropertyValueFactory<>("expectedDeliveryDate"));
         expectedDeliveryDateColumn.setStyle("-fx-text-fill: white;");
 
+        TableColumn<Order, String> orderStatusColumn = new TableColumn<>("Order Status");
+        orderStatusColumn.setCellValueFactory(new PropertyValueFactory<>("orderStatus"));
+        orderStatusColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        orderStatusColumn.setOnEditCommit(event -> {
+            Order order = event.getRowValue();
+            String newStatus = event.getNewValue();
+            order.setOrderStatus(newStatus);
+            updateOrderStatusInDatabase(order.getOrderID(), newStatus);
+        });
+        orderStatusColumn.setStyle("-fx-text-fill: white;");
+
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         ScrollPane scrollPane = new ScrollPane(tableView);
@@ -192,7 +207,7 @@ public class StockOrdersUI extends BaseUI {
 
 
         // Add columns to the table view
-        tableView.getColumns().addAll(orderIDColumn, dateOrderedColumn, expectedDeliveryDateColumn);
+        tableView.getColumns().addAll(orderIDColumn, dateOrderedColumn, expectedDeliveryDateColumn, orderStatusColumn);
 
         // Set the cell factory to style table cells
         tableView.setRowFactory(tv -> {
@@ -212,7 +227,7 @@ public class StockOrdersUI extends BaseUI {
                 }
             });
 
-            // Add event handler to view order details when a row is clicked
+//             Add event handler to view order details when a row is clicked
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 1 && !row.isEmpty()) {
                     Order selectedOrder = row.getItem();
@@ -223,7 +238,32 @@ public class StockOrdersUI extends BaseUI {
             return row;
         });
 
+        // Enable cell editing for the "Order Status" column
+        orderStatusColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        // Set the cell value factory for the "Order Status" column
+        orderStatusColumn.setCellValueFactory(cellData -> {
+            Order order = cellData.getValue();
+            String orderStatus = order.getOrderStatus();
+            System.out.println("Getting order status: " + orderStatus); // Print statement
+            return new SimpleStringProperty(orderStatus);
+        });
+
         return tableView;
+    }
+
+    private void updateOrderStatusInDatabase(int orderID, String newStatus) {
+        try (Connection conn = DatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE StockOrders SET orderStatus = ? WHERE orderID = ?")) {
+
+            stmt.setString(1, newStatus);
+            stmt.setInt(2, orderID);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

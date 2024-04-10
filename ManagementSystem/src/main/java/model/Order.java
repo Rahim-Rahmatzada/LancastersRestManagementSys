@@ -6,11 +6,22 @@ public class Order {
     private int orderID;
     private LocalDate dateOrdered;
     private LocalDate expectedDeliveryDate;
+    private String orderStatus;
 
-    public Order(int orderID, LocalDate dateOrdered, LocalDate expectedDeliveryDate) {
+
+    public Order(int orderID, LocalDate dateOrdered, LocalDate expectedDeliveryDate, String orderStatus) {
         this.orderID = orderID;
         this.dateOrdered = dateOrdered;
         this.expectedDeliveryDate = expectedDeliveryDate;
+        this.orderStatus = orderStatus;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     public int getOrderID() {
