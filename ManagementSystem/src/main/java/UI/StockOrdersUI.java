@@ -194,7 +194,7 @@ public class StockOrdersUI extends BaseUI {
         orderStatusColumn.setOnEditCommit(event -> {
             Order order = event.getRowValue();
             String newStatus = event.getNewValue();
-            
+
             if (newStatus.matches(".*\\d.*")) { // Regex to check for any digit
                 showAlert("Invalid Input", "Order status cannot contain numbers.");
                 return; // Do not proceed with the update
