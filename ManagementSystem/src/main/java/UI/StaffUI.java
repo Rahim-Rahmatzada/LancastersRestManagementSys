@@ -407,5 +407,13 @@ public class StaffUI extends BaseUI {
 }
 
 
-//    Staff Scheduling: Manage staff schedules including shifts, holidays, and absences to ensure adequate staffing.
-//        Performance Tracking: Monitor staff performance and productivity metrics.
+
+//So user enters a date thorugh a date picker then hits the get schedule button, this will then loop through all the staff and check if the relation with the staff schedule
+//where there is a dateWorking variable if it matches input date of user then output the staffs name role as well as their starting/ending time for shift and their duration
+//in one table view
+
+//Button to go to "View Staff Holidays", user can enter begin and end date then there will be an sql query looking through each staff and if their holiday dates fit the range
+//if so output staff name, starting/ending date of holiday and numberOfDays
+
+//Another button for "Modify Staff Schedule" which will lead to another UI subsection, there will be a table view of all staff listed then user can click on a user which
+//will output the all schedule relations with that staff here they can add remove modify a specific staffs schedule, this info will be in another table view
