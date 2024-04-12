@@ -1,21 +1,22 @@
 package model;
 
 import java.util.Date;
+import java.sql.Time;
 
 public class Schedule {
     private int scheduleID;
-    private String staffName;
-    private Date startDate;
-    private Date endDate;
-    private String role;
+    private Date dateWorking;
+    private Time shiftStartingTime;
+    private Time shiftEndingTime;
+    private String duration;
 
-    public Schedule(int scheduleID, String staffName, Date startDate, Date endDate, String role) {
+    public Schedule(int scheduleID, Date dateWorking, Time shiftStartingTime, Time shiftEndingTime, String duration) {
         this.scheduleID = scheduleID;
-        this.staffName = staffName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.role = role;
+        this.dateWorking = dateWorking;
+        this.shiftStartingTime = shiftStartingTime;
+        this.shiftEndingTime = shiftEndingTime;
+        this.duration = duration;
     }
 
-    // Getters and setters...
+
 }

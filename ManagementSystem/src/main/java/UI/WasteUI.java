@@ -10,3 +10,6 @@ public class WasteUI {
 }
 
 //testing gitbranch in wasteUI
+
+
+//waste is a boh job but we can visualize it
