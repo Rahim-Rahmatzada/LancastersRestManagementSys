@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
-import model.DatabaseConnector;
+import model.AdminDatabaseConnector;
 import model.Ingredient;
 
 import java.sql.*;
@@ -212,7 +212,7 @@ public class InventoryUI extends BaseUI {
     }
 
     private void deleteIngredient(String ingredientName) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "DELETE FROM Ingredient WHERE ingredientName = ?")) {
 
@@ -269,7 +269,7 @@ public class InventoryUI extends BaseUI {
     }
 
     private void addNewIngredient(String ingredientName) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO Ingredient (ingredientID, ingredientName, ingredientCost, ingredientQuantity, ingredientThreshold) " +
                              "VALUES (?, ?, ?, ?, ?)")) {
@@ -286,7 +286,7 @@ public class InventoryUI extends BaseUI {
 
     private int getMaxIngredientID() {
         int maxID = 0;
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT MAX(ingredientID) FROM Ingredient")) {
 
@@ -300,7 +300,7 @@ public class InventoryUI extends BaseUI {
     }
 
     private void updateIngredientValue(Ingredient ingredient, String column, Object newValue) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE Ingredient SET " + column + " = ? WHERE ingredientID = ?")) {
 
@@ -328,7 +328,7 @@ public class InventoryUI extends BaseUI {
     private ObservableList<Ingredient> getIngredientDataFromDatabase() {
         ObservableList<Ingredient> ingredientList = FXCollections.observableArrayList();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT ingredientID, ingredientName, ingredientCost, ingredientQuantity, ingredientThreshold FROM Ingredient")) {
 
@@ -377,7 +377,7 @@ public class InventoryUI extends BaseUI {
                 "LIMIT 3;";
 
         StringBuilder topIngredients = new StringBuilder();
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
@@ -402,7 +402,7 @@ public class InventoryUI extends BaseUI {
                 "LIMIT 3;";
 
         StringBuilder mostExpensiveIngredients = new StringBuilder();
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
@@ -426,7 +426,7 @@ public class InventoryUI extends BaseUI {
                 "LIMIT 3;";
 
         StringBuilder highestQuantityIngredients = new StringBuilder();
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 

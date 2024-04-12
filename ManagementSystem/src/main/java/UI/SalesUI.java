@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import model.DatabaseConnector;
+import model.AdminDatabaseConnector;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -311,7 +311,7 @@ public class SalesUI extends BaseUI {
     private List<SoldItem> getSoldDishesWithQuantities(LocalDate startDate, LocalDate endDate) {
         List<SoldItem> soldDishes = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT d.name, d.price, COUNT(*) AS quantity " +
                              "FROM Sale s " +
@@ -347,7 +347,7 @@ public class SalesUI extends BaseUI {
     private List<SoldItem> getSoldWinesWithQuantities(LocalDate startDate, LocalDate endDate) {
         List<SoldItem> soldWines = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT w.name, d.price, COUNT(*) AS quantity " +
                              "FROM Sale s " +
@@ -398,7 +398,7 @@ public class SalesUI extends BaseUI {
 
             graphCreator.clearGraph();
 
-            try (Connection conn = DatabaseConnector.getConnection()) {
+            try (Connection conn = AdminDatabaseConnector.getConnection()) {
                 updatePopularItems(startDate, endDate, conn);
 
                 if (dishCheckBox.isSelected()) {

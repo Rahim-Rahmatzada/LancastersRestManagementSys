@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
-import model.DatabaseConnector;
+import model.AdminDatabaseConnector;
 import model.Ingredient;
 import model.Order;
 import java.sql.*;
@@ -138,7 +138,7 @@ public class StockOrdersUI extends BaseUI {
     private List<Order> getOrdersFromDatabase(LocalDate startDate, LocalDate endDate) {
         List<Order> orders = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT orderID, dateOrdered, expectedDeliveryDate, orderStatus " +
                              "FROM StockOrders " +
@@ -263,7 +263,7 @@ public class StockOrdersUI extends BaseUI {
     }
 
     private void updateOrderStatusInDatabase(int orderID, String newStatus) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE StockOrders SET orderStatus = ? WHERE orderID = ?")) {
 
@@ -310,7 +310,7 @@ public class StockOrdersUI extends BaseUI {
     private List<Ingredient> getOrderIngredientsFromDatabase(int orderID) {
         List<Ingredient> ingredients = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT i.ingredientID, i.ingredientName, soi.ingredientQuantityOrdered " +
                              "FROM Ingredient i " +
@@ -557,7 +557,7 @@ public class StockOrdersUI extends BaseUI {
     private int getIngredientQuantityFromDatabase(int ingredientID) {
         int quantity = 0;
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ingredientQuantity FROM Ingredient WHERE ingredientID = ?")) {
 
@@ -587,7 +587,7 @@ public class StockOrdersUI extends BaseUI {
     private int getIngredientThresholdFromDatabase(int ingredientID) {
         int threshold = 0;
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT ingredientThreshold FROM Ingredient WHERE ingredientID = ?")) {
 
@@ -615,7 +615,7 @@ public class StockOrdersUI extends BaseUI {
     private List<Ingredient> getIngredientsFromDatabase(int menuID) {
         List<Ingredient> ingredients = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT i.ingredientID, i.ingredientName " +
                              "FROM Ingredient i " +
@@ -649,7 +649,7 @@ public class StockOrdersUI extends BaseUI {
     private List<Menu> getMenusFromDatabase() {
         List<Menu> menus = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT menuID, effectiveDate, menuStatus FROM Menu")) {
 
@@ -717,7 +717,7 @@ public class StockOrdersUI extends BaseUI {
     private int getLastOrderID() {
         int lastOrderID = 0;
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT MAX(orderID) AS maxOrderID FROM StockOrders")) {
 
@@ -743,7 +743,7 @@ public class StockOrdersUI extends BaseUI {
 
     private void saveOrderToDatabase(int orderID, LocalDate orderDate, LocalDate expectedDeliveryDate,
                                      List<Ingredient> ingredients) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement orderStmt = conn.prepareStatement(
                      "INSERT INTO StockOrders (orderID, dateOrdered, expectedDeliveryDate) " +
                              "VALUES (?, ?, ?)");

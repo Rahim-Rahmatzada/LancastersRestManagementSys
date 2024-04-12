@@ -8,11 +8,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import model.DatabaseConnector;
 import model.LoginManager;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public class DashboardUI extends BaseUI {
     private LoginManager loginManager;

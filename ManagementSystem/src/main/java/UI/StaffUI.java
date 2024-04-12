@@ -7,7 +7,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import model.DatabaseConnector;
+import model.AdminDatabaseConnector;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -154,7 +154,7 @@ public class StaffUI extends BaseUI {
         }
 
         // Update or insert the shift into the database
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             // Check if the employee already has a shift on the selected date
             String query = "SELECT * FROM StaffSchedule WHERE scheduleDate = ? AND employeeName = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
@@ -252,7 +252,7 @@ public class StaffUI extends BaseUI {
 
     private void generateScheduleData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
         // Connect to the database using DatabaseConnector
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "SELECT staffName, startTime, endTime, scheduleDate FROM StaffInfo INNER JOIN StaffSchedule ON StaffInfo.staffScheduleID = StaffSchedule.scheduleID";
             try (PreparedStatement pstmt = conn.prepareStatement(query);
                  ResultSet rs = pstmt.executeQuery()) {
@@ -287,7 +287,7 @@ public class StaffUI extends BaseUI {
 
     private void generateAbsencesData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
         // Connect to the SQLite database
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "SELECT StaffInfo.staffName, StaffHoliday.startDate, StaffHoliday.endDate FROM StaffHoliday " +
                     "INNER JOIN StaffHoliday_StaffInfo ON StaffHoliday.holidayID = StaffHoliday_StaffInfo.holidayID " +
                     "INNER JOIN StaffInfo ON StaffHoliday_StaffInfo.staffID = StaffInfo.staffID " +
@@ -324,7 +324,7 @@ public class StaffUI extends BaseUI {
 
     private void generateHolidaysData(LocalDate startDate, LocalDate endDate, List<ScheduleEntry> data) {
         // Connect to the SQLite database
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "SELECT * FROM StaffHoliday WHERE startDate BETWEEN ? AND ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, startDate.toString());
@@ -365,7 +365,7 @@ public class StaffUI extends BaseUI {
 
     private void deleteSchedule(LocalDate date, String name) {
         // Delete the schedule from the database
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String deleteQuery = "DELETE FROM StaffSchedule WHERE scheduleDate = ? AND employeeName = ?";
             PreparedStatement pstmt = conn.prepareStatement(deleteQuery);
             pstmt.setDate(1, Date.valueOf(date));

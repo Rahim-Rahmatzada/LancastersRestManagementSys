@@ -4,12 +4,22 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import model.DataUserDatabaseConnector;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Main user interface for the application. Manages primary stage and switches scenes based on UI interaction.
  */
 
+
 public class MainUI extends Application implements UISwitcher {
+
+    private static ConfigurableApplicationContext springContext;
 
     private Stage primaryStage;
     private DashboardUI dashboardUI;
@@ -28,6 +38,7 @@ public class MainUI extends Application implements UISwitcher {
      */
 
     public static void main(String[] args) {
+
         launch(args);
     }
 
@@ -40,6 +51,8 @@ public class MainUI extends Application implements UISwitcher {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+
+
         switchToDashboard();
         primaryStage.show();
     }
