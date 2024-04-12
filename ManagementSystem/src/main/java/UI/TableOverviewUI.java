@@ -192,7 +192,7 @@ public class TableOverviewUI extends BaseUI {
 
                 // Add mouse event handlers to the table button
                 tableButton.setOnMouseEntered(event -> {
-                    tableButton.setStyle("-fx-background-color: #d3d3d3; -fx-text-fill: white;");
+                    tableButton.setStyle("-fx-background-color: #d3d3d3; -fx-text-fill: black;");
                 });
 
                 tableButton.setOnMouseExited(event -> {
