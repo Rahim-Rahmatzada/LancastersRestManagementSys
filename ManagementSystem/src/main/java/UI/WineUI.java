@@ -10,12 +10,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import model.DatabaseConnector;
-import model.Ingredient;
 import model.Wine;
 
 import java.sql.*;
@@ -26,7 +23,6 @@ import javafx.scene.text.Text;
 
 public class WineUI extends BaseUI {
     private TableView<Wine> wineTableView;
-    private int threshold = 3;
     public WineUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Wine");
@@ -44,12 +40,15 @@ public class WineUI extends BaseUI {
         wineMainContent.getChildren().addAll(wineTableView, controlsBox);
 
         setMainContent(wineMainContent);
+
     }
 
     private TableView<Wine> createWineTableView() {
         TableView<Wine> tableView = new TableView<>();
 
         tableView.setStyle("-fx-background-color: #1A1A1A;");
+
+        // Create table columns
 
         TableColumn<Wine, String> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
@@ -60,7 +59,7 @@ public class WineUI extends BaseUI {
             updateWineValue(wine, "ID", newValue);
         });
 
-        // Create table columns
+
         TableColumn<Wine, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -106,17 +105,16 @@ public class WineUI extends BaseUI {
             updateWineValue(wine, "price", newValue);
         });
 
-        // Add other columns for type, quantity, prize as needed
 
         // Set the style for table columns
         nameColumn.setStyle("-fx-text-fill: white;");
         typeColumn.setStyle("-fx-text-fill: white;");
         vintageColumn.setStyle("-fx-text-fill: white;");
-        quantityColumn.setStyle("-fx-text-fill: white;");
+        quantityColumn.setStyle("-fx-text-fill: black;");
         priceColumn.setStyle("-fx-text-fill: white;");
         idColumn.setStyle("-fx-text-fill: white;");
 
-        // Add styles for other columns as needed
+
 
         // Add columns to the table view
         tableView.getColumns().addAll(idColumn, nameColumn, typeColumn, vintageColumn, quantityColumn, priceColumn); // Add other columns as needed
@@ -139,13 +137,6 @@ public class WineUI extends BaseUI {
                     setStyle("");
                 } else {
                     setText(item);
-
-                    Wine wine = getTableView().getItems().get(getIndex());
-                    if (wine.getQuantity() < threshold) {
-                        setStyle("-fx-text-fill: red;");
-                    } else {
-                        setStyle("-fx-text-fill: white;");
-                    }
                 }
             }
         });
@@ -237,7 +228,6 @@ public class WineUI extends BaseUI {
         controlsBox.setAlignment(Pos.CENTER_LEFT);
 
         controlsBox.getChildren().addAll(
-                createThresholdControls(),
                 createAddWineControls(),
                 createDeleteWineControls()
         );
@@ -344,12 +334,12 @@ public class WineUI extends BaseUI {
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
-                int id = rs.getInt("ID");
+                int id = rs.getInt("wineID");
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 int vintage = rs.getInt("vintage");
                 int quantity = rs.getInt("quantity");
-                double price = rs.getDouble("price");
+                double price = rs.getDouble("winePrice");
 
 
                 // Create Wine object and add to the list
@@ -361,28 +351,6 @@ public class WineUI extends BaseUI {
         }
 
         return wineList;
-    }
-    private HBox createThresholdControls() {
-        HBox thresholdBox = new HBox();
-        thresholdBox.setSpacing(10);
-
-        TextField thresholdField = new TextField();
-        thresholdField.setPromptText("Enter Threshold");
-        thresholdField.setText(String.valueOf(threshold));
-
-        Button setThresholdButton = new Button("Set Low Stock Threshold");
-        setThresholdButton.setOnAction(event -> {
-            try {
-                threshold = Integer.parseInt(thresholdField.getText());
-                reloadWineTableView();
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Threshold", "Please enter a valid threshold value.");
-            }
-        });
-
-        thresholdBox.getChildren().addAll(thresholdField, setThresholdButton);
-
-        return thresholdBox;
     }
     private void reloadWineTableView() {
         // Reload the data in the table view
@@ -397,6 +365,4 @@ public class WineUI extends BaseUI {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
-
 }
