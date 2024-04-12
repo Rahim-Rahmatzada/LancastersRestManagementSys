@@ -21,7 +21,7 @@ public class TableOverviewUI extends BaseUI {
     private Label totalTablesLabel;
     private Label availableTablesLabel;
     private Label occupancyPercentageLabel;
-    private DatePicker datePicker;
+    protected DatePicker datePicker;
     private VBox tableDetailsBox;
     private Label tableDetailsLabel;
     private Button backButton;
@@ -57,21 +57,39 @@ public class TableOverviewUI extends BaseUI {
         capacityBox = new VBox(10);
         capacityBox.setAlignment(Pos.CENTER_LEFT);
 
-       // Label totalTablesTitle = new Label("Total Tables:");
-       // totalTablesTitle.setTextFill(Color.WHITE);
-        Label availableTablesTitle = new Label("Available Tables:");
-        availableTablesTitle.setTextFill(Color.WHITE);
-
-        capacityBox.getChildren().addAll(
-               // totalTablesTitle, totalTablesLabel,
-                availableTablesTitle, availableTablesLabel
-        );
-
         occupancyPercentageLabel = new Label();
         occupancyPercentageLabel.setTextFill(Color.WHITE);
         occupancyPercentageLabel.setStyle("-fx-font-size: 16px;");
 
-        // Create labels to explain the table colors
+        // Create a date picker for selecting the date
+        datePicker = new DatePicker();
+        datePicker.setOnAction(e -> updateTableAvailability());
+
+        // Create a label for the selected date
+        Label selectedDateLabel = new Label();
+
+        dateBox = new VBox(10);
+        dateBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label dateLabel = new Label("Select date: ");
+        dateLabel.setTextFill(Color.WHITE);
+
+        dateBox.getChildren().addAll(dateLabel, datePicker, selectedDateLabel);
+        //dateBox.getChildren().addAll(new Label("Select Date:"), datePicker, selectedDateLabel);
+
+        //datePicker.setStyle("-fx-text-fill: white;");
+
+        tableLayout = new GridPane();
+        tableLayout.setHgap(10);
+        tableLayout.setVgap(10);
+        tableLayout.setPadding(new Insets(10));
+
+        createTableLayout(LocalDate.now());
+
+        VBox extraInfoBox = new VBox(10);
+        extraInfoBox.setAlignment(Pos.TOP_LEFT);
+        extraInfoBox.setPadding(new Insets(10));
+
         Label occupiedLabel = new Label("Blue Table: Occupied");
         occupiedLabel.setTextFill(Color.WHITE);
         occupiedLabel.setStyle("-fx-font-size: 12px;");
@@ -80,31 +98,33 @@ public class TableOverviewUI extends BaseUI {
         availableLabel.setTextFill(Color.WHITE);
         availableLabel.setStyle("-fx-font-size: 12px;");
 
-        VBox legendBox = new VBox(5);
-        legendBox.getChildren().addAll(occupiedLabel, availableLabel);
-        legendBox.setAlignment(Pos.TOP_RIGHT);
-        legendBox.setPadding(new Insets(10));
+        Label availableTablesTitle = new Label("Available Tables:");
+        availableTablesTitle.setTextFill(Color.WHITE);
 
-        // Create a date picker for selecting the date
-        datePicker = new DatePicker();
-        datePicker.setOnAction(e -> updateTableAvailability());
+        availableTablesLabel = new Label();
+        availableTablesLabel.setTextFill(Color.WHITE);
 
-        // Create a label for the selected date
-        Label selectedDateLabel = new Label();
-        selectedDateLabel.setTextFill(Color.WHITE);
-        selectedDateLabel.textProperty().bind(datePicker.valueProperty().asString());
+        occupancyPercentageLabel = new Label();
+        occupancyPercentageLabel.setTextFill(Color.WHITE);
+        occupancyPercentageLabel.setStyle("-fx-font-size: 16px;");
 
-        dateBox = new VBox(10);
-        dateBox.setAlignment(Pos.CENTER_LEFT);
-        dateBox.getChildren().addAll(new Label("Select Date:"), datePicker, selectedDateLabel);
+        extraInfoBox.getChildren().addAll(
+                occupiedLabel,
+                availableLabel,
+                availableTablesTitle,
+                availableTablesLabel,
+                occupancyPercentageLabel
+        );
 
         HBox mainContent = new HBox(20);
         mainContent.setPadding(new Insets(20));
 
         VBox leftContent = new VBox(20);
-        leftContent.getChildren().addAll(tableLayout, capacityBox, occupancyPercentageLabel, dateBox);
+       // leftContent.getChildren().addAll(tableLayout, capacityBox, occupancyPercentageLabel, dateBox);
+        leftContent.getChildren().addAll(dateBox, tableLayout);
 
-        mainContent.getChildren().addAll(leftContent, legendBox);
+
+        mainContent.getChildren().addAll(leftContent, extraInfoBox);
 
         setMainContent(mainContent);
     }
@@ -122,7 +142,7 @@ public class TableOverviewUI extends BaseUI {
      * and highlights them in red or blue
      */
 
-    private void createTableLayout(LocalDate selectedDate) {
+    void createTableLayout(LocalDate selectedDate) {
         tableLayout.getChildren().clear();
 
         try (Connection conn = DatabaseConnector.getConnection()) {
@@ -168,10 +188,24 @@ public class TableOverviewUI extends BaseUI {
                 tableButton.setTextAlignment(TextAlignment.CENTER);
                 tableButton.setWrapText(true);
                 tableButton.setPrefSize(150, 120);
+                tableButton.setStyle("-fx-background-color: #1A1A1A; -fx-text-fill: white;");
+
+                // Add mouse event handlers to the table button
+                tableButton.setOnMouseEntered(event -> {
+                    tableButton.setStyle("-fx-background-color: #d3d3d3; -fx-text-fill: white;");
+                });
+
+                tableButton.setOnMouseExited(event -> {
+                    if (bookingStatus.equals("Confirmed")) {
+                        tableButton.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
+                    } else {
+                        tableButton.setStyle("-fx-background-color: white; -fx-text-fill: black;");
+                    }
+                });
 
                 if (bookingStatus.equals("Confirmed")) {
                     occupiedTables++;
-                    tableButton.setStyle("-fx-background-color: #4CB5F5; -fx-text-fill: white;");
+                    tableButton.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
                 } else {
                     availableTables++;
                     tableButton.setStyle("-fx-background-color: white; -fx-text-fill: black;");
@@ -216,7 +250,7 @@ public class TableOverviewUI extends BaseUI {
      */
     private void showTableDetails(int tableId, LocalDate selectedDate) {
 
-        VBox mainContent = (VBox) getMainContent();
+        VBox mainContent = getMainContent();
         mainContent.getChildren().clear();
 
         tableDetailsBox = new VBox();
@@ -224,7 +258,7 @@ public class TableOverviewUI extends BaseUI {
         tableDetailsBox.setPadding(new Insets(10));
 
         tableDetailsLabel = new Label("Table Details - Table " + tableId);
-        tableDetailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        tableDetailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         backButton = new Button("Back");
         backButton.setOnAction(e -> showMainUI(selectedDate));
@@ -256,14 +290,44 @@ public class TableOverviewUI extends BaseUI {
 
             // Create a table view to display the data
             TableView<DishWine.DishWinePrice> tableView = new TableView<>();
+            tableView.setStyle("-fx-background-color: #1A1A1A;");
+
             TableColumn<DishWine.DishWinePrice, String> dishColumn = new TableColumn<>("Dish");
             dishColumn.setCellValueFactory(data -> data.getValue().dishNamePriceProperty());
+            dishColumn.setStyle("-fx-text-fill: white;");
+            dishColumn.setPrefWidth(300);
+
             TableColumn<DishWine.DishWinePrice, String> wineColumn = new TableColumn<>("Wine");
             wineColumn.setCellValueFactory(data -> data.getValue().wineNamePriceProperty());
+            wineColumn.setStyle("-fx-text-fill: white;");
+            wineColumn.setPrefWidth(300);
+
             TableColumn<DishWine.DishWinePrice, Number> totalColumn = new TableColumn<>("Total Price");
             totalColumn.setCellValueFactory(data -> data.getValue().totalPriceProperty());
+            totalColumn.setStyle("-fx-text-fill: white;");
+            totalColumn.setPrefWidth(400);
+
             tableView.getColumns().addAll(dishColumn, wineColumn, totalColumn);
 
+            // Set the row factory to style table rows
+            tableView.setRowFactory(tv -> {
+                TableRow<DishWine.DishWinePrice> row = new TableRow<>();
+                row.setStyle("-fx-background-color: #1A1A1A;");
+
+                row.setOnMouseEntered(event -> {
+                    if (!row.isEmpty()) {
+                        row.setStyle("-fx-background-color: #333333;");
+                    }
+                });
+
+                row.setOnMouseExited(event -> {
+                    if (!row.isEmpty()) {
+                        row.setStyle("-fx-background-color: #1A1A1A;");
+                    }
+                });
+
+                return row;
+            });
 
             int tableLayout = 0;
            // int numPeople = 0;
@@ -276,30 +340,27 @@ public class TableOverviewUI extends BaseUI {
                 double winePrice = resultSet.getDouble("winePrice");
                 tableView.getItems().add(new DishWine.DishWinePrice(dishName, dishPrice, wineName, winePrice));
 
-                tableLayout = resultSet.getInt("tableLayout");
+                //tableLayout = resultSet.getInt("tableLayout");
                // numPeople = resultSet.getInt("numPeople");
             }
 
-//            // Create labels to display the table layout and number of people
-            Label tableLayoutLabel = new Label("Table Layout: " + tableLayout);
-            //Label numPeopleLabel = new Label("Number of People: " + numPeople);
-//
-//            // Create a vertical box to hold the table view and labels
-//            VBox dialogContent = new VBox(10);
-//           // dialogContent.getChildren().addAll(tableView, tableLayoutLabel, numPeopleLabel);
-//            dialogContent.getChildren().addAll(tableView, tableLayoutLabel);
-//
-//            // Set the vertical box as the dialog content
-//            dialog.getDialogPane().setContent(dialogContent);
-//
-//            // Add a close button to the dialog
-//            ButtonType closeButtonType = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-//            dialog.getDialogPane().getButtonTypes().add(closeButtonType);
-//
-//            // Show the dialog and wait for it to be closed
-//            dialog.showAndWait();
+            tableView.setStyle("-fx-background-color: #1A1A1A; -fx-text-fill: white;");
 
             tableDetailsBox.getChildren().add(tableView);
+
+            // Retrieve the table layout from the database
+            String tableLayoutQuery = "SELECT t.tablesLayout FROM Tables t WHERE t.tablesID = ?";
+            PreparedStatement tableLayoutStatement = conn.prepareStatement(tableLayoutQuery);
+            tableLayoutStatement.setInt(1, tableId);
+            ResultSet tableLayoutResult = tableLayoutStatement.executeQuery();
+
+            if (tableLayoutResult.next()) {
+                tableLayout = tableLayoutResult.getInt("tablesLayout");
+                Label tableLayoutLabel = new Label("Table Layout: " + tableLayout);
+                tableLayoutLabel.setStyle("-fx-font-size: 14px;");
+                tableLayoutLabel.setStyle("-fx-text-fill: white;");
+                tableDetailsBox.getChildren().add(tableLayoutLabel);
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -311,12 +372,16 @@ public class TableOverviewUI extends BaseUI {
 
     private void showMainUI(LocalDate selectedDate) {
         // Clear the main content
-        VBox mainContent = (VBox) getMainContent();
+        VBox mainContent = getMainContent();
         mainContent.getChildren().clear();
 
-        // Recreate the main UI
-        VBox leftContent = new VBox(20);
-        leftContent.getChildren().addAll(tableLayout, capacityBox, dateBox);
+        // Recreate the table layout
+        createTableLayout(selectedDate);
+
+        // Create the extra info box
+        VBox extraInfoBox = new VBox(10);
+        extraInfoBox.setAlignment(Pos.TOP_LEFT);
+        extraInfoBox.setPadding(new Insets(10));
 
         Label occupiedLabel = new Label("Blue Table: Occupied");
         occupiedLabel.setTextFill(Color.WHITE);
@@ -326,20 +391,27 @@ public class TableOverviewUI extends BaseUI {
         availableLabel.setTextFill(Color.WHITE);
         availableLabel.setStyle("-fx-font-size: 12px;");
 
-        HBox legendBox = new HBox(10);
-        legendBox.getChildren().addAll(occupiedLabel, availableLabel);
+        Label availableTablesTitle = new Label("Available Tables:");
+        availableTablesTitle.setTextFill(Color.WHITE);
 
-        VBox rightContent = new VBox(20);
-        rightContent.getChildren().addAll(legendBox);
+        extraInfoBox.getChildren().addAll(
+                occupiedLabel,
+                availableLabel,
+                availableTablesTitle,
+                availableTablesLabel,
+                occupancyPercentageLabel
+        );
 
-        HBox mainBox = new HBox(20);
-        mainBox.getChildren().addAll(leftContent, rightContent);
+        // Create the main content layout
+        HBox mainContentLayout = new HBox(20);
+        mainContentLayout.setPadding(new Insets(20));
 
-        mainContent.getChildren().add(mainBox);
+        VBox leftContent = new VBox(20);
+        leftContent.getChildren().addAll(dateBox, tableLayout);
 
+        mainContentLayout.getChildren().addAll(leftContent, extraInfoBox);
 
-        // Refresh the table layout
-        createTableLayout(selectedDate);
+        mainContent.getChildren().add(mainContentLayout);
     }
 
 //    /**
