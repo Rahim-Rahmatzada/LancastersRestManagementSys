@@ -88,13 +88,13 @@ public class WineUI extends BaseUI {
             updateWineValue(wine, "quantity", newValue);
         });
 
-        TableColumn<Wine, Double> prizeColumn = new TableColumn<>("Prize");
-        prizeColumn.setCellValueFactory(new PropertyValueFactory<>("prize"));
-        prizeColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-        prizeColumn.setOnEditCommit(event -> {
+        TableColumn<Wine, Double> priceColumn = new TableColumn<>("Price");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        priceColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             double newValue = event.getNewValue();
-            updateWineValue(wine, "prize", newValue);
+            updateWineValue(wine, "price", newValue);
         });
 
         // Add other columns for type, quantity, prize as needed
@@ -104,12 +104,12 @@ public class WineUI extends BaseUI {
         typeColumn.setStyle("-fx-text-fill: white;");
         vintageColumn.setStyle("-fx-text-fill: white;");
         quantityColumn.setStyle("-fx-text-fill: white;");
-        prizeColumn.setStyle("-fx-text-fill: white;");
+        priceColumn.setStyle("-fx-text-fill: white;");
 
         // Add styles for other columns as needed
 
         // Add columns to the table view
-        tableView.getColumns().addAll(nameColumn, typeColumn, vintageColumn, quantityColumn, prizeColumn); // Add other columns as needed
+        tableView.getColumns().addAll(nameColumn, typeColumn, vintageColumn, quantityColumn, priceColumn); // Add other columns as needed
 
         // Load wine data from the database
         ObservableList<Wine> wineData = getWineDataFromDatabase();
@@ -261,7 +261,7 @@ public class WineUI extends BaseUI {
     private void addNewWine(String name) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO Wine (id, name, type, vintage, quantity, prize) " +
+                     "INSERT INTO Wine (wineID, name, type, vintage, quantity, winePrice) " +
                              "VALUES (?, ?, ?, ?, ?, ?)")) {
 
             int newID = getMaxID() + 1;
@@ -288,7 +288,7 @@ public class WineUI extends BaseUI {
         int maxID = 0;
         try (Connection conn = DatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT MAX(id) FROM Wine")) {
+             ResultSet rs = stmt.executeQuery("SELECT MAX(wineID) FROM Wine")) {
 
             if (rs.next()) {
                 maxID = rs.getInt(1);
@@ -302,7 +302,7 @@ public class WineUI extends BaseUI {
     private void updateWineValue(Wine wine, String column, Object newValue) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "UPDATE Wine SET " + column + " = ? WHERE id = ?")) {
+                     "UPDATE Wine SET " + column + " = ? WHERE wineID = ?")) {
 
             if (newValue instanceof String) {
                 stmt.setString(1, (String) newValue);
@@ -327,7 +327,7 @@ public class WineUI extends BaseUI {
         ObservableList<Wine> wineList = FXCollections.observableArrayList();
 
         // Query to retrieve wine data from the database
-        String query = "SELECT id, name, type, vintage, quantity, prize FROM Wine";
+        String query = "SELECT wineID, name, type, vintage, quantity, winePrice FROM Wine";
 
         try (Connection conn = DatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
@@ -339,11 +339,11 @@ public class WineUI extends BaseUI {
                 String type = rs.getString("type");
                 int vintage = rs.getInt("vintage");
                 int quantity = rs.getInt("quantity");
-                double prize = rs.getDouble("prize");
+                double price = rs.getDouble("price");
 
 
                 // Create Wine object and add to the list
-                Wine wine = new Wine(id, name, type, vintage, quantity, prize);
+                Wine wine = new Wine(id, name, type, vintage, quantity, price);
                 wineList.add(wine);
             }
         } catch (SQLException e) {
