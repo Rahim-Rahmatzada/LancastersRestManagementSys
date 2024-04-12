@@ -110,7 +110,7 @@ public class WineUI extends BaseUI {
         nameColumn.setStyle("-fx-text-fill: white;");
         typeColumn.setStyle("-fx-text-fill: white;");
         vintageColumn.setStyle("-fx-text-fill: white;");
-        quantityColumn.setStyle("-fx-text-fill: black;");
+        quantityColumn.setStyle("-fx-text-fill: white;");
         priceColumn.setStyle("-fx-text-fill: white;");
         idColumn.setStyle("-fx-text-fill: white;");
 
