@@ -1,52 +1,167 @@
 package UI;
 
-import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.ComboBoxTableCell;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import model.AdminDatabaseConnector;
-
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.AdminDatabaseConnector;
+import model.StaffHoliday;
 import model.StaffInfo;
+
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StaffUI extends BaseUI {
     private DatePicker datePicker;
     private Button getScheduleButton;
+    private Button viewHolidaysButton;
+
     private TableView<StaffInfo> scheduleTableView;
+    private TableView<StaffHoliday> holidayTableView;
+
 
     public StaffUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Staff");
         setTopText("Staff Overview");
+        initializeUI();
+    }
 
+    private void initializeUI() {
         VBox mainContent = new VBox();
         mainContent.setPadding(new Insets(20));
         mainContent.setSpacing(10);
 
-        // Create a date picker and a "Get Schedule" button
         datePicker = new DatePicker();
         getScheduleButton = new Button("Get Schedule");
         getScheduleButton.setOnAction(e -> loadSchedule());
+        viewHolidaysButton = new Button("View Staff Holidays");
+        viewHolidaysButton.setOnAction(e -> viewStaffHolidays());
 
-        HBox topControls = new HBox(10, datePicker, getScheduleButton);
+        HBox topControls = new HBox(10, datePicker, getScheduleButton, viewHolidaysButton);
 
-        // Create a TableView to display the schedule
-        scheduleTableView = new TableView<>();
-        scheduleTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        scheduleTableView = createScheduleTableView();
+
+        mainContent.getChildren().addAll(topControls, scheduleTableView);
+        setMainContent(mainContent);
+    }
+
+    private void viewStaffHolidays() {
+        VBox mainContent = (VBox) getMainContent();
+        mainContent.getChildren().clear();
+
+        DatePicker startDatePicker = new DatePicker();
+        DatePicker endDatePicker = new DatePicker();
+        Button getHolidaysButton = new Button("Get Holidays");
+        getHolidaysButton.setOnAction(e -> loadHolidays(startDatePicker.getValue(), endDatePicker.getValue()));
+
+        HBox holidayControls = new HBox(10, startDatePicker, endDatePicker, getHolidaysButton);
+
+        holidayTableView = createHolidayTableView();
+
+        mainContent.getChildren().addAll(holidayControls, holidayTableView);
+    }
+
+    private TableView<StaffHoliday> createHolidayTableView() {
+        TableView<StaffHoliday> tableView = new TableView<>();
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<StaffHoliday, String> nameColumn = new TableColumn<>("Name");
+        nameColumn.setCellValueFactory(param -> param.getValue().getNameProperty());
+
+        TableColumn<StaffHoliday, LocalDate> startDateColumn = new TableColumn<>("Start Date");
+        startDateColumn.setCellValueFactory(param -> param.getValue().getStartDateProperty());
+
+        TableColumn<StaffHoliday, LocalDate> endDateColumn = new TableColumn<>("End Date");
+        endDateColumn.setCellValueFactory(param -> param.getValue().getEndDateProperty());
+
+        TableColumn<StaffHoliday, Long> durationColumn = new TableColumn<>("Duration (Days)");
+//        durationColumn.setCellValueFactory(param -> param.getValue().getDurationProperty());
+        //NNEEEDD TO FIXXX HTISSSSS
+
+        tableView.getColumns().addAll(nameColumn, startDateColumn, endDateColumn, durationColumn);
+
+        // Set the cell factory to style table cells (same as createScheduleTableView)
+        tableView.setRowFactory(tv -> {
+            TableRow<StaffHoliday> row = new TableRow<>();
+            row.setStyle("-fx-background-color: #1A1A1A;");
+
+            // Change the highlight color of the selected cell
+            row.setOnMouseEntered(event -> {
+                if (!row.isEmpty()) {
+                    row.setStyle("-fx-background-color: #333333;");
+                }
+            });
+
+            row.setOnMouseExited(event -> {
+                if (!row.isEmpty()) {
+                    row.setStyle("-fx-background-color: #1A1A1A;");
+                }
+            });
+
+            return row;
+        });
+
+        return tableView;
+    }
+
+    private void loadHolidays(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            showAlert("Invalid Date Range", "Please select both start and end dates.");
+            return;
+        }
+
+        if (startDate.isAfter(endDate)) {
+            showAlert("Invalid Date Range", "Start date cannot be after the end date.");
+            return;
+        }
+
+        List<StaffHoliday> holidays = getStaffHolidaysFromDatabase(startDate, endDate);
+        holidayTableView.getItems().setAll(holidays);
+    }
+
+    private List<StaffHoliday> getStaffHolidaysFromDatabase(LocalDate startDate, LocalDate endDate) {
+        List<StaffHoliday> holidays = new ArrayList<>();
+
+        try (Connection conn = AdminDatabaseConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT si.staffName, sh.startDate, sh.endDate " +
+                             "FROM StaffInfo si " +
+                             "JOIN StaffHoliday_StaffInfo shsi ON si.staffID = shsi.staffID " +
+                             "JOIN StaffHoliday sh ON shsi.holidayID = sh.holidayID " +
+                             "WHERE sh.startDate BETWEEN ? AND ? OR sh.endDate BETWEEN ? AND ?")) {
+
+            stmt.setDate(1, Date.valueOf(startDate));
+            stmt.setDate(2, Date.valueOf(endDate));
+            stmt.setDate(3, Date.valueOf(startDate));
+            stmt.setDate(4, Date.valueOf(endDate));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String name = rs.getString("staffName");
+                    LocalDate startHolidayDate = rs.getDate("startDate").toLocalDate();
+                    LocalDate endHolidayDate = rs.getDate("endDate").toLocalDate();
+                    long duration = ChronoUnit.DAYS.between(startHolidayDate, endHolidayDate) + 1;
+
+                    StaffHoliday holiday = new StaffHoliday(name, startHolidayDate, endHolidayDate, duration);
+                    holidays.add(holiday);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return holidays;
+    }
+
+    private TableView<StaffInfo> createScheduleTableView() {
+        TableView<StaffInfo> tableView = new TableView<>();
+        tableView.setStyle("-fx-background-color: #1A1A1A;");
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<StaffInfo, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(param -> param.getValue().getNameProperty());
@@ -63,10 +178,37 @@ public class StaffUI extends BaseUI {
         TableColumn<StaffInfo, String> durationColumn = new TableColumn<>("Duration");
         durationColumn.setCellValueFactory(param -> param.getValue().getDurationProperty());
 
-        scheduleTableView.getColumns().addAll(nameColumn, roleColumn, shiftStartColumn, shiftEndColumn, durationColumn);
+        nameColumn.setStyle("-fx-text-fill: white;");
+        roleColumn.setStyle("-fx-text-fill: white;");
+        shiftStartColumn.setStyle("-fx-text-fill: white;");
+        shiftEndColumn.setStyle("-fx-text-fill: white;");
+        durationColumn.setStyle("-fx-text-fill: white;");
 
-        mainContent.getChildren().addAll(topControls, scheduleTableView);
-        setMainContent(mainContent);
+
+        tableView.getColumns().addAll(nameColumn, roleColumn, shiftStartColumn, shiftEndColumn, durationColumn);
+
+        // Set the cell factory to style table cells
+        tableView.setRowFactory(tv -> {
+            TableRow<StaffInfo> row = new TableRow<>();
+            row.setStyle("-fx-background-color: #1A1A1A;");
+
+            // Change the highlight color of the selected cell
+            row.setOnMouseEntered(event -> {
+                if (!row.isEmpty()) {
+                    row.setStyle("-fx-background-color: #333333;");
+                }
+            });
+
+            row.setOnMouseExited(event -> {
+                if (!row.isEmpty()) {
+                    row.setStyle("-fx-background-color: #1A1A1A;");
+                }
+            });
+
+            return row;
+        });
+
+        return tableView;
     }
 
     private void loadSchedule() {
@@ -120,15 +262,3 @@ public class StaffUI extends BaseUI {
         alert.showAndWait();
     }
 }
-
-
-
-//So user enters a date thorugh a date picker then hits the get schedule button, this will then loop through all the staff and check if the relation with the staff schedule
-//where there is a dateWorking variable if it matches input date of user then output the staffs name role as well as their starting/ending time for shift and their duration
-//in one table view
-
-//Button to go to "View Staff Holidays", user can enter begin and end date then there will be an sql query looking through each staff and if their holiday dates fit the range
-//if so output staff name, starting/ending date of holiday and numberOfDays
-
-//Another button for "Modify Staff Schedule" which will lead to another UI subsection, there will be a table view of all staff listed then user can click on a user which
-//will output the all schedule relations with that staff here they can add remove modify a specific staffs schedule, this info will be in another table view
