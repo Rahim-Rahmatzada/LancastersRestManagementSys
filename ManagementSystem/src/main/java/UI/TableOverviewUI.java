@@ -26,7 +26,7 @@ public class TableOverviewUI extends BaseUI {
     private Label tableDetailsLabel;
     private Button backButton;
     private VBox capacityBox;
-    private VBox dateBox;
+    protected VBox dateBox;
 
     /**
      * Constructs a new TableOverview UI instance.
@@ -129,7 +129,7 @@ public class TableOverviewUI extends BaseUI {
         setMainContent(mainContent);
     }
 
-    private void updateTableAvailability() {
+     void updateTableAvailability() {
         LocalDate selectedDate = datePicker.getValue();
         if (selectedDate != null) {
             createTableLayout(selectedDate);
@@ -142,7 +142,7 @@ public class TableOverviewUI extends BaseUI {
      * and highlights them in red or blue
      */
 
-    void createTableLayout(LocalDate selectedDate) {
+   public void createTableLayout(LocalDate selectedDate) {
         tableLayout.getChildren().clear();
 
         try (Connection conn = DatabaseConnector.getConnection()) {
@@ -265,7 +265,7 @@ public class TableOverviewUI extends BaseUI {
 
         tableDetailsBox.getChildren().addAll(tableDetailsLabel);
 
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = DatabaseConnector.getConnection()) {  //fixx rahim, might want to look at inner class down below as well
             String query = "SELECT d.name AS dishName, d.price AS dishPrice, w.name AS wineName, w.winePrice AS winePrice, " +
                     "t.tablesLayout AS tableLayout, COUNT(b.bookingID) AS numPeople " +
                     "FROM Sale s " +
@@ -445,7 +445,7 @@ public class TableOverviewUI extends BaseUI {
     /**
      * Inner class representing a dish-wine pair.
      */
-    private static class DishWine {
+    private static class DishWine {   //might want to look at this as well rahim
         private final SimpleStringProperty dishName;
         private final SimpleStringProperty wineName;
 
