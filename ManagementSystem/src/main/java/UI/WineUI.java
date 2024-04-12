@@ -51,6 +51,15 @@ public class WineUI extends BaseUI {
 
         tableView.setStyle("-fx-background-color: #1A1A1A;");
 
+        TableColumn<Wine, String> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        idColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        idColumn.setOnEditCommit(event -> {
+            Wine wine = event.getRowValue();
+            String newValue = event.getNewValue();
+            updateWineValue(wine, "ID", newValue);
+        });
+
         // Create table columns
         TableColumn<Wine, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -105,11 +114,12 @@ public class WineUI extends BaseUI {
         vintageColumn.setStyle("-fx-text-fill: white;");
         quantityColumn.setStyle("-fx-text-fill: white;");
         priceColumn.setStyle("-fx-text-fill: white;");
+        idColumn.setStyle("-fx-text-fill: white;");
 
         // Add styles for other columns as needed
 
         // Add columns to the table view
-        tableView.getColumns().addAll(nameColumn, typeColumn, vintageColumn, quantityColumn, priceColumn); // Add other columns as needed
+        tableView.getColumns().addAll(idColumn, nameColumn, typeColumn, vintageColumn, quantityColumn, priceColumn); // Add other columns as needed
 
         // Load wine data from the database
         ObservableList<Wine> wineData = getWineDataFromDatabase();
@@ -334,7 +344,7 @@ public class WineUI extends BaseUI {
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("ID");
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 int vintage = rs.getInt("vintage");
