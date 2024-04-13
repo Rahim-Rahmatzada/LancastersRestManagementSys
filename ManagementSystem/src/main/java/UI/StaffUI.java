@@ -18,6 +18,7 @@ public class StaffUI extends BaseUI {
     private DatePicker datePicker;
     private Button getScheduleButton;
     private Button viewHolidaysButton;
+    private Button viewScheduleButton;
 
     private TableView<StaffInfo> scheduleTableView;
     private TableView<StaffHoliday> holidayTableView;
@@ -40,6 +41,8 @@ public class StaffUI extends BaseUI {
         getScheduleButton.setOnAction(e -> loadSchedule());
         viewHolidaysButton = new Button("View Staff Holidays");
         viewHolidaysButton.setOnAction(e -> viewStaffHolidays());
+        viewScheduleButton = new Button("View Schedule");
+        viewScheduleButton.setOnAction(e -> viewSchedule());
 
         HBox topControls = new HBox(10, datePicker, getScheduleButton, viewHolidaysButton);
 
@@ -48,7 +51,16 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().addAll(topControls, scheduleTableView);
         setMainContent(mainContent);
     }
+    private void viewSchedule() {
+        VBox mainContent = (VBox) getMainContent();
+        mainContent.getChildren().clear();
+        HBox topControls = new HBox(10, datePicker, getScheduleButton, viewHolidaysButton);
 
+        scheduleTableView = createScheduleTableView();
+
+        mainContent.getChildren().addAll(topControls, scheduleTableView);
+        setMainContent(mainContent);
+    }
     private void viewStaffHolidays() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
@@ -58,7 +70,7 @@ public class StaffUI extends BaseUI {
         Button getHolidaysButton = new Button("Get Holidays");
         getHolidaysButton.setOnAction(e -> loadHolidays(startDatePicker.getValue(), endDatePicker.getValue()));
 
-        HBox holidayControls = new HBox(10, startDatePicker, endDatePicker, getHolidaysButton);
+        HBox holidayControls = new HBox(10, startDatePicker, endDatePicker, getHolidaysButton, viewScheduleButton);
 
         holidayTableView = createHolidayTableView();
 
@@ -81,6 +93,10 @@ public class StaffUI extends BaseUI {
         TableColumn<StaffHoliday, Long> durationColumn = new TableColumn<>("Duration (Days)");
 //        durationColumn.setCellValueFactory(param -> param.getValue().getDurationProperty());
         //NNEEEDD TO FIXXX HTISSSSS
+        nameColumn.setStyle("-fx-text-fill: white;");
+        startDateColumn.setStyle("-fx-text-fill: white;");
+        endDateColumn.setStyle("-fx-text-fill: white;");
+        durationColumn.setStyle("-fx-text-fill: white;");
 
         tableView.getColumns().addAll(nameColumn, startDateColumn, endDateColumn, durationColumn);
 
