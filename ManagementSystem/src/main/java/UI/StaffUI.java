@@ -1,11 +1,12 @@
 package UI;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import model.*;
+import model.AdminDatabaseConnector;
+import model.StaffHoliday;
+import model.StaffInfo;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -17,14 +18,9 @@ public class StaffUI extends BaseUI {
     private DatePicker datePicker;
     private Button getScheduleButton;
     private Button viewHolidaysButton;
-    private Button viewScheduleButton;
-    private Button viewModifyScheduleButton;
-    private Button viewModifyHolidayButton;
 
     private TableView<StaffInfo> scheduleTableView;
     private TableView<StaffHoliday> holidayTableView;
-    private TableView<ModifySchedule> modifyScheduleTableView;
-    private TableView<ModifyHoliday> modifyHolidayTableView;
 
 
     public StaffUI(UISwitcher uiSwitcher) {
@@ -44,43 +40,15 @@ public class StaffUI extends BaseUI {
         getScheduleButton.setOnAction(e -> loadSchedule());
         viewHolidaysButton = new Button("View Staff Holidays");
         viewHolidaysButton.setOnAction(e -> viewStaffHolidays());
-        viewScheduleButton = new Button("View Schedule");
-        viewScheduleButton.setOnAction(e -> viewSchedule());
-        viewModifyScheduleButton = new Button("Modify Schedule");
-        viewModifyScheduleButton.setOnAction(e -> viewModifySchedule());
-        viewModifyHolidayButton = new Button("Modify Holidays");
-        viewModifyHolidayButton.setOnAction(e -> viewModifyHoliday());
 
-        HBox topControls = new HBox(10, datePicker, getScheduleButton, viewHolidaysButton, viewModifyScheduleButton, viewModifyHolidayButton);
+        HBox topControls = new HBox(10, datePicker, getScheduleButton, viewHolidaysButton);
 
         scheduleTableView = createScheduleTableView();
 
         mainContent.getChildren().addAll(topControls, scheduleTableView);
         setMainContent(mainContent);
     }
-    private void viewModifySchedule() {
-        VBox mainContent = (VBox) getMainContent();
-        mainContent.getChildren().clear();
-        modifyScheduleTableView = createModifyScheduleView();
-        mainContent.getChildren().addAll(modifyScheduleTableView);
 
-    }
-    private void viewModifyHoliday() {
-        VBox mainContent = (VBox) getMainContent();
-        mainContent.getChildren().clear();
-        modifyHolidayTableView = createModifyHolidayView();
-        mainContent.getChildren().addAll(modifyHolidayTableView);
-
-    }
-    private void viewSchedule() {
-        VBox mainContent = (VBox) getMainContent();
-        mainContent.getChildren().clear();
-        HBox topControls = new HBox(10, datePicker, getScheduleButton, viewHolidaysButton, viewModifyScheduleButton, viewModifyHolidayButton);
-
-        scheduleTableView = createScheduleTableView();
-
-        mainContent.getChildren().addAll(topControls, scheduleTableView);
-    }
     private void viewStaffHolidays() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
@@ -90,43 +58,13 @@ public class StaffUI extends BaseUI {
         Button getHolidaysButton = new Button("Get Holidays");
         getHolidaysButton.setOnAction(e -> loadHolidays(startDatePicker.getValue(), endDatePicker.getValue()));
 
-        HBox holidayControls = new HBox(10, startDatePicker, endDatePicker, getHolidaysButton, viewScheduleButton, viewModifyScheduleButton, viewModifyHolidayButton);
+        HBox holidayControls = new HBox(10, startDatePicker, endDatePicker, getHolidaysButton);
 
         holidayTableView = createHolidayTableView();
 
         mainContent.getChildren().addAll(holidayControls, holidayTableView);
     }
-    private TableView<ModifyHoliday> createModifyHolidayView () {
-        TableView<ModifyHoliday> tableView = new TableView<>();
-        return tableView;
-    }
 
-    private TableView<ModifySchedule> createModifyScheduleView () {
-        TableView<ModifySchedule> tableView = new TableView<>();
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        TableColumn<ModifySchedule, String> nameColumn = new TableColumn<>("Staff Name");
-        nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStaffName()));
-
-        List<ModifySchedule> staffNames = getStaffNamesFromDatabase();
-        tableView.getItems().addAll(staffNames);
-
-
-
-        // Add event handler for row selection
-        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-
-            } else {
-
-            }
-        });
-
-        tableView.getColumns().add(nameColumn);
-
-
-        return tableView;
-    }
     private TableView<StaffHoliday> createHolidayTableView() {
         TableView<StaffHoliday> tableView = new TableView<>();
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -143,10 +81,6 @@ public class StaffUI extends BaseUI {
         TableColumn<StaffHoliday, Long> durationColumn = new TableColumn<>("Duration (Days)");
 //        durationColumn.setCellValueFactory(param -> param.getValue().getDurationProperty());
         //NNEEEDD TO FIXXX HTISSSSS
-        nameColumn.setStyle("-fx-text-fill: white;");
-        startDateColumn.setStyle("-fx-text-fill: white;");
-        endDateColumn.setStyle("-fx-text-fill: white;");
-        durationColumn.setStyle("-fx-text-fill: white;");
 
         tableView.getColumns().addAll(nameColumn, startDateColumn, endDateColumn, durationColumn);
 
@@ -309,59 +243,6 @@ public class StaffUI extends BaseUI {
                     String duration = rs.getString("duration");
 
                     StaffInfo staffInfo = new StaffInfo(name, role, shiftStart.toString(), shiftEnd.toString(), duration);
-                    staffSchedule.add(staffInfo);
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return staffSchedule;
-    }
-    private List<ModifySchedule> getStaffNamesFromDatabase() {
-        List<ModifySchedule> staffNames = new ArrayList<>();
-
-        try (Connection conn = AdminDatabaseConnector.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT staffName FROM StaffInfo")) {
-
-            while (rs.next()) {
-                String name = rs.getString("staffName");
-                staffNames.add(new ModifySchedule(name)); // Assuming ModifySchedule has a constructor that takes a staff name
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return staffNames;
-    }
-    private void loadStaffSchedule(String staffName) {
-        List<StaffInfo> staffSchedule = getStaffScheduleForNameFromDatabase(staffName);
-        scheduleTableView.getItems().setAll(staffSchedule);
-    }
-    private List<StaffInfo> getStaffScheduleForNameFromDatabase(String staffName) {
-        List<StaffInfo> staffSchedule = new ArrayList<>();
-
-        try (Connection conn = AdminDatabaseConnector.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT si.staffName, si.staffRole, ss.shiftStartingTime, ss.shiftEndingTime, ss.duration " +
-                             "FROM StaffInfo si " +
-                             "JOIN StaffSchedule_StaffInfo ssi ON si.staffID = ssi.staffID " +
-                             "JOIN StaffSchedule ss ON ssi.scheduleID = ss.scheduleID " +
-                             "WHERE si.staffName = ?")) {
-
-            stmt.setString(1, staffName);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String role = rs.getString("staffRole");
-                    Time shiftStart = rs.getTime("shiftStartingTime");
-                    Time shiftEnd = rs.getTime("shiftEndingTime");
-                    String duration = rs.getString("duration");
-
-                    StaffInfo staffInfo = new StaffInfo(staffName, role, shiftStart.toString(), shiftEnd.toString(), duration);
                     staffSchedule.add(staffInfo);
                 }
             }
