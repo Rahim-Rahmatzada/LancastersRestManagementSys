@@ -3,16 +3,16 @@ package model;
 public class Wine {
     private int wineID;
     private String name;
-    private double price;
     private String type;
+    private double prize;
     private int quantity;
     private int vintage; // Assuming vintage is stored as integer year
 
 
-    public Wine(int wineID, String name, String type, int vintage, int quantity, double price) {
+    public Wine(int wineID, String name, String type, int vintage, int quantity, double prize) {
         this.wineID = wineID;
         this.name = name;
-        this.price = price;
+        this.prize = prize;
         this.quantity = quantity;
         this.vintage = vintage;
         this.type = type;
@@ -34,12 +34,12 @@ public class Wine {
         this.name = name;
     }
 
-    public double getPrice() {
-        return price;
+    public double getPrize() {
+        return prize;
     }
 
-    public void setPrice (double price) {
-        this.price = price;
+    public void setPrize(double prize) {
+        this.prize = prize;
     }
 
     public int getQuantity() {

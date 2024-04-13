@@ -23,6 +23,7 @@ import javafx.scene.text.Text;
 
 public class WineUI extends BaseUI {
     private TableView<Wine> wineTableView;
+
     public WineUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Wine");
@@ -115,7 +116,6 @@ public class WineUI extends BaseUI {
         idColumn.setStyle("-fx-text-fill: white;");
 
 
-
         // Add columns to the table view
         tableView.getColumns().addAll(idColumn, nameColumn, typeColumn, vintageColumn, quantityColumn, priceColumn); // Add other columns as needed
 
@@ -124,7 +124,6 @@ public class WineUI extends BaseUI {
 
         // Set the data to the table view
         tableView.setItems(wineData);
-
 
 
         nameColumn.setCellFactory(column -> new TableCell<Wine, String>() {
@@ -137,6 +136,13 @@ public class WineUI extends BaseUI {
                     setStyle("");
                 } else {
                     setText(item);
+
+                    Wine wine = getTableView().getItems().get(getIndex());
+                    if (wine.getQuantity() < 3) {
+                        setStyle("-fx-text-fill: red;");
+                    } else {
+                        setStyle("-fx-text-fill: white;");
+                    }
                 }
             }
         });
@@ -158,8 +164,6 @@ public class WineUI extends BaseUI {
                     row.setStyle("-fx-background-color: #1A1A1A;");
                 }
             });
-
-
 
 
             return row;
@@ -273,11 +277,6 @@ public class WineUI extends BaseUI {
             stmt.setInt(5, 0); // Set initial quantity to 0
             stmt.setDouble(6, 0.0); // Set initial prize to 0
 
-
-            stmt.executeUpdate();
-
-            // Refresh the table view
-            reloadWineTableView();
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to add new wine.");
@@ -308,6 +307,8 @@ public class WineUI extends BaseUI {
                 stmt.setString(1, (String) newValue);
             } else if (newValue instanceof Integer) {
                 stmt.setInt(1, (Integer) newValue);
+            } else if (newValue instanceof Double) {
+                stmt.setDouble(1, (Double) newValue);
             }
 
             stmt.setInt(2, wine.getWineID());
@@ -352,6 +353,7 @@ public class WineUI extends BaseUI {
 
         return wineList;
     }
+
     private void reloadWineTableView() {
         // Reload the data in the table view
         ObservableList<Wine> wineData = getWineDataFromDatabase();
