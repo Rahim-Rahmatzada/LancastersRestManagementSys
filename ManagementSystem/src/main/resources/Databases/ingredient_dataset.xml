@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <Ingredient ingredientID="1" ingredientName="Ingredient 1" ingredientCost="10.0" ingredientQuantity="100" ingredientThreshold="50" />
+    <Ingredient ingredientID="2" ingredientName="Ingredient 2" ingredientCost="20.0" ingredientQuantity="200" ingredientThreshold="100" />
+    <Ingredient ingredientID="3" ingredientName="Ingredient 3" ingredientCost="30.0" ingredientQuantity="300" ingredientThreshold="150" />
+</dataset>
