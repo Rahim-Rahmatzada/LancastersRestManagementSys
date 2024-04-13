@@ -51,8 +51,6 @@ public class WineUI extends BaseUI {
 
         HBox controlsBox = createControlsBox();
 
-        // Create a TableView to display wine data
-
         wineMainContent.getChildren().addAll(wineTableView, controlsBox, insightsBox);
 
         setMainContent(wineMainContent);
@@ -71,7 +69,7 @@ public class WineUI extends BaseUI {
         // Create table columns
 
         TableColumn<Wine, String> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("wineID"));
         idColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         idColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
@@ -81,7 +79,7 @@ public class WineUI extends BaseUI {
 
 
         TableColumn<Wine, String> nameColumn = new TableColumn<>("Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("wineName"));
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         nameColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
@@ -90,7 +88,7 @@ public class WineUI extends BaseUI {
         });
 
         TableColumn<Wine, String> typeColumn = new TableColumn<>("Type");
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("wineType"));
         typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         typeColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
@@ -99,7 +97,7 @@ public class WineUI extends BaseUI {
         });
 
         TableColumn<Wine, Integer> vintageColumn = new TableColumn<>("Vintage");
-        vintageColumn.setCellValueFactory(new PropertyValueFactory<>("vintage"));
+        vintageColumn.setCellValueFactory(new PropertyValueFactory<>("wineVintage"));
         vintageColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         vintageColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
@@ -108,7 +106,7 @@ public class WineUI extends BaseUI {
         });
 
         TableColumn<Wine, Integer> quantityColumn = new TableColumn<>("Quantity");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("wineQuantity"));
         quantityColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         quantityColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
@@ -117,7 +115,7 @@ public class WineUI extends BaseUI {
         });
 
         TableColumn<Wine, Double> priceColumn = new TableColumn<>("Price");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("winePrice"));
         priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         priceColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
