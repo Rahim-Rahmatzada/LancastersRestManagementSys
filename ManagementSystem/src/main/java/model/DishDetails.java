@@ -1,15 +1,23 @@
 package model;
 
-public class DishDetails extends Dish {
-    private String wineName;
+public class DishDetails  {
 
-    public DishDetails(int dishID, String name, double price, String dishDescription, String allergyInfo, int wineID, String wineName) {
-        super(dishID, name, price, dishDescription, allergyInfo, wineID);
-        this.wineName = wineName;
-    }
+        private int dishID;
+        private String name;
+        private double price;
+        private String dishDescription;
+        private String allergyInfo;
+        private int wineID;
+        private String wineName;
 
-    public String getWineName() {
-        return wineName;
-    }
+        public DishDetails(int dishID, String name, double price, String dishDescription, String allergyInfo, int wineID, String wineName) {
+            this.dishID = dishID;
+            this.name = name;
+            this.price = price;
+            this.dishDescription = dishDescription;
+            this.allergyInfo = allergyInfo;
+            this.wineID = wineID;
+            this.wineName = wineName;
+        }
 }
 

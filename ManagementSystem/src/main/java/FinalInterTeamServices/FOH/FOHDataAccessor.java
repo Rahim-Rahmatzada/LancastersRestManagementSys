@@ -70,15 +70,14 @@ public class FOHDataAccessor implements FOHFinalInterface {
     }
 
     @Override
-    public DishDetails getDishDetails(int dishID) {
-        DishDetails dishDetails = null;
+    public Dish getDishDetails(int dishID) {
+        Dish dish = null;
 
         try (Connection connection = DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT d.dishID, d.name, d.price, d.dishDescription, d.allergyInfo, d.wineID, w.name AS wineName " +
-                             "FROM Dish d " +
-                             "LEFT JOIN Wine w ON d.wineID = w.wineID " +
-                             "WHERE d.dishID = ?")) {
+                     "SELECT dishID, name, price, dishDescription, allergyInfo, wineID " +
+                             "FROM Dish " +
+                             "WHERE dishID = ?")) {
 
             statement.setInt(1, dishID);
             ResultSet resultSet = statement.executeQuery();
@@ -90,15 +89,14 @@ public class FOHDataAccessor implements FOHFinalInterface {
                 String description = resultSet.getString("dishDescription");
                 String allergyInfo = resultSet.getString("allergyInfo");
                 int wineID = resultSet.getInt("wineID");
-                String wineName = resultSet.getString("wineName");
 
-                dishDetails = new DishDetails(id, name, price, description, allergyInfo, wineID, wineName);
+                dish = new Dish(id, name, price, description, allergyInfo, wineID);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return dishDetails;
+        return dish;
     }
 
     @Override
@@ -107,7 +105,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
 
         try (Connection connection = DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT w.wineID, w.name, w.type, w.vintage, w.quantity " +
+                     "SELECT w.wineID, w.wineName, w.wineType, w.wineVintage, w.wineQuantity " +
                              "FROM Dish d " +
                              "JOIN Wine w ON d.wineID = w.wineID " +
                              "WHERE d.dishID = ?")) {
@@ -117,10 +115,10 @@ public class FOHDataAccessor implements FOHFinalInterface {
 
             if (resultSet.next()) {
                 int id = resultSet.getInt("wineID");
-                String name = resultSet.getString("name");
-                String type = resultSet.getString("type");
-                int vintage = resultSet.getInt("vintage");
-                int quantity = resultSet.getInt("quantity");
+                String name = resultSet.getString("wineName");
+                String type = resultSet.getString("wineType");
+                int vintage = resultSet.getInt("wineVintage");
+                int quantity = resultSet.getInt("wineQuantity");
 
                 wine = new Wine(id, name, type, vintage, quantity);
             }
@@ -158,16 +156,13 @@ public class FOHDataAccessor implements FOHFinalInterface {
 
         try (Connection connection = DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT d.price " +
-                             "FROM Dish d " +
-                             "JOIN Wine w ON d.wineID = w.wineID " +
-                             "WHERE w.wineID = ?")) {
+                     "SELECT winePrice FROM Wine WHERE wineID = ?")) {
 
             statement.setInt(1, wineID);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                price = resultSet.getDouble("price");
+                price = resultSet.getDouble("winePrice");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -182,13 +177,13 @@ public class FOHDataAccessor implements FOHFinalInterface {
 
         try (Connection connection = DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT quantity FROM Wine WHERE wineID = ?")) {
+                     "SELECT wineQuantity FROM Wine WHERE wineID = ?")) {
 
             statement.setInt(1, wineID);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                quantity = resultSet.getInt("quantity");
+                quantity = resultSet.getInt("wineQuantity");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -264,13 +259,24 @@ public class FOHDataAccessor implements FOHFinalInterface {
                              "FROM StaffInfo s " +
                              "WHERE s.staffName = ? AND s.staffRole = 'waiter'");
              PreparedStatement insertStmt = connection.prepareStatement(
-                     "INSERT INTO Tables_FOHStaff (tableID, staffInfoID) VALUES (?, ?)")) {
+                     "INSERT INTO Tables_FOHStaff (tableID, staffInfoID) VALUES (?, ?)");
+             PreparedStatement checkDuplicateStmt = connection.prepareStatement(
+                     "SELECT COUNT(*) FROM Tables_FOHStaff WHERE tableID = ? AND staffInfoID = ?")) {
 
             checkStmt.setString(1, staffName);
             ResultSet resultSet = checkStmt.executeQuery();
 
             if (resultSet.next()) {
                 int staffID = resultSet.getInt("staffID");
+
+                checkDuplicateStmt.setInt(1, tableID);
+                checkDuplicateStmt.setInt(2, staffID);
+                ResultSet duplicateResultSet = checkDuplicateStmt.executeQuery();
+
+                if (duplicateResultSet.next() && duplicateResultSet.getInt(1) > 0) {
+                    System.out.println("Waiter " + staffName + " is already assigned to Table " + tableID);
+                    return false;
+                }
 
                 insertStmt.setInt(1, tableID);
                 insertStmt.setInt(2, staffID);
