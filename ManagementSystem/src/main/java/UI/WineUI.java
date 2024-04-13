@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
-import model.DatabaseConnector;
+import model.AdminDatabaseConnector;
 import model.Wine;
 
 import java.sql.*;
@@ -185,7 +185,7 @@ public class WineUI extends BaseUI {
     }
 
     private void addNewWine(String wineName) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO Wine (wineID, wineName, wineType, wineVintage, wineQuality, winePrice) " +
                              "VALUES (?, ?, ?, ?, ?, ?)")) {
@@ -217,7 +217,7 @@ public class WineUI extends BaseUI {
     }
 
     private boolean isWineIDExists(int wineID) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT COUNT(*) FROM Wine WHERE wineID = ?")) {
 
@@ -240,7 +240,7 @@ public class WineUI extends BaseUI {
     private ObservableList<Wine> getWineDataFromDatabase() {
         ObservableList<Wine> wineList = FXCollections.observableArrayList();
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Wine")) {
 
@@ -278,7 +278,7 @@ public class WineUI extends BaseUI {
     }
 
     private void updateWineInDatabase(Wine wine) {
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "UPDATE Wine SET wineName = ?, wineType = ?, wineVintage = ?, wineQuantity = ?, winePrice = ? WHERE wineID = ?")) {
 
@@ -385,7 +385,7 @@ public class WineUI extends BaseUI {
     private String getMostExpensiveWine() {
         String mostExpensiveWine = "";
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT wineName, winePrice FROM Wine ORDER BY winePrice DESC LIMIT 1")) {
 
@@ -402,7 +402,7 @@ public class WineUI extends BaseUI {
     private String getMostPopularWine() {
         String mostPopularWine = "";
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(
                      "SELECT w.wineName, COUNT(sd.dishID) AS totalSales " +
@@ -427,7 +427,7 @@ public class WineUI extends BaseUI {
     private String getWineWithHighestQuantity() {
         String wineWithHighestQuantity = "";
 
-        try (Connection conn = DatabaseConnector.getConnection();
+        try (Connection conn = AdminDatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT wineName, wineQuantity FROM Wine ORDER BY wineQuantity DESC LIMIT 1")) {
 

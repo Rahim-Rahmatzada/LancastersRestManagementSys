@@ -18,6 +18,15 @@ public class Wine {
         this.type = type;
     }
 
+    //over loading constructor for BOH interface method
+    public Wine(int wineID, String name, String type, int vintage, int quantity) {
+        this.wineID = wineID;
+        this.name = name;
+        this.quantity = quantity;
+        this.vintage = vintage;
+        this.type = type;
+    }
+
     public int getWineID() {
         return wineID;
     }
