@@ -70,8 +70,8 @@ public class FOHDataAccessor implements FOHFinalInterface {
     }
 
     @Override
-    public Dish getDishDetails(int dishID) {
-        Dish dish = null;
+    public DishDetails getDishDetails(int dishID) {
+        DishDetails dishDetails = null;
 
         try (Connection connection = DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
@@ -92,14 +92,13 @@ public class FOHDataAccessor implements FOHFinalInterface {
                 int wineID = resultSet.getInt("wineID");
                 String wineName = resultSet.getString("wineName");
 
-                dish = new Dish(id, name, price, description, allergyInfo, wineID);
-                dish.setWineName(wineName);
+                dishDetails = new DishDetails(id, name, price, description, allergyInfo, wineID, wineName);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return dish;
+        return dishDetails;
     }
 
     @Override
@@ -108,7 +107,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
 
         try (Connection connection = DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT w.wineID, w.name, w.type, w.quantity " +
+                     "SELECT w.wineID, w.name, w.type, w.vintage, w.quantity " +
                              "FROM Dish d " +
                              "JOIN Wine w ON d.wineID = w.wineID " +
                              "WHERE d.dishID = ?")) {
@@ -120,9 +119,10 @@ public class FOHDataAccessor implements FOHFinalInterface {
                 int id = resultSet.getInt("wineID");
                 String name = resultSet.getString("name");
                 String type = resultSet.getString("type");
+                int vintage = resultSet.getInt("vintage");
                 int quantity = resultSet.getInt("quantity");
 
-                wine = new Wine(id, name, type, quantity);
+                wine = new Wine(id, name, type, vintage, quantity);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -174,5 +174,151 @@ public class FOHDataAccessor implements FOHFinalInterface {
         }
 
         return price;
+    }
+
+    @Override
+    public int getWineQuantity(int wineID) {
+        int quantity = 0;
+
+        try (Connection connection = DataUserDatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT quantity FROM Wine WHERE wineID = ?")) {
+
+            statement.setInt(1, wineID);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                quantity = resultSet.getInt("quantity");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return quantity;
+    }
+
+    @Override
+    public List<StaffInfo> getStaffByRole(String role) {
+        List<StaffInfo> staffMembers = new ArrayList<>();
+
+        try (Connection connection = DataUserDatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT s.staffID, s.staffName, s.staffRole " +
+                             "FROM StaffInfo s " +
+                             "WHERE s.staffRole = ?")) {
+
+            statement.setString(1, role);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int staffID = resultSet.getInt("staffID");
+                String staffName = resultSet.getString("staffName");
+                String staffRole = resultSet.getString("staffRole");
+
+                StaffInfo staffMember = new StaffInfo(staffID, staffName, staffRole);
+                staffMembers.add(staffMember);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return staffMembers;
+    }
+
+    @Override
+    public List<Schedule> getStaffSchedule(int staffID) {
+        List<Schedule> schedules = new ArrayList<>();
+
+        try (Connection connection = DataUserDatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT ss.scheduleID, ss.dateWorking, ss.shiftStartingTime, ss.shiftEndingTime, ss.duration " +
+                             "FROM StaffSchedule ss " +
+                             "JOIN StaffSchedule_StaffInfo ssi ON ss.scheduleID = ssi.scheduleID " +
+                             "WHERE ssi.staffID = ?")) {
+
+            statement.setInt(1, staffID);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int scheduleID = resultSet.getInt("scheduleID");
+                Date dateWorking = resultSet.getDate("dateWorking");
+                Time startTime = resultSet.getTime("shiftStartingTime");
+                Time endTime = resultSet.getTime("shiftEndingTime");
+                String duration = resultSet.getString("duration");
+
+                Schedule schedule = new Schedule(scheduleID, dateWorking, startTime, endTime, duration);
+                schedules.add(schedule);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return schedules;
+    }
+
+    @Override
+    public boolean assignWaiterToTable(String staffName, int tableID) {
+        try (Connection connection = DataUserDatabaseConnector.getConnection();
+             PreparedStatement checkStmt = connection.prepareStatement(
+                     "SELECT s.staffID " +
+                             "FROM StaffInfo s " +
+                             "WHERE s.staffName = ? AND s.staffRole = 'waiter'");
+             PreparedStatement insertStmt = connection.prepareStatement(
+                     "INSERT INTO Tables_FOHStaff (tableID, staffInfoID) VALUES (?, ?)")) {
+
+            checkStmt.setString(1, staffName);
+            ResultSet resultSet = checkStmt.executeQuery();
+
+            if (resultSet.next()) {
+                int staffID = resultSet.getInt("staffID");
+
+                insertStmt.setInt(1, tableID);
+                insertStmt.setInt(2, staffID);
+                int rowsAffected = insertStmt.executeUpdate();
+
+                return rowsAffected > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public List<StaffHolidayAssociation> getStaffHolidaysWithinDateRange(LocalDate startDate, LocalDate endDate) {
+        List<StaffHolidayAssociation> staffHolidayAssociations = new ArrayList<>();
+
+        try (Connection connection = DataUserDatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT shsi.staffID, shsi.holidayID, sh.startDate, sh.endDate, si.staffName " +
+                             "FROM StaffHoliday sh " +
+                             "JOIN StaffHoliday_StaffInfo shsi ON sh.holidayID = shsi.holidayID " +
+                             "JOIN StaffInfo si ON shsi.staffID = si.staffID " +
+                             "WHERE sh.startDate >= ? AND sh.endDate <= ?")) {
+
+            statement.setDate(1, Date.valueOf(startDate));
+            statement.setDate(2, Date.valueOf(endDate));
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int staffID = resultSet.getInt("staffID");
+                int holidayID = resultSet.getInt("holidayID");
+                Date startDateValue = resultSet.getDate("startDate");
+                Date endDateValue = resultSet.getDate("endDate");
+                String staffName = resultSet.getString("staffName");
+
+                StaffHoliday holiday = new StaffHoliday(holidayID, startDateValue.toLocalDate(), endDateValue.toLocalDate());
+                StaffInfo staffInfo = new StaffInfo(staffID, staffName, null); // Assuming the StaffInfo constructor expects a null staffRole
+                StaffHolidayAssociation association = new StaffHolidayAssociation(staffID, holidayID);
+
+                staffHolidayAssociations.add(association);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return staffHolidayAssociations;
     }
 }

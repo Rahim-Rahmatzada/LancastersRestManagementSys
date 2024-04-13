@@ -7,7 +7,7 @@ public class Wine {
     private int quantity;
     private int vintage; // Assuming vintage is stored as integer year
 
-    public Wine(int wineID, String name, String type, int quantity, int vintage) {
+    public Wine(int wineID, String name, String type, int vintage, int quantity) {
         this.wineID = wineID;
         this.name = name;
         this.type = type;

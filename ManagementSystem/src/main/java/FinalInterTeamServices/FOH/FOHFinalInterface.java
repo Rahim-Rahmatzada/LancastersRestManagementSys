@@ -1,10 +1,8 @@
 package FinalInterTeamServices.FOH;
 
-import model.Dish;
-import model.Menu;
-import model.Schedule;
-import model.Wine;
+import model.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface FOHFinalInterface {
@@ -55,19 +53,47 @@ public interface FOHFinalInterface {
      * @return The price of the specified wine.
      */
     double getWinePrice(int wineID);
+
+    /**
+     * Retrieves the quantity of a specific wine in stock.
+     *
+     * @param wineID The ID of the wine to retrieve the quantity for.
+     * @return The quantity of the specified wine in stock.
+     */
+    int getWineQuantity(int wineID);
+
+    /**
+     * Retrieves a list of staff members with the specified role.
+     *
+     * @param role The role to filter the staff members by.
+     * @return A list of StaffInfo objects representing the staff members with the specified role.
+     */
+    List<StaffInfo> getStaffByRole(String role);
+
+    /**
+     * Retrieves the schedule of a specific staff member.
+     *
+     * @param staffID The ID of the staff member to retrieve the schedule for.
+     * @return A list of StaffSchedule objects representing the schedule of the specified staff member.
+     */
+    List<Schedule> getStaffSchedule(int staffID);
+
+    /**
+     * Assigns a staff member with the role "waiter" to a specific table.
+     *
+     * @param staffName The name of the staff member to assign to the table.
+     * @param tableID The ID of the table to assign the staff member to.
+     * @return true if the assignment is successful, false otherwise.
+     */
+    boolean assignWaiterToTable(String staffName, int tableID);
+
+    /**
+     * Retrieves the staff members on holiday within a specified date range.
+     *
+     * @param startDate The start date of the date range (inclusive).
+     * @param endDate The end date of the date range (inclusive).
+     * @return A list of StaffHoliday objects representing the staff members on holiday within the specified date range.
+     */
+    List<StaffHolidayAssociation> getStaffHolidaysWithinDateRange(LocalDate startDate, LocalDate endDate);
 }
 
-    //given a wineID get the quantity in stock
-    //given a dishID get the
-
-
-//    //given role as a parameter get list of staff
-//
-//    //given one staff id find their schedule
-//    List<Schedule> getIndividualStaffSchedule(int staffID);
-//
-//    //assing a staff to table
-//    void assignStaffToTable(int staffID, int tableID);
-//
-//    //given a range of date output the staff name who are on holiday, the startDate and endDate and duration all values from the StaffHoliday table
-//}
