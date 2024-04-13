@@ -229,4 +229,34 @@ public class BOHDataAccessor implements BOHFinalInterface {
 
         return menus;
     }
+
+    @Override
+    public Wine getWineByDish(int dishID) {
+        Wine wine = null;
+
+        try (Connection connection = DataUserDatabaseConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT w.wineID, w.wineName, w.wineType, w.wineVintage, w.wineQuantity " +
+                             "FROM Dish d " +
+                             "JOIN Wine w ON d.wineID = w.wineID " +
+                             "WHERE d.dishID = ?")) {
+
+            statement.setInt(1, dishID);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt("wineID");
+                String name = resultSet.getString("wineName");
+                String type = resultSet.getString("wineType");
+                int vintage = resultSet.getInt("wineVintage");
+                int quantity = resultSet.getInt("wineQuantity");
+
+                wine = new Wine(id, name, type, vintage, quantity);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return wine;
+    }
 }

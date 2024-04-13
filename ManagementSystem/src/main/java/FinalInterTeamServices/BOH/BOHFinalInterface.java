@@ -1,9 +1,6 @@
 package FinalInterTeamServices.BOH;
 
-import model.Dish;
-import model.Ingredient;
-import model.Menu;
-import model.Order;
+import model.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -72,5 +69,13 @@ public interface BOHFinalInterface {
      * @return A list of Menu objects representing the menus with the specified status.
      */
     List<Menu> getMenusByStatus(String status);
+
+    /**
+     * Retrieves the wine associated with a specific dish.
+     *
+     * @param dishID The ID of the dish to retrieve the associated wine for.
+     * @return A Wine object representing the wine associated with the specified dish, including its name, type, quantity, and price.
+     */
+    Wine getWineByDish(int dishID);
 
 }
