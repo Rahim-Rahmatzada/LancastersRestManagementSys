@@ -46,14 +46,14 @@ public class SalesSQLTests {
         List<Sale> saleList = new ArrayList<>();
 
         try (Statement stmt = staticConnection.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT saleID, date, totalCost FROM Sale")) {
+             ResultSet rs = stmt.executeQuery("SELECT saleID, date, numOfCovers FROM Sale")) {
 
             while (rs.next()) {
                 int saleID = rs.getInt("saleID");
                 Date date = rs.getDate("date");
-                double totalCost = rs.getDouble("totalCost");
+                int numOfCovers = rs.getInt("numOfCovers");
 
-                Sale sale = new Sale(saleID, date, totalCost);
+                Sale sale = new Sale(saleID, date, numOfCovers);
                 saleList.add(sale);
             }
 
@@ -72,12 +72,13 @@ public class SalesSQLTests {
         Sale sale1 = saleList.get(0);
         if (sale1.getSaleID() == 1 &&
                 sale1.getDate().equals(Date.valueOf("2024-09-01")) &&
-                Math.abs(sale1.getTotalCost() - 105.50) < 0.01) {
+                sale1.getNumOfCovers() == 10) {
             System.out.println("Test passed: Sale 1 details are correct.");
         } else {
             System.out.println("Test failed: Incorrect details for Sale 1.");
         }
     }
+}
 
 //    @Test
 //    public void testGetDishDataFromDatabase() {
@@ -90,4 +91,3 @@ public class SalesSQLTests {
 //        // Implement a test to retrieve wine data from the database
 //        // Similar to the testGetSaleDataFromDatabase() method
 //    }
-}

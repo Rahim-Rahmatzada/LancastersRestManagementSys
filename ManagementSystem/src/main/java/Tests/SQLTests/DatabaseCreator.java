@@ -50,7 +50,7 @@ public class DatabaseCreator {
         String createSaleTableQuery = "CREATE TABLE Sale (" +
                 "saleID INT PRIMARY KEY," +
                 "date DATE," +
-                "totalCost DOUBLE" +
+                "numOfCovers INT" +
                 ")";
         statement.execute(createSaleTableQuery);
 

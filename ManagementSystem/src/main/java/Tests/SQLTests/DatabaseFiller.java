@@ -43,11 +43,10 @@ public class DatabaseFiller {
         Statement statement = connection.createStatement();
 
         // Sample sale data
-        String insertSaleDataQuery = "INSERT INTO Sale (saleID, date, totalCost) VALUES " +
-                "(1, '2024-09-01', 105.50), " +
-                "(2, '2024-09-02', 68.00), " +
-                "(3, '2024-09-02', 92.25)";
-               // "(4, '2024-09-03', 80.75)";
+        String insertSaleDataQuery = "INSERT INTO Sale (saleID, date, numOfCovers) VALUES " +
+                "(1, '2024-09-01', 10), " +
+                "(2, '2024-09-02', 8), " +
+                "(3, '2024-09-02', 12)";
         statement.execute(insertSaleDataQuery);
 
         statement.close();
