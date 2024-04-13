@@ -1,11 +1,26 @@
 package model;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Properties;
 
 public class DataUserDatabaseConnector {
-    private static final String DB_URL = "jdbc:mysql://smcse-stuproj00.city.ac.uk:3306/in2033t36";
-    private static final String DB_USER = "in2033t36_d";
-    private static final String DB_PASSWORD = "uNwu4o0a3ow";
+    private static final String DB_URL = loadProperty("db.url");
+    private static final String DB_USER = loadProperty("db.user");
+    private static final String DB_PASSWORD = loadProperty("db.password");
+
+    private static final String CONFIG_FILE = "database.properties";
+
+    private static String loadProperty(String propertyName) {
+        Properties properties = new Properties();
+        try (InputStream inputStream = DataUserDatabaseConnector.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
+            properties.load(inputStream);
+            return properties.getProperty(propertyName);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load database configuration", e);
+        }
+    }
 
 
     // Method to get a database connection
