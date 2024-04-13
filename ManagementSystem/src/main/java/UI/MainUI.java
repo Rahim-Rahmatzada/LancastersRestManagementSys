@@ -5,9 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.DataUserDatabaseConnector;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,7 +16,7 @@ import java.sql.SQLException;
 
 public class MainUI extends Application implements UISwitcher {
 
-    private static ConfigurableApplicationContext springContext;
+
 
     private Stage primaryStage;
     private DashboardUI dashboardUI;

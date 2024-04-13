@@ -325,7 +325,7 @@ public class InventoryUI extends BaseUI {
         }
     }
 
-    private ObservableList<Ingredient> getIngredientDataFromDatabase() {
+    public ObservableList<Ingredient> getIngredientDataFromDatabase() {
         ObservableList<Ingredient> ingredientList = FXCollections.observableArrayList();
 
         try (Connection conn = AdminDatabaseConnector.getConnection();
