@@ -22,6 +22,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class WineUI extends BaseUI {
+
+    private Text topWineText;
+    private Text mostExpensiveWinesText;
+    private Text highestQuantityWineText;
     private TableView<Wine> wineTableView;
 
     public WineUI(UISwitcher uiSwitcher) {
@@ -34,13 +38,28 @@ public class WineUI extends BaseUI {
         wineMainContent.setPadding(new Insets(20));
         wineMainContent.setSpacing(10);
 
+        wineTableView = createWineTableView();
+
+        VBox topWinesBox = createTopWinesBox();
+        VBox mostExpensiveWinesBox = createMostExpensiveWinesBox();
+        VBox highestQuantityWinesBox = createHighestQuantityWinesBox();
+
+        HBox insightsBox = new HBox();
+        insightsBox.setSpacing(50);
+        insightsBox.setAlignment(Pos.CENTER);
+        insightsBox.getChildren().addAll(topWinesBox, mostExpensiveWinesBox, highestQuantityWinesBox);
+
         HBox controlsBox = createControlsBox();
 
         // Create a TableView to display wine data
-        wineTableView = createWineTableView();
-        wineMainContent.getChildren().addAll(wineTableView, controlsBox);
+
+        wineMainContent.getChildren().addAll(wineTableView, controlsBox, insightsBox);
 
         setMainContent(wineMainContent);
+
+        showTopWines();
+        showMostExpensiveWines();
+        showHighestQuantityWines();
 
     }
 
@@ -57,7 +76,7 @@ public class WineUI extends BaseUI {
         idColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             String newValue = event.getNewValue();
-            updateWineValue(wine, "ID", newValue);
+            updateWineValue(wine, "wineID", newValue);
         });
 
 
@@ -67,7 +86,7 @@ public class WineUI extends BaseUI {
         nameColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             String newValue = event.getNewValue();
-            updateWineValue(wine, "name", newValue);
+            updateWineValue(wine, "wineName", newValue);
         });
 
         TableColumn<Wine, String> typeColumn = new TableColumn<>("Type");
@@ -76,7 +95,7 @@ public class WineUI extends BaseUI {
         typeColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             String newValue = event.getNewValue();
-            updateWineValue(wine, "type", newValue);
+            updateWineValue(wine, "wineType", newValue);
         });
 
         TableColumn<Wine, Integer> vintageColumn = new TableColumn<>("Vintage");
@@ -85,7 +104,7 @@ public class WineUI extends BaseUI {
         vintageColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             int newValue = event.getNewValue();
-            updateWineValue(wine, "vintage", newValue);
+            updateWineValue(wine, "wineVintage", newValue);
         });
 
         TableColumn<Wine, Integer> quantityColumn = new TableColumn<>("Quantity");
@@ -94,7 +113,7 @@ public class WineUI extends BaseUI {
         quantityColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             int newValue = event.getNewValue();
-            updateWineValue(wine, "quantity", newValue);
+            updateWineValue(wine, "wineQuantity", newValue);
         });
 
         TableColumn<Wine, Double> priceColumn = new TableColumn<>("Price");
@@ -103,7 +122,7 @@ public class WineUI extends BaseUI {
         priceColumn.setOnEditCommit(event -> {
             Wine wine = event.getRowValue();
             double newValue = event.getNewValue();
-            updateWineValue(wine, "price", newValue);
+            updateWineValue(wine, "winePrice", newValue);
         });
 
 
@@ -209,7 +228,7 @@ public class WineUI extends BaseUI {
     private void deleteWine(String name) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM Wine WHERE name = ?")) {
+                     "DELETE FROM Wine WHERE wineName = ?")) {
 
             stmt.setString(1, name);
             int rowsAffected = stmt.executeUpdate();
@@ -230,6 +249,7 @@ public class WineUI extends BaseUI {
         HBox controlsBox = new HBox();
         controlsBox.setSpacing(20);
         controlsBox.setAlignment(Pos.CENTER_LEFT);
+        controlsBox.setPadding(new Insets(0, 0, 0, 200));
 
         controlsBox.getChildren().addAll(
                 createAddWineControls(),
@@ -265,7 +285,7 @@ public class WineUI extends BaseUI {
     private void addNewWine(String name) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO Wine (wineID, name, type, vintage, quantity, winePrice) " +
+                     "INSERT INTO Wine (wineID, wineName, wineType, wineVintage, wineQuantity, winePrice) " +
                              "VALUES (?, ?, ?, ?, ?, ?)")) {
 
             int newID = getMaxID() + 1;
@@ -327,26 +347,24 @@ public class WineUI extends BaseUI {
     private ObservableList<Wine> getWineDataFromDatabase() {
         ObservableList<Wine> wineList = FXCollections.observableArrayList();
 
-        // Query to retrieve wine data from the database
-        String query = "SELECT wineID, name, type, vintage, quantity, winePrice FROM Wine";
-
         try (Connection conn = DatabaseConnector.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             ResultSet rs = stmt.executeQuery("SELECT wineID, wineName, wineType, wineVintage, wineQuantity, winePrice FROM Wine")) {
 
             while (rs.next()) {
-                int id = rs.getInt("wineID");
-                String name = rs.getString("name");
-                String type = rs.getString("type");
-                int vintage = rs.getInt("vintage");
-                int quantity = rs.getInt("quantity");
-                double price = rs.getDouble("winePrice");
+                int ID = rs.getInt("wineID");
+                String Name = rs.getString("wineName");
+                String Type = rs.getString("wineType");
+                int Vintage = rs.getInt("wineVintage");
+                int Quantity = rs.getInt("wineQuantity");
+                double Price = rs.getDouble("winePrice");
 
 
                 // Create Wine object and add to the list
-                Wine wine = new Wine(id, name, type, vintage, quantity, price);
+                Wine wine = new Wine(ID, Name, Type, Vintage, Quantity, Price);
                 wineList.add(wine);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -367,4 +385,157 @@ public class WineUI extends BaseUI {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    private void showTopWines() {
+        // Execute the SQL query to get the top 5 most used ingredients
+        String query =
+                "SELECT I.wineName, COUNT(*) as totalUsage " +
+                        "FROM Sale_Dish SD" +
+                        "JOIN Dish DI ON SD.dishID = DI.dishID" +
+                        "JOIN Wine I ON DI.wineID = I.wineID" +
+                        "GROUP BY I.wineID" +
+                        "ORDER BY totalUsage DESC" +
+                        "LIMIT 4;";
+
+        StringBuilder topWines = new StringBuilder();
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String wineName = rs.getString("wineName");
+                int totalUsage = rs.getInt("totalUsage");
+                topWines.append(wineName).append(": ").append(totalUsage).append("\n");
+            }
+
+            // Display the top ingredients in the Text
+            topWineText.setText(topWines.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showMostExpensiveWines() {
+        String query = "SELECT wineName, winePrice " +
+                "FROM Wine " +
+                "ORDER BY winePrice DESC " +
+                "LIMIT 4;";
+
+        StringBuilder mostExpensiveWines = new StringBuilder();
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String wineName = rs.getString("wineName");
+                double cost = rs.getDouble("winePrice");
+                mostExpensiveWines.append(wineName).append(": £").append(cost).append("\n");
+            }
+
+            mostExpensiveWinesText.setText(mostExpensiveWines.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showHighestQuantityWines() {
+        String query = "SELECT wineName, wineQuantity" +
+                "FROM Wine " +
+                "ORDER BY wineQuantity DESC " +
+                "LIMIT 4;";
+
+        StringBuilder highestQuantityWines = new StringBuilder();
+        try (Connection conn = DatabaseConnector.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String ingredientName = rs.getString("wineName");
+                int quantity = rs.getInt("wineQuantity");
+                highestQuantityWines.append(ingredientName).append(": ").append(quantity).append("\n");
+            }
+
+            highestQuantityWineText.setText(highestQuantityWines.toString());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private VBox createMostExpensiveWinesBox() {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
+        box.setPadding(new Insets(10));
+        box.setSpacing(5);
+        box.setAlignment(Pos.CENTER);
+
+        Text titleText = new Text("Most Expensive Wines");
+        titleText.setFont(Font.font(16));
+        titleText.setFill(Color.BLACK);
+
+        mostExpensiveWinesText = new Text();
+        mostExpensiveWinesText.setFont(Font.font(12));
+        mostExpensiveWinesText.setFill(Color.BLACK);
+        mostExpensiveWinesText.setTextAlignment(TextAlignment.CENTER);
+
+        box.getChildren().addAll(titleText, mostExpensiveWinesText);
+
+        box.setMinWidth(250);
+        box.setMaxWidth(250);
+
+        return box;
+    }
+
+    private VBox createHighestQuantityWinesBox() {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
+        box.setPadding(new Insets(10));
+        box.setSpacing(5);
+        box.setAlignment(Pos.CENTER);
+
+        Text titleText = new Text("Highest Quantity Wines");
+        titleText.setFont(Font.font(16));
+        titleText.setFill(Color.BLACK);
+
+        highestQuantityWineText = new Text();
+        highestQuantityWineText.setFont(Font.font(12));
+        highestQuantityWineText.setFill(Color.BLACK);
+        highestQuantityWineText.setTextAlignment(TextAlignment.CENTER);
+
+        box.getChildren().addAll(titleText, highestQuantityWineText);
+
+        box.setMinWidth(250);
+        box.setMaxWidth(250);
+
+        return box;
+    }
+
+    private VBox createTopWinesBox() {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
+        box.setPadding(new Insets(10));
+        box.setSpacing(5);
+        box.setAlignment(Pos.CENTER);
+
+        Text titleText = new Text("Most Used Wines");
+        titleText.setFont(Font.font(16));
+        titleText.setFill(Color.BLACK);
+
+        topWineText = new Text();
+        topWineText.setFont(Font.font(12));
+        topWineText.setFill(Color.BLACK);
+        topWineText.setTextAlignment(TextAlignment.CENTER);
+
+        box.getChildren().addAll(titleText, topWineText);
+
+        // Set the position and size of the top ingredients box
+
+        box.setMinWidth(250);
+        box.setMaxWidth(250);
+
+        return box;
+    }
+
 }
