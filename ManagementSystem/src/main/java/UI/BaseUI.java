@@ -232,7 +232,7 @@ public abstract class BaseUI {
             case "Dashboard" -> uiSwitcher.switchToDashboard();
             case "Inventory" -> uiSwitcher.switchToInventory();
             case "Sales" -> uiSwitcher.switchToSales();
-            case "Table overview" -> uiSwitcher.switchToTableOverview();
+            case "Table Overview" -> uiSwitcher.switchToTableOverview();
             case "Menus" -> uiSwitcher.switchToMenus();
             case "Staff" -> uiSwitcher.switchToStaff();
             case "Wine" -> uiSwitcher.switchToWine();
