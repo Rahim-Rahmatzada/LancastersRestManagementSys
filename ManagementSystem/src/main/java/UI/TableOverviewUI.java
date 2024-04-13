@@ -1,6 +1,7 @@
 package UI;
 
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -243,14 +244,7 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
-    /**
-     * Displays the dishes, wines, their prices, and table layout for a selected table on a specific date.
-     *
-     * @param tableId      the ID of the selected table
-     * @param selectedDate the selected date
-     */
     private void showTableDetails(int tableId, LocalDate selectedDate) {
-
         VBox mainContent = getMainContent();
         mainContent.getChildren().clear();
 
@@ -266,53 +260,45 @@ public class TableOverviewUI extends BaseUI {
 
         tableDetailsBox.getChildren().addAll(tableDetailsLabel);
 
-        try (Connection conn = AdminDatabaseConnector.getConnection()) {  //fixx rahim, might want to look at inner class down below as well
-            String query = "SELECT d.name AS dishName, d.price AS dishPrice, w.name AS wineName, w.winePrice AS winePrice, " +
-                    "t.tablesLayout AS tableLayout, COUNT(b.bookingID) AS numPeople " +
-                    "FROM Sale s " +
-                    "JOIN Sale_Dish_Wine sdw ON s.saleID = sdw.saleID " +
-                    "JOIN Dish d ON sdw.dishID = d.dishID " +
-                    "JOIN Wine w ON sdw.wineID = w.wineID " +
-                    "JOIN Booking b ON s.saleDate = b.bookingDate AND b.tablesID = ? " +
-                    "JOIN Tables t ON b.tablesID = t.tablesID " +
-                    "WHERE s.saleDate = ? " +
-                    "GROUP BY d.name, d.price, w.name, w.winePrice, t.tablesLayout";
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
+            // Retrieve dish details
+            String dishQuery = "SELECT d.name AS dishName, d.price AS dishPrice, COUNT(sd.dishID) AS dishQuantity " +
+                    "FROM Booking b " +
+                    "JOIN Sale s ON b.bookingDate = s.date " +
+                    "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
+                    "JOIN Dish d ON sd.dishID = d.dishID " +
+                    "WHERE b.tablesID = ? AND b.bookingDate = ? " +
+                    "GROUP BY d.name, d.price";
 
-            PreparedStatement statement = conn.prepareStatement(query);
-            statement.setInt(1, tableId);
-            statement.setDate(2, Date.valueOf(selectedDate));
+            PreparedStatement dishStatement = conn.prepareStatement(dishQuery);
+            dishStatement.setInt(1, tableId);
+            dishStatement.setDate(2, Date.valueOf(selectedDate));
 
-            ResultSet resultSet = statement.executeQuery();
+            ResultSet dishResultSet = dishStatement.executeQuery();
 
-            // Create a dialog box to display the dishes, wines, prices, and table layout
-            Dialog<Void> dialog = new Dialog<>();
-            dialog.setTitle("Table Details");
-            dialog.setHeaderText("Dishes, Wines, and Table Layout for Table " + tableId + " on " + selectedDate);
+            // Create a table view for dishes
+            TableView<DishDetails> dishTableView = new TableView<>();
+            dishTableView.setStyle("-fx-background-color: #1A1A1A;");
 
-            // Create a table view to display the data
-            TableView<DishWine.DishWinePrice> tableView = new TableView<>();
-            tableView.setStyle("-fx-background-color: #1A1A1A;");
+            TableColumn<DishDetails, String> dishNameColumn = new TableColumn<>("Dish Name");
+            dishNameColumn.setPrefWidth(300);
+            dishNameColumn.setCellValueFactory(data -> data.getValue().dishNameProperty());
+            dishNameColumn.setStyle("-fx-text-fill: white;");
 
-            TableColumn<DishWine.DishWinePrice, String> dishColumn = new TableColumn<>("Dish");
-            dishColumn.setCellValueFactory(data -> data.getValue().dishNamePriceProperty());
-            dishColumn.setStyle("-fx-text-fill: white;");
-            dishColumn.setPrefWidth(300);
+            TableColumn<DishDetails, Number> dishPriceColumn = new TableColumn<>("Price");
+            dishPriceColumn.setPrefWidth(250);
+            dishPriceColumn.setCellValueFactory(data -> data.getValue().dishPriceProperty());
+            dishPriceColumn.setStyle("-fx-text-fill: white;");
 
-            TableColumn<DishWine.DishWinePrice, String> wineColumn = new TableColumn<>("Wine");
-            wineColumn.setCellValueFactory(data -> data.getValue().wineNamePriceProperty());
-            wineColumn.setStyle("-fx-text-fill: white;");
-            wineColumn.setPrefWidth(300);
+            TableColumn<DishDetails, Number> dishQuantityColumn = new TableColumn<>("Quantity Sold");
+            dishQuantityColumn.setPrefWidth(420);
+            dishQuantityColumn.setCellValueFactory(data -> data.getValue().dishQuantityProperty());
+            dishQuantityColumn.setStyle("-fx-text-fill: white;");
 
-            TableColumn<DishWine.DishWinePrice, Number> totalColumn = new TableColumn<>("Total Price");
-            totalColumn.setCellValueFactory(data -> data.getValue().totalPriceProperty());
-            totalColumn.setStyle("-fx-text-fill: white;");
-            totalColumn.setPrefWidth(400);
+            dishTableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishQuantityColumn);
 
-            tableView.getColumns().addAll(dishColumn, wineColumn, totalColumn);
-
-            // Set the row factory to style table rows
-            tableView.setRowFactory(tv -> {
-                TableRow<DishWine.DishWinePrice> row = new TableRow<>();
+            dishTableView.setRowFactory(tv -> {
+                TableRow<DishDetails> row = new TableRow<>();
                 row.setStyle("-fx-background-color: #1A1A1A;");
 
                 row.setOnMouseEntered(event -> {
@@ -330,46 +316,165 @@ public class TableOverviewUI extends BaseUI {
                 return row;
             });
 
-            int tableLayout = 0;
-            // int numPeople = 0;
+            // Populate the dish table view
+            while (dishResultSet.next()) {
+                String dishName = dishResultSet.getString("dishName");
+                double dishPrice = dishResultSet.getDouble("dishPrice");
+                int dishQuantity = dishResultSet.getInt("dishQuantity");
 
-            // Populate the table view with data from the result set
-            while (resultSet.next()) {
-                String dishName = resultSet.getString("dishName");
-                double dishPrice = resultSet.getDouble("dishPrice");
-                String wineName = resultSet.getString("wineName");
-                double winePrice = resultSet.getDouble("winePrice");
-                tableView.getItems().add(new DishWine.DishWinePrice(dishName, dishPrice, wineName, winePrice));
-
-                //tableLayout = resultSet.getInt("tableLayout");
-                // numPeople = resultSet.getInt("numPeople");
+                DishDetails dishDetails = new DishDetails(dishName, dishPrice, dishQuantity);
+                dishTableView.getItems().add(dishDetails);
             }
 
-            tableView.setStyle("-fx-background-color: #1A1A1A; -fx-text-fill: white;");
+            // Retrieve wine details
+            String wineQuery = "SELECT w.wineName AS wineName, w.winePrice AS winePrice, COUNT(d.dishID) AS wineQuantity " +
+                    "FROM Booking b " +
+                    "JOIN Sale s ON b.bookingDate = s.date " +
+                    "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
+                    "JOIN Dish d ON sd.dishID = d.dishID " +
+                    "JOIN Wine w ON d.wineID = w.wineID " +
+                    "WHERE b.tablesID = ? AND b.bookingDate = ? " +
+                    "GROUP BY w.wineName, w.winePrice";
 
-            tableDetailsBox.getChildren().add(tableView);
+            PreparedStatement wineStatement = conn.prepareStatement(wineQuery);
+            wineStatement.setInt(1, tableId);
+            wineStatement.setDate(2, Date.valueOf(selectedDate));
 
-            // Retrieve the table layout from the database
-            String tableLayoutQuery = "SELECT t.tablesLayout FROM Tables t WHERE t.tablesID = ?";
-            PreparedStatement tableLayoutStatement = conn.prepareStatement(tableLayoutQuery);
-            tableLayoutStatement.setInt(1, tableId);
-            ResultSet tableLayoutResult = tableLayoutStatement.executeQuery();
+            ResultSet wineResultSet = wineStatement.executeQuery();
 
-            if (tableLayoutResult.next()) {
-                tableLayout = tableLayoutResult.getInt("tablesLayout");
-                Label tableLayoutLabel = new Label("Table Layout: " + tableLayout);
-                tableLayoutLabel.setStyle("-fx-font-size: 14px;");
-                tableLayoutLabel.setStyle("-fx-text-fill: white;");
-                tableDetailsBox.getChildren().add(tableLayoutLabel);
+            // Create a table view for wines
+            TableView<WineDetails> wineTableView = new TableView<>();
+            wineTableView.setStyle("-fx-background-color: #1A1A1A;");
+
+            TableColumn<WineDetails, String> wineNameColumn = new TableColumn<>("Wine Name");
+            wineNameColumn.setPrefWidth(300);
+            wineNameColumn.setCellValueFactory(data -> data.getValue().wineNameProperty());
+            wineNameColumn.setStyle("-fx-text-fill: white;");
+
+            TableColumn<WineDetails, Number> winePriceColumn = new TableColumn<>("Price");
+            winePriceColumn.setPrefWidth(250);
+            winePriceColumn.setCellValueFactory(data -> data.getValue().winePriceProperty());
+            winePriceColumn.setStyle("-fx-text-fill: white;");
+
+            TableColumn<WineDetails, Number> wineQuantityColumn = new TableColumn<>("Quantity Sold");
+            wineQuantityColumn.setPrefWidth(420);
+            wineQuantityColumn.setCellValueFactory(data -> data.getValue().wineQuantityProperty());
+            wineQuantityColumn.setStyle("-fx-text-fill: white;");
+
+            wineTableView.getColumns().addAll(wineNameColumn, winePriceColumn, wineQuantityColumn);
+
+            wineTableView.setRowFactory(tv -> {
+                TableRow<WineDetails> row = new TableRow<>();
+                row.setStyle("-fx-background-color: #1A1A1A;");
+
+                row.setOnMouseEntered(event -> {
+                    if (!row.isEmpty()) {
+                        row.setStyle("-fx-background-color: #333333;");
+                    }
+                });
+
+                row.setOnMouseExited(event -> {
+                    if (!row.isEmpty()) {
+                        row.setStyle("-fx-background-color: #1A1A1A;");
+                    }
+                });
+
+                return row;
+            });
+
+            // Populate the wine table view
+            while (wineResultSet.next()) {
+                String wineName = wineResultSet.getString("wineName");
+                double winePrice = wineResultSet.getDouble("winePrice");
+                int wineQuantity = wineResultSet.getInt("wineQuantity");
+
+                WineDetails wineDetails = new WineDetails(wineName, winePrice, wineQuantity);
+                wineTableView.getItems().add(wineDetails);
             }
+
+            tableDetailsBox.getChildren().addAll(dishTableView, wineTableView);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        tableDetailsBox.getChildren().add(backButton);
 
+        tableDetailsBox.getChildren().add(backButton);
         mainContent.getChildren().add(tableDetailsBox);
     }
+
+    // Inner classes for dish and wine details
+    private static class DishDetails {
+        private final SimpleStringProperty dishName;
+        private final SimpleDoubleProperty dishPrice;
+        private final SimpleIntegerProperty dishQuantity;
+
+        public DishDetails(String dishName, double dishPrice, int dishQuantity) {
+            this.dishName = new SimpleStringProperty(dishName);
+            this.dishPrice = new SimpleDoubleProperty(dishPrice);
+            this.dishQuantity = new SimpleIntegerProperty(dishQuantity);
+        }
+
+        public String getDishName() {
+            return dishName.get();
+        }
+
+        public SimpleStringProperty dishNameProperty() {
+            return dishName;
+        }
+
+        public double getDishPrice() {
+            return dishPrice.get();
+        }
+
+        public SimpleDoubleProperty dishPriceProperty() {
+            return dishPrice;
+        }
+
+        public int getDishQuantity() {
+            return dishQuantity.get();
+        }
+
+        public SimpleIntegerProperty dishQuantityProperty() {
+            return dishQuantity;
+        }
+    }
+
+    private static class WineDetails {
+        private final SimpleStringProperty wineName;
+        private final SimpleDoubleProperty winePrice;
+        private final SimpleIntegerProperty wineQuantity;
+
+        public WineDetails(String wineName, double winePrice, int wineQuantity) {
+            this.wineName = new SimpleStringProperty(wineName);
+            this.winePrice = new SimpleDoubleProperty(winePrice);
+            this.wineQuantity = new SimpleIntegerProperty(wineQuantity);
+        }
+
+        public String getWineName() {
+            return wineName.get();
+        }
+
+        public SimpleStringProperty wineNameProperty() {
+            return wineName;
+        }
+
+        public double getWinePrice() {
+            return winePrice.get();
+        }
+
+        public SimpleDoubleProperty winePriceProperty() {
+            return winePrice;
+        }
+
+        public int getWineQuantity() {
+            return wineQuantity.get();
+        }
+
+        public SimpleIntegerProperty wineQuantityProperty() {
+            return wineQuantity;
+        }
+    }
+
 
     private void showMainUI(LocalDate selectedDate) {
         // Clear the main content
@@ -415,100 +520,4 @@ public class TableOverviewUI extends BaseUI {
         mainContent.getChildren().add(mainContentLayout);
     }
 
-//    /**
-//     * Calculates the table threshold based on the number of available waiters
-//     * retrieved from the StaffInfo and StaffSchedule tables in the database.
-//     *
-//     * @return the table threshold
-//     */
-//    private int calculateTableThreshold() {
-//        int tableThreshold = 0;
-//        try (Connection conn = DatabaseConnector.getConnection()) {
-//            LocalDate currentDate = LocalDate.now();
-//            String query = "SELECT COUNT(*) FROM StaffInfo si " +
-//                    "JOIN StaffSchedule ss ON si.staffScheduleID = ss.scheduleID " +
-//                    "WHERE si.staffRole = 'Waiter' AND ss.startDate <= ? AND ss.endDate >= ?";
-//            PreparedStatement statement = conn.prepareStatement(query);
-//            statement.setDate(1, Date.valueOf(currentDate));
-//            statement.setDate(2, Date.valueOf(currentDate));
-//            ResultSet resultSet = statement.executeQuery();
-//            if (resultSet.next()) {
-//                int numWaiters = resultSet.getInt(1);
-//                tableThreshold = numWaiters * 4; // Assuming each waiter can handle 4 tables
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return tableThreshold;
-//    }
-
-
-    /**
-     * Inner class representing a dish-wine pair.
-     */
-    private static class DishWine {   //might want to look at this as well rahim
-        private final SimpleStringProperty dishName;
-        private final SimpleStringProperty wineName;
-
-        /**
-         * Constructs a DishWine object with the given dish name and wine name.
-         *
-         * @param dishName the name of the dish
-         * @param wineName the name of the wine
-         */
-        private DishWine(String dishName, String wineName) {
-            this.dishName = new SimpleStringProperty(dishName);
-            this.wineName = new SimpleStringProperty(wineName);
-        }
-
-        /**
-         * Inner class representing a dish-wine pair with prices.
-         */
-        private static class DishWinePrice {
-            private final SimpleStringProperty dishNamePrice;
-            private final SimpleStringProperty wineNamePrice;
-            private final SimpleDoubleProperty totalPrice;
-
-            /**
-             * Constructs a DishWinePrice object with the given dish name, dish price, wine name, and wine price.
-             *
-             * @param dishName  the name of the dish
-             * @param dishPrice the price of the dish
-             * @param wineName  the name of the wine
-             * @param winePrice the price of the wine
-             */
-            private DishWinePrice(String dishName, double dishPrice, String wineName, double winePrice) {
-                this.dishNamePrice = new SimpleStringProperty(dishName + " (" + dishPrice + ")");
-                this.wineNamePrice = new SimpleStringProperty(wineName + " (" + winePrice + ")");
-                this.totalPrice = new SimpleDoubleProperty(dishPrice + winePrice);
-            }
-
-            /**
-             * Returns the SimpleStringProperty representing the dish name and price.
-             *
-             * @return the SimpleStringProperty for the dish name and price
-             */
-            public SimpleStringProperty dishNamePriceProperty() {
-                return dishNamePrice;
-            }
-
-            /**
-             * Returns the SimpleStringProperty representing the wine name and price.
-             *
-             * @return the SimpleStringProperty for the wine name and price
-             */
-            public SimpleStringProperty wineNamePriceProperty() {
-                return wineNamePrice;
-            }
-
-            /**
-             * Returns the SimpleDoubleProperty representing the total price of the dish and wine.
-             *
-             * @return the SimpleDoubleProperty for the total price
-             */
-            public SimpleDoubleProperty totalPriceProperty() {
-                return totalPrice;
-            }
-        }
-    }
 }
