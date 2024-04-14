@@ -147,7 +147,7 @@ public class TableOverviewUI extends BaseUI {
     /**
      * Creates the table layout by retrieving table information from the database
      * and displaying table buttons in a grid layout and displaying waiter's name with the assigned table. Check which table is occupied or available
-     * and highlights them in red or blue
+     * Mouse hover affects added
      */
 
     public void createTableLayout(LocalDate selectedDate) {
@@ -242,6 +242,15 @@ public class TableOverviewUI extends BaseUI {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Displays a table view for dish and a table view for wine with the price and quantity sold with.
+     * Separate query for Dish and Wine.
+     * Background style added to TableView.
+     *
+     * @param tableId      the ID of the selected table
+     * @param selectedDate the selected date
+     */
 
     private void showTableDetails(int tableId, LocalDate selectedDate) {
         VBox mainContent = getMainContent();
@@ -403,7 +412,9 @@ public class TableOverviewUI extends BaseUI {
         mainContent.getChildren().add(tableDetailsBox);
     }
 
-    // Inner classes for dish and wine details
+    /**
+     * Inner class representing a dish details.
+     */
     private static class DishDetails {
         private final SimpleStringProperty dishName;
         private final SimpleDoubleProperty dishPrice;
@@ -439,6 +450,10 @@ public class TableOverviewUI extends BaseUI {
             return dishQuantity;
         }
     }
+
+    /**
+     * Inner class representing wine details.
+     */
 
     private static class WineDetails {
         private final SimpleStringProperty wineName;
@@ -476,6 +491,9 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
+    /**
+     * Method to display UI after selecting a date and after clicking back button on table view
+     */
 
     private void showMainUI(LocalDate selectedDate) {
         // Clear the main content
