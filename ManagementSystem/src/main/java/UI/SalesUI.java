@@ -349,13 +349,13 @@ public class SalesUI extends BaseUI {
 
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT w.name, d.price, COUNT(*) AS quantity " +
+                     "SELECT w.wineName AS name, w.winePrice AS price, COUNT(*) AS quantity " +
                              "FROM Sale s " +
                              "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
                              "JOIN Dish d ON sd.dishID = d.dishID " +
                              "JOIN Wine w ON d.wineID = w.wineID " +
                              "WHERE s.date BETWEEN ? AND ? " +
-                             "GROUP BY w.name, d.price")) {
+                             "GROUP BY w.wineName, w.winePrice")) {
 
             stmt.setDate(1, Date.valueOf(startDate));
             stmt.setDate(2, Date.valueOf(endDate));
@@ -459,7 +459,7 @@ public class SalesUI extends BaseUI {
     }
 
     private void updateDishSalesGraph(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
-        String dishQuery = "SELECT DATE(s.date) AS saleDate, SUM(d.price) AS totalSales " +
+        String dishQuery = "SELECT DATE(s.date) AS saleDate, SUM(d.price) AS totalDishSales " +
                 "FROM Sale s " +
                 "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
                 "JOIN Dish d ON sd.dishID = d.dishID " +
@@ -467,10 +467,12 @@ public class SalesUI extends BaseUI {
                 "GROUP BY DATE(s.date)";
 
         updateSalesGraph(dishQuery, startDate, endDate, conn, "Dish Sales");
+
+
     }
 
     private void updateWineSalesGraph(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
-        String wineQuery = "SELECT DATE(s.date) AS saleDate, SUM(w.winePrice) AS totalSales " +
+        String wineQuery = "SELECT DATE(s.date) AS saleDate, SUM(w.winePrice) AS totalWineSales " +
                 "FROM Sale s " +
                 "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
                 "JOIN Dish d ON sd.dishID = d.dishID " +
@@ -482,11 +484,11 @@ public class SalesUI extends BaseUI {
     }
 
     private void updateTotalSalesGraph(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
-        String totalQuery = "SELECT DATE(s.date) AS saleDate, SUM(d.price + w.winePrice) AS totalSales " +
+        String totalQuery = "SELECT DATE(s.date) AS saleDate, SUM(d.price + COALESCE(w.winePrice, 0)) AS totalSales " +
                 "FROM Sale s " +
                 "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
                 "JOIN Dish d ON sd.dishID = d.dishID " +
-                "JOIN Wine w ON d.wineID = w.wineID " +
+                "LEFT JOIN Wine w ON d.wineID = w.wineID " +
                 "WHERE s.date BETWEEN ? AND ? " +
                 "GROUP BY DATE(s.date)";
 
@@ -501,11 +503,14 @@ public class SalesUI extends BaseUI {
             try (ResultSet rs = stmt.executeQuery()) {
                 List<Double> salesData = new ArrayList<>();
                 while (rs.next()) {
-                    double totalSales = rs.getDouble("totalSales");
+                    double totalSales = rs.getDouble(2);
                     salesData.add(totalSales);
                 }
                 graphCreator.addSeriesToGraph(salesData, seriesName, startDate, "Total Sales");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error executing sales query: " + e.getMessage());
         }
     }
 
