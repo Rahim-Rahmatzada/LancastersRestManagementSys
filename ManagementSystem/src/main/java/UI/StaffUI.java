@@ -5,7 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import model.AdminDatabaseConnector;
+import DatabaseConnections.AdminDatabaseConnector;
 import model.ScheduleForUI;
 import model.StaffHolidayForUI;
 import model.StaffInfoForUI;

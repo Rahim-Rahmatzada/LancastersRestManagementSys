@@ -1,13 +1,11 @@
-package model;
+package DatabaseConnections;
 
 import java.sql.*;
 
-public class DataUserDatabaseConnector {
+public class AdminDatabaseConnector {
     private static final String DB_URL = "jdbc:mysql://smcse-stuproj00.city.ac.uk:3306/in2033t36";
-    private static final String DB_USER = "in2033t36_d";
-    private static final String DB_PASSWORD = "uNwu4o0a3ow";
-
-
+    private static final String DB_USER = "in2033t36_a";
+    private static final String DB_PASSWORD = "xIYZBnWNwEA";
 
 
     // Method to get a database connection
@@ -15,7 +13,3 @@ public class DataUserDatabaseConnector {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 }
-
-
-
-

@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import model.AdminDatabaseConnector;
+import DatabaseConnections.AdminDatabaseConnector;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
