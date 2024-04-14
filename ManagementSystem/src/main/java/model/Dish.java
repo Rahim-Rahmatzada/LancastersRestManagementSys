@@ -8,15 +8,15 @@ public class Dish {
     private String name;
     private List<Ingredient> ingredients;
     private double price;
-    private String description;
+    private String dishDescription;
     private String allergyInfo;
     private int wineID;
 
-    public Dish(int dishID, String name, double price, String description, String allergyInfo, int wineID) {
+    public Dish(int dishID, String name, double price, String dishDescription, String allergyInfo, int wineID) {
         this.dishID = dishID;
         this.name = name;
         this.price = price;
-        this.description = description;
+        this.dishDescription = dishDescription;
         this.allergyInfo = allergyInfo;
         this.wineID = wineID;
         this.ingredients = new ArrayList<>();
@@ -26,52 +26,52 @@ public class Dish {
         return dishID;
     }
 
-    public void setDishID(int dishID) {
-        this.dishID = dishID;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
+    public void addIngredient(Ingredient ingredient) {
+        ingredients.add(ingredient);
     }
 
     public double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public String getDishDescription() {
+        return dishDescription;
     }
 
     public String getAllergyInfo() {
         return allergyInfo;
     }
 
-    public void setAllergyInfo(String allergyInfo) {
-        this.allergyInfo = allergyInfo;
-    }
-
     public int getWineID() {
         return wineID;
+    }
+
+    public void setDishID(int dishID) {
+        this.dishID = dishID;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setDishDescription(String dishDescription) {
+        this.dishDescription = dishDescription;
+    }
+
+    public void setAllergyInfo(String allergyInfo) {
+        this.allergyInfo = allergyInfo;
     }
 
     public void setWineID(int wineID) {

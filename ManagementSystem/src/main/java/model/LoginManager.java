@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class LoginManager {
     public boolean authenticate(String username, String password) {
         String hashedPassword = hashPassword(password);
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "SELECT * FROM User WHERE username = ? AND password = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
@@ -26,7 +26,7 @@ public class LoginManager {
 
     public boolean createAccount(String username, String password) {
         String hashedPassword = hashPassword(password);
-        try (Connection conn = DatabaseConnector.getConnection()) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "INSERT INTO User (username, password) VALUES (?, ?)";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);

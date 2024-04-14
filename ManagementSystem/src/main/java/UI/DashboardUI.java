@@ -8,11 +8,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import model.DatabaseConnector;
 import model.LoginManager;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public class DashboardUI extends BaseUI {
     private LoginManager loginManager;
@@ -250,7 +246,7 @@ public class DashboardUI extends BaseUI {
             // Preload other UI classes
             uiSwitcher.preloadInventoryUI();
             uiSwitcher.preloadSalesUI();
-            uiSwitcher.preloadRestaurantCapacityUI();
+            uiSwitcher.preloadTableOverviewUI();
             uiSwitcher.preloadMenusUI();
             uiSwitcher.preloadStaffUI();
             uiSwitcher.preloadWineUI();

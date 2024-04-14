@@ -9,13 +9,16 @@ import javafx.stage.Stage;
  * Main user interface for the application. Manages primary stage and switches scenes based on UI interaction.
  */
 
+
 public class MainUI extends Application implements UISwitcher {
+
+
 
     private Stage primaryStage;
     private DashboardUI dashboardUI;
     private InventoryUI inventoryUI;
     private SalesUI salesUI;
-    private RestaurantCapacityUI restaurantCapacityUI;
+    private TableOverviewUI tableOverviewUI;
     private MenusUI menusUI;
     private StaffUI staffUI;
     private WineUI wineUI;
@@ -28,6 +31,7 @@ public class MainUI extends Application implements UISwitcher {
      */
 
     public static void main(String[] args) {
+
         launch(args);
     }
 
@@ -40,6 +44,8 @@ public class MainUI extends Application implements UISwitcher {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+
+
         switchToDashboard();
         primaryStage.show();
     }
@@ -87,12 +93,12 @@ public class MainUI extends Application implements UISwitcher {
      */
 
     @Override
-    public void switchToRestaurantCapacity() {
-        if (restaurantCapacityUI == null) {
-            restaurantCapacityUI = new RestaurantCapacityUI(this);
+    public void switchToTableOverview() {
+        if (tableOverviewUI == null) {
+            tableOverviewUI = new TableOverviewUI(this);
         }
-        switchScene(restaurantCapacityUI, "Restaurant Capacity UI"); // Use the updated switchScene method
-        restaurantCapacityUI.highlightButton("Restaurant Capacity");
+        switchScene(tableOverviewUI, "Table Overview UI"); // Use the updated switchScene method
+        tableOverviewUI.highlightButton("Table Overview");
     }
 
     /**
@@ -173,9 +179,9 @@ public class MainUI extends Application implements UISwitcher {
     }
 
     @Override
-    public void preloadRestaurantCapacityUI() {
-        if (restaurantCapacityUI == null) {
-            restaurantCapacityUI = new RestaurantCapacityUI(this);
+    public void preloadTableOverviewUI() {
+        if (tableOverviewUI == null) {
+            tableOverviewUI = new TableOverviewUI(this);
         }
     }
 

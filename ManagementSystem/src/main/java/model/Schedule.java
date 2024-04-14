@@ -1,7 +1,7 @@
 package model;
 
-import java.util.Date;
 import java.sql.Time;
+import java.util.Date;
 
 public class Schedule {
     private int scheduleID;
@@ -18,5 +18,43 @@ public class Schedule {
         this.duration = duration;
     }
 
+    public int getScheduleID() {
+        return scheduleID;
+    }
 
+    public void setScheduleID(int scheduleID) {
+        this.scheduleID = scheduleID;
+    }
+
+    public Date getDateWorking() {
+        return dateWorking;
+    }
+
+    public void setDateWorking(Date dateWorking) {
+        this.dateWorking = dateWorking;
+    }
+
+    public Time getShiftStartingTime() {
+        return shiftStartingTime;
+    }
+
+    public void setShiftStartingTime(Time shiftStartingTime) {
+        this.shiftStartingTime = shiftStartingTime;
+    }
+
+    public Time getShiftEndingTime() {
+        return shiftEndingTime;
+    }
+
+    public void setShiftEndingTime(Time shiftEndingTime) {
+        this.shiftEndingTime = shiftEndingTime;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
 }

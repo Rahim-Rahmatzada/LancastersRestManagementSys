@@ -9,12 +9,21 @@ public class Sale {
     private Date date;
     private Map<Dish, Integer> dishQuantities;
     private double totalCost;
+    private int numOfCovers;
 
-    public Sale(int saleID, Date date, double totalCost) {
+    public Sale(int saleID, Date date,int numOfCovers) {
         this.saleID = saleID;
         this.date = date;
-        this.totalCost = totalCost;
+        this.numOfCovers = numOfCovers;
         this.dishQuantities = new HashMap<>();
+    }
+
+    public int getNumOfCovers() {
+        return numOfCovers;
+    }
+
+    public void setNumOfCovers(int numOfCovers) {
+        this.numOfCovers = numOfCovers;
     }
 
     public int getSaleID() {
@@ -48,4 +57,5 @@ public class Sale {
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
     }
+
 }
