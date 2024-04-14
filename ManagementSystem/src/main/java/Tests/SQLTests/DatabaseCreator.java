@@ -10,7 +10,6 @@ public class DatabaseCreator {
 
         System.out.println("Creating tables...");
 
-
         // Create the Menu table
         String createMenuTableQuery = "CREATE TABLE Menu (" +
                 "menuID INT PRIMARY KEY," +
@@ -47,13 +46,28 @@ public class DatabaseCreator {
                 ")";
         statement.execute(createIngredientTableQuery);
 
-        // Create other tables as needed
+        // Create the Sale table
+        String createSaleTableQuery = "CREATE TABLE Sale (" +
+                "saleID INT PRIMARY KEY," +
+                "date DATE," +
+                "numOfCovers INT" +
+                ")";
+        statement.execute(createSaleTableQuery);
+
+        // Create the Dish table
+        String createDishTableQuery = "CREATE TABLE Dish (" +
+                "dishID INT PRIMARY KEY," +
+                "name VARCHAR(255)," +
+                "price DOUBLE," +
+                "dishDescription VARCHAR(255)," +
+                "allergyInfo VARCHAR(255)," +
+                "wineID INT," +
+                "FOREIGN KEY (wineID) REFERENCES Wine(wineID)" +
+                ")";
+        statement.execute(createDishTableQuery);
 
         statement.close();
 
         System.out.println("Tables created successfully.");
-
     }
-
-
 }

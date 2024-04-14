@@ -8,7 +8,7 @@ public interface UISwitcher {
     void switchToDashboard();
     void switchToInventory();
     void switchToSales();
-    void switchToRestaurantCapacity();
+    void switchToTableOverview();
     void switchToMenus();
     void switchToStaff();
     void switchToWine();
@@ -17,7 +17,7 @@ public interface UISwitcher {
 
     void preloadInventoryUI();
     void preloadSalesUI();
-    void preloadRestaurantCapacityUI();
+    void preloadTableOverviewUI();
     void preloadMenusUI();
     void preloadStaffUI();
     void preloadWineUI();
