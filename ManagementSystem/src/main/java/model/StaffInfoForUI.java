@@ -2,6 +2,14 @@ package model;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
+
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class StaffInfoForUI {
     private StringProperty name;
@@ -10,6 +18,9 @@ public class StaffInfoForUI {
     private StringProperty shiftEnd;
     private StringProperty duration;
 
+    private IntegerProperty staffID;
+
+
     public StaffInfoForUI(String name, String role, String shiftStart, String shiftEnd, String duration) {
         this.name = new SimpleStringProperty(name);
         this.role = new SimpleStringProperty(role);
@@ -17,6 +28,21 @@ public class StaffInfoForUI {
         this.shiftEnd = new SimpleStringProperty(shiftEnd);
         this.duration = new SimpleStringProperty(duration);
     }
+
+    public StaffInfoForUI(int staffID, String name, String role) {
+        this.staffID = new SimpleIntegerProperty(staffID);
+        this.name = new SimpleStringProperty(name);
+        this.role = new SimpleStringProperty(role);
+    }
+
+    public int getStaffID() {
+        return staffID.get();
+    }
+
+    public IntegerProperty getStaffIDProperty() {
+        return staffID;
+    }
+
 
     public String getName() {
         return name.get();
