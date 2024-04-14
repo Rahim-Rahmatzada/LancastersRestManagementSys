@@ -12,8 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import model.AdminDatabaseConnector;
+
 import java.sql.*;
 import java.time.LocalDate;
+import java.sql.Connection;
 
 
 
@@ -29,6 +31,8 @@ public class TableOverviewUI extends BaseUI {
     private VBox capacityBox;
     protected VBox dateBox;
 
+
+
     /**
      * Constructs a new TableOverview UI instance.
      *
@@ -39,7 +43,9 @@ public class TableOverviewUI extends BaseUI {
         highlightButton("Table Overview");
         setTopText("Table Overview");
         initializeUI();
+
     }
+
 
     /**
      * Initializes the user interface components and layout.
