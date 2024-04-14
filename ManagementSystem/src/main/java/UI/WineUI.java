@@ -21,9 +21,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+
+/**
+ * This class represents the user interface for managing wine-related operations.
+ * It extends the `BaseUI` class to inherit basic UI functionalities.
+ */
+
 public class WineUI extends BaseUI {
     private TableView<Wine> wineTableView;
 
+    /**
+     * Constructor for the WineUI class.
+     * Initializes the UI components and sets up the wine overview.
+     *
+     * @param uiSwitcher The UISwitcher instance for switching between UIs.
+     */
     public WineUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Wine");
@@ -49,7 +61,11 @@ public class WineUI extends BaseUI {
 
         setMainContent(wineMainContent);
     }
-
+    /**
+     * Creates the TableView for displaying wine data.
+     *
+     * @return The configured TableView for wine data.
+     */
     private TableView<Wine> createWineTableView() {
         TableView<Wine> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -147,7 +163,11 @@ public class WineUI extends BaseUI {
 
         return tableView;
     }
-
+    /**
+     * Creates the box containing control elements for adding wines.
+     *
+     * @return The configured HBox containing controls for adding wines.
+     */
     private HBox createControlsBox() {
         HBox controlsBox = new HBox();
         controlsBox.setSpacing(20);
@@ -161,6 +181,11 @@ public class WineUI extends BaseUI {
         return controlsBox;
     }
 
+    /**
+     * Creates the box containing control elements for adding wines.
+     *
+     * @return The configured HBox containing controls for adding wines.
+     */
     private HBox createAddWineControls() {
         HBox addWineBox = new HBox();
         addWineBox.setSpacing(10);
@@ -184,6 +209,11 @@ public class WineUI extends BaseUI {
         return addWineBox;
     }
 
+    /**
+     * Adds a new wine to the database.
+     *
+     * @param wineName The name of the new wine to be added.
+     */
     private void addNewWine(String wineName) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -212,10 +242,21 @@ public class WineUI extends BaseUI {
         }
     }
 
+    /**
+     * Generates a random wine ID between 100 and 999.
+     *
+     * @return The randomly generated wine ID.
+     */
     private int generateRandomWineID() {
         return (int) (Math.random() * 900) + 100;
     }
 
+    /**
+     * Checks if a wine ID already exists in the database.
+     *
+     * @param wineID The wine ID to check.
+     * @return True if the wine ID exists, false otherwise.
+     */
     private boolean isWineIDExists(int wineID) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -235,7 +276,11 @@ public class WineUI extends BaseUI {
         return false;
     }
 
-
+    /**
+     * Retrieves wine data from the database and populates the TableView.
+     *
+     * @return An ObservableList containing wine data retrieved from the database.
+     */
 
     private ObservableList<Wine> getWineDataFromDatabase() {
         ObservableList<Wine> wineList = FXCollections.observableArrayList();
@@ -263,6 +308,9 @@ public class WineUI extends BaseUI {
         return wineList;
     }
 
+    /**
+     * Reloads the wine TableView by fetching updated data from the database.
+     */
     private void reloadWineTableView() {
         // Reload the data in the table view
         ObservableList<Wine> wineData = getWineDataFromDatabase();
@@ -277,6 +325,11 @@ public class WineUI extends BaseUI {
         alert.showAndWait();
     }
 
+    /**
+     * Updates an existing wine record in the database.
+     *
+     * @param wine The Wine object containing updated information.
+     */
     private void updateWineInDatabase(Wine wine) {
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -296,6 +349,11 @@ public class WineUI extends BaseUI {
         }
     }
 
+    /**
+     * Creates a box containing statistics about wines.
+     *
+     * @return The configured HBox containing wine statistics.
+     */
     private HBox createStatsBox() {
         HBox statsBox = new HBox();
         statsBox.setSpacing(50);
@@ -310,6 +368,11 @@ public class WineUI extends BaseUI {
         return statsBox;
     }
 
+    /**
+     * Creates a box containing information about the most expensive wine.
+     *
+     * @return The configured VBox containing information about the most expensive wine.
+     */
     private VBox createMostExpensiveWineBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -334,6 +397,11 @@ public class WineUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Creates a box containing information about the most popular wine.
+     *
+     * @return The configured VBox containing information about the most popular wine.
+     */
     private VBox createMostPopularWineBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -358,6 +426,11 @@ public class WineUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Creates a box containing information about the wine with the highest quantity.
+     *
+     * @return The configured VBox containing information about the wine with the highest quantity.
+     */
     private VBox createHighestQuantityWineBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -382,6 +455,11 @@ public class WineUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Retrieves the name and price of the most expensive wine from the database.
+     *
+     * @return A string containing the name and price of the most expensive wine.
+     */
     private String getMostExpensiveWine() {
         String mostExpensiveWine = "";
 
@@ -399,6 +477,12 @@ public class WineUI extends BaseUI {
         return mostExpensiveWine;
     }
 
+
+    /**
+     * Retrieves the name and total sales count of the most popular wine from the database.
+     *
+     * @return A string containing the name of the most popular wine and its total sales count.
+     */
     private String getMostPopularWine() {
         String mostPopularWine = "";
 
@@ -424,6 +508,12 @@ public class WineUI extends BaseUI {
         return mostPopularWine;
     }
 
+
+    /**
+     * Retrieves the name and quantity of the wine with the highest quantity from the database.
+     *
+     * @return A string containing the name of the wine with the highest quantity and its quantity.
+     */
     private String getWineWithHighestQuantity() {
         String wineWithHighestQuantity = "";
 
