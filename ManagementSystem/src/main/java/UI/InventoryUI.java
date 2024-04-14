@@ -517,12 +517,4 @@ public class InventoryUI extends BaseUI {
         return box;
     }
 
-
-
-
-
 }
-
-//set threshold
-//low stock items
-//most used ingredient

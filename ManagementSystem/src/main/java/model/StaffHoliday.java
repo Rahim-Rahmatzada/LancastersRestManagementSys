@@ -12,6 +12,6 @@ public class StaffHoliday {
         this.startDate = startDate;
         this.endDate = endDate;
     }
-
+    
 
 }
