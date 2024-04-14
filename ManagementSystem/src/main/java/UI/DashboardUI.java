@@ -246,7 +246,7 @@ public class DashboardUI extends BaseUI {
             // Preload other UI classes
             uiSwitcher.preloadInventoryUI();
             uiSwitcher.preloadSalesUI();
-            uiSwitcher.preloadRestaurantCapacityUI();
+            uiSwitcher.preloadTableOverviewUI();
             uiSwitcher.preloadMenusUI();
             uiSwitcher.preloadStaffUI();
             uiSwitcher.preloadWineUI();

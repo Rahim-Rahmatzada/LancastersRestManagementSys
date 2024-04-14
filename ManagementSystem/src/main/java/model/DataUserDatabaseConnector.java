@@ -8,6 +8,8 @@ public class DataUserDatabaseConnector {
     private static final String DB_PASSWORD = "uNwu4o0a3ow";
 
 
+
+
     // Method to get a database connection
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);

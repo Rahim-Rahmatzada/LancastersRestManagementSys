@@ -4,15 +4,27 @@ public class Wine {
     private int wineID;
     private String name;
     private String type;
+    private double price;
     private int quantity;
     private int vintage; // Assuming vintage is stored as integer year
 
-    public Wine(int wineID, String name, String type, int quantity, int vintage) {
+
+    public Wine(int wineID, String name, String type, int vintage, int quantity, double price) {
         this.wineID = wineID;
         this.name = name;
-        this.type = type;
+        this.price = price;
         this.quantity = quantity;
         this.vintage = vintage;
+        this.type = type;
+    }
+
+    //over loading constructor for BOH interface method
+    public Wine(int wineID, String name, String type, int vintage, int quantity) {
+        this.wineID = wineID;
+        this.name = name;
+        this.quantity = quantity;
+        this.vintage = vintage;
+        this.type = type;
     }
 
     public int getWineID() {
@@ -31,12 +43,12 @@ public class Wine {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public double getPrice() {
+        return price;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public int getQuantity() {
@@ -52,8 +64,15 @@ public class Wine {
     }
 
     public void setVintage(int vintage) {
+
         this.vintage = vintage;
     }
 
+    public String getType() {
+        return type;
+    }
 
+    public void setType(String type) {
+        this.type = type;
+    }
 }
