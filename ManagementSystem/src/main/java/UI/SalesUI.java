@@ -428,13 +428,13 @@ public class SalesUI extends BaseUI {
                 "ORDER BY totalSold DESC " +
                 "LIMIT 1";
 
-        String popularWineQuery = "SELECT w.name AS wineName, COUNT(*) AS totalSold " +
+        String popularWineQuery = "SELECT w.wineName AS wineName, COUNT(*) AS totalSold " +
                 "FROM Sale_Dish sd " +
                 "JOIN Dish d ON sd.dishID = d.dishID " +
                 "JOIN Wine w ON d.wineID = w.wineID " +
                 "JOIN Sale s ON sd.saleID = s.saleID " +
                 "WHERE s.date BETWEEN ? AND ? " +
-                "GROUP BY w.name " +
+                "GROUP BY w.wineName " +
                 "ORDER BY totalSold DESC " +
                 "LIMIT 1";
 
