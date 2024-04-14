@@ -18,9 +18,6 @@ public class Menu {
         this.dishes = new ArrayList<>();
     }
 
-    public Date getEffectiveDateAsSqlDate() {
-        return Date.valueOf(effectiveDate);
-    }
 
     public int getMenuID() {
         return menuID;
@@ -54,5 +51,5 @@ public class Menu {
         this.dishes = dishes;
     }
 
-    // Other methods...
+
 }
