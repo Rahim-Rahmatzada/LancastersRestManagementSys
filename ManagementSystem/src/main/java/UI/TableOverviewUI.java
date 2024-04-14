@@ -148,7 +148,8 @@ public class TableOverviewUI extends BaseUI {
         tableLayout.getChildren().clear();
 
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
-            String query = "SELECT t.tablesID, t.tablesLayout, COALESCE(b.bookingStatus, 'Available') AS bookingStatus, s.staffName " +
+            String query = "SELECT t.tablesID, t.tablesLayout, COALESCE(b.bookingStatus, 'Available') AS bookingStatus, " +
+                    "GROUP_CONCAT(s.staffName SEPARATOR ', ') AS waiterNames " +
                     "FROM Tables t " +
                     "LEFT JOIN (" +
                     "    SELECT tablesID, MAX(bookingDate) AS maxDate " +
@@ -158,7 +159,8 @@ public class TableOverviewUI extends BaseUI {
                     ") AS latest ON t.tablesID = latest.tablesID " +
                     "LEFT JOIN Booking b ON t.tablesID = b.tablesID AND b.bookingDate = latest.maxDate " +
                     "LEFT JOIN Tables_FOHStaff tf ON t.tablesID = tf.tableID " +
-                    "LEFT JOIN StaffInfo s ON tf.staffInfoID = s.staffID";
+                    "LEFT JOIN StaffInfo s ON tf.staffInfoID = s.staffID " +
+                    "GROUP BY t.tablesID";
 
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setDate(1, Date.valueOf(selectedDate));
@@ -173,18 +175,15 @@ public class TableOverviewUI extends BaseUI {
 
             while (resultSet.next()) {
                 int tableId = resultSet.getInt("tablesID");
-                //int capacity = resultSet.getInt("tablesLayout");
                 String bookingStatus = resultSet.getString("bookingStatus");
-                String waiterName = resultSet.getString("staffName");
+                String waiterNames = resultSet.getString("waiterNames");
 
-                //String buttonText = "Table " + tableId + " (" + capacity + ")\n";
                 String buttonText = "Table " + tableId + " \n";
-                if (waiterName != null) {
-                    buttonText += "Waiter: " + waiterName + "\n";
+                if (waiterNames != null) {
+                    buttonText += "Waiters: " + waiterNames + "\n";
                 } else {
                     buttonText += "No waiter assigned \n";
                 }
-
 
                 Button tableButton = new Button(buttonText);
                 tableButton.setTextAlignment(TextAlignment.CENTER);
@@ -213,13 +212,7 @@ public class TableOverviewUI extends BaseUI {
                     tableButton.setStyle("-fx-background-color: white; -fx-text-fill: black;");
                 }
 
-//                int tableThreshold = calculateTableThreshold();
-//                if (availableTables > tableThreshold) {
-//                    tableButton.setDisable(true);
-//                }
-
                 tableButton.setOnAction(e -> showTableDetails(tableId, selectedDate));
-
 
                 tableLayout.add(tableButton, col, row);
 
