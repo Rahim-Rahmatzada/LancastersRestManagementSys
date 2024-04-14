@@ -257,7 +257,9 @@ public class TableOverviewUI extends BaseUI {
             // Retrieve dish details
             String dishQuery = "SELECT d.name AS dishName, d.price AS dishPrice, COUNT(sd.dishID) AS dishQuantity " +
                     "FROM Booking b " +
-                    "JOIN Sale s ON b.bookingDate = s.date " +
+                    "JOIN Tables t ON b.tablesID = t.tablesID " +
+                    "JOIN Sale_Table st ON t.tablesID = st.tablesID " +
+                    "JOIN Sale s ON st.saleID = s.saleID AND b.bookingDate = s.date " +
                     "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
                     "JOIN Dish d ON sd.dishID = d.dishID " +
                     "WHERE b.tablesID = ? AND b.bookingDate = ? " +
@@ -271,20 +273,19 @@ public class TableOverviewUI extends BaseUI {
 
             // Create a table view for dishes
             TableView<DishDetails> dishTableView = new TableView<>();
+            dishTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
             dishTableView.setStyle("-fx-background-color: #1A1A1A;");
 
             TableColumn<DishDetails, String> dishNameColumn = new TableColumn<>("Dish Name");
-            dishNameColumn.setPrefWidth(300);
             dishNameColumn.setCellValueFactory(data -> data.getValue().dishNameProperty());
             dishNameColumn.setStyle("-fx-text-fill: white;");
 
             TableColumn<DishDetails, Number> dishPriceColumn = new TableColumn<>("Price");
-            dishPriceColumn.setPrefWidth(250);
             dishPriceColumn.setCellValueFactory(data -> data.getValue().dishPriceProperty());
             dishPriceColumn.setStyle("-fx-text-fill: white;");
 
             TableColumn<DishDetails, Number> dishQuantityColumn = new TableColumn<>("Quantity Sold");
-            dishQuantityColumn.setPrefWidth(420);
             dishQuantityColumn.setCellValueFactory(data -> data.getValue().dishQuantityProperty());
             dishQuantityColumn.setStyle("-fx-text-fill: white;");
 
@@ -322,7 +323,9 @@ public class TableOverviewUI extends BaseUI {
             // Retrieve wine details
             String wineQuery = "SELECT w.wineName AS wineName, w.winePrice AS winePrice, COUNT(d.dishID) AS wineQuantity " +
                     "FROM Booking b " +
-                    "JOIN Sale s ON b.bookingDate = s.date " +
+                    "JOIN Tables t ON b.tablesID = t.tablesID " +
+                    "JOIN Sale_Table st ON t.tablesID = st.tablesID " +
+                    "JOIN Sale s ON st.saleID = s.saleID AND b.bookingDate = s.date " +
                     "JOIN Sale_Dish sd ON s.saleID = sd.saleID " +
                     "JOIN Dish d ON sd.dishID = d.dishID " +
                     "JOIN Wine w ON d.wineID = w.wineID " +
@@ -337,20 +340,19 @@ public class TableOverviewUI extends BaseUI {
 
             // Create a table view for wines
             TableView<WineDetails> wineTableView = new TableView<>();
+            wineTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
             wineTableView.setStyle("-fx-background-color: #1A1A1A;");
 
             TableColumn<WineDetails, String> wineNameColumn = new TableColumn<>("Wine Name");
-            wineNameColumn.setPrefWidth(300);
             wineNameColumn.setCellValueFactory(data -> data.getValue().wineNameProperty());
             wineNameColumn.setStyle("-fx-text-fill: white;");
 
             TableColumn<WineDetails, Number> winePriceColumn = new TableColumn<>("Price");
-            winePriceColumn.setPrefWidth(250);
             winePriceColumn.setCellValueFactory(data -> data.getValue().winePriceProperty());
             winePriceColumn.setStyle("-fx-text-fill: white;");
 
             TableColumn<WineDetails, Number> wineQuantityColumn = new TableColumn<>("Quantity Sold");
-            wineQuantityColumn.setPrefWidth(420);
             wineQuantityColumn.setCellValueFactory(data -> data.getValue().wineQuantityProperty());
             wineQuantityColumn.setStyle("-fx-text-fill: white;");
 
