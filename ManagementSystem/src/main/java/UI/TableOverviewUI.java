@@ -182,7 +182,7 @@ public class TableOverviewUI extends BaseUI {
                 String bookingStatus = resultSet.getString("bookingStatus");
                 String waiterNames = resultSet.getString("waiterNames");
 
-                String buttonText = "Table " + tableId + " \n";
+                String buttonText = "Table " + tableId + " (Layout: " + resultSet.getInt("tablesLayout") + ")\n";
                 if (waiterNames != null) {
                     buttonText += "Waiters: " + waiterNames + "\n";
                 } else {
@@ -249,7 +249,7 @@ public class TableOverviewUI extends BaseUI {
         tableDetailsBox.setSpacing(10);
         tableDetailsBox.setPadding(new Insets(10));
 
-        tableDetailsLabel = new Label("Table Details - Table " + tableId); //hereeeeeeeeeee
+        tableDetailsLabel = new Label("Table Details - Table " + tableId);
         tableDetailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         backButton = new Button("Back");
