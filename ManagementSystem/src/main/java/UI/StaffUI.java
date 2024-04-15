@@ -1,17 +1,23 @@
 package UI;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import DatabaseConnections.AdminDatabaseConnector;
+import javafx.util.converter.LocalDateStringConverter;
+import javafx.util.converter.LocalTimeStringConverter;
 import model.ScheduleForUI;
 import model.StaffHolidayForUI;
 import model.StaffInfoForUI;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +32,7 @@ public class StaffUI extends BaseUI {
     private TableView<StaffInfoForUI> staffTableView;
     private TableView<StaffHolidayForUI> holidayTableView;
     private TableView<ScheduleForUI> scheduleTableView;
-
-
+    private ScheduleForUI schedule;
 
 
     public StaffUI(UISwitcher uiSwitcher) {
@@ -58,6 +63,28 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().addAll(topControls, staffTableView);
         setMainContent(mainContent);
     }
+    private void updateDatabase(ScheduleForUI schedule) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
+            String query = "UPDATE YourTableName SET Date = ?, StartTime = ?, EndTime = ? WHERE ScheduleID = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+
+            pstmt.setDate(1, java.sql.Date.valueOf(schedule.getDate()));
+            pstmt.setTime(2, schedule.getStartTime());
+            pstmt.setTime(3, schedule.getEndTime());
+            pstmt.setInt(4, schedule.getScheduleID());
+
+            int updatedRows = pstmt.executeUpdate();
+
+            if (updatedRows > 0) {
+                System.out.println("Database updated successfully");
+            } else {
+                System.out.println("Failed to update database");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void modifyStaffSchedule() {
         VBox mainContent = (VBox) getMainContent();
@@ -66,14 +93,27 @@ public class StaffUI extends BaseUI {
         VBox staffScheduleContent = new VBox();
         staffScheduleContent.setSpacing(10);
 
+
         // Create a table view to display all staff
         staffTableView = createStaffTableView();
         staffTableView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 1 && !staffTableView.getSelectionModel().isEmpty()) {
                 StaffInfoForUI selectedStaff = staffTableView.getSelectionModel().getSelectedItem();
                 int staffID = selectedStaff.getStaffID();
+                Button backButton = new Button("Back");
+                backButton.setOnAction(e -> backToMainView());
+                HBox hBox = new HBox(10);
+                TextField textField1 = new TextField();
+                textField1.setPromptText("StaffID:ScheduleID");
+                TextField textField2 = new TextField();
+                textField2.setPromptText("StaffID:Schedule");
+                Button addSchedule = new Button("Add Schedule");
+                addSchedule.setOnAction(e -> addScheduleToDatabase(textField1.getText()));
+                Button delSchedule = new Button("Delete Schedule");
+                delSchedule.setOnAction(e -> deleteScheduleFromDatabase(textField2.getText()));
+                hBox.getChildren().addAll(textField1, addSchedule, textField2, delSchedule);
                 scheduleTableView = createScheduleTableView(staffID);
-                staffScheduleContent.getChildren().setAll(staffTableView, scheduleTableView);
+                staffScheduleContent.getChildren().setAll(backButton, staffTableView, scheduleTableView, hBox);
                 staffTableView.setStyle("-fx-background-color: #1A1A1A;");
                 scheduleTableView.setStyle("-fx-background-color: #1A1A1A;");
             }
@@ -82,7 +122,7 @@ public class StaffUI extends BaseUI {
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> backToMainView());
 
-        staffScheduleContent.getChildren().addAll(staffTableView, backButton);
+        staffScheduleContent.getChildren().addAll(backButton, staffTableView);
         mainContent.getChildren().add(staffScheduleContent);
     }
 
@@ -343,27 +383,67 @@ public class StaffUI extends BaseUI {
 
         TableColumn<ScheduleForUI, LocalDate> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(param -> param.getValue().getDateProperty());
+        dateColumn.setCellFactory(TextFieldTableCell.forTableColumn(new LocalDateStringConverter()));
+        dateColumn.setOnEditCommit(event -> {
+            ScheduleForUI schedule = event.getRowValue();
+            LocalDate newValue = event.getNewValue();
+            schedule.setDate(newValue);
+        });
 
-        TableColumn<ScheduleForUI, String> startTimeColumn = new TableColumn<>("Start Time");
-        TableColumn<ScheduleForUI, String> endTimeColumn = new TableColumn<>("End Time");
-
+        TableColumn<ScheduleForUI, LocalTime> startTimeColumn = new TableColumn<>("Start Time");
         startTimeColumn.setCellValueFactory(param -> {
             Time startTime = param.getValue().getStartTime();
-            return new SimpleStringProperty(startTime != null ? startTime.toString() : "");
+            return new SimpleObjectProperty<>(startTime.toLocalTime());
+        });
+        startTimeColumn.setCellFactory(TextFieldTableCell.forTableColumn(new LocalTimeStringConverter()));
+        startTimeColumn.setOnEditCommit(event -> {
+            ScheduleForUI schedule = event.getRowValue();
+            LocalTime newValue = event.getNewValue();
+            schedule.setStartTime(Time.valueOf(newValue));
         });
 
+        TableColumn<ScheduleForUI, LocalTime> endTimeColumn = new TableColumn<>("End Time");
         endTimeColumn.setCellValueFactory(param -> {
             Time endTime = param.getValue().getEndTime();
-            return new SimpleStringProperty(endTime != null ? endTime.toString() : "");
+            return new SimpleObjectProperty<>(endTime.toLocalTime());
         });
+        endTimeColumn.setCellFactory(TextFieldTableCell.forTableColumn(new LocalTimeStringConverter()));
+        endTimeColumn.setOnEditCommit(event -> {
+            ScheduleForUI schedule = event.getRowValue();
+            LocalTime newValue = event.getNewValue();
+            schedule.setEndTime(Time.valueOf(newValue));
+        });
+
+        //On edit commit for Date, startTime and endTime columns
+        dateColumn.setOnEditCommit(event -> {
+            ScheduleForUI schedule = event.getRowValue();
+            LocalDate newValue = event.getNewValue();
+            schedule.setDate(newValue);
+            updateDatabase(schedule);
+        });
+
+        startTimeColumn.setOnEditCommit(event -> {
+            ScheduleForUI schedule = event.getRowValue();
+            LocalTime newValue = event.getNewValue();
+            schedule.setStartTime(Time.valueOf(newValue));
+            updateDatabase(schedule);
+        });
+
+        endTimeColumn.setOnEditCommit(event -> {
+            ScheduleForUI schedule = event.getRowValue();
+            LocalTime newValue = event.getNewValue();
+            schedule.setEndTime(Time.valueOf(newValue));
+            updateDatabase(schedule);
+        });
+
+        TableColumn<ScheduleForUI, String> durationColumn = new TableColumn<>("Duration");
+        durationColumn.setCellValueFactory(param -> param.getValue().getDurationProperty());
 
         scheduleIDColumn.setStyle("-fx-text-fill: white;");
         dateColumn.setStyle("-fx-text-fill: white;");
         startTimeColumn.setStyle("-fx-text-fill: white;");
         endTimeColumn.setStyle("-fx-text-fill: white;");
-
-        TableColumn<ScheduleForUI, String> durationColumn = new TableColumn<>("Duration");
-        durationColumn.setCellValueFactory(param -> param.getValue().getDurationProperty());
+        durationColumn.setStyle("-fx-text-fill: white;");
 
         tableView.getColumns().addAll(scheduleIDColumn, dateColumn, startTimeColumn, endTimeColumn, durationColumn);
 
@@ -391,6 +471,10 @@ public class StaffUI extends BaseUI {
         // Load schedule data from the database
         List<ScheduleForUI> schedules = getScheduleFromDatabase(staffID);
         tableView.getItems().setAll(schedules);
+
+        // Enable cell selection and editing
+        tableView.getSelectionModel().cellSelectionEnabledProperty().set(true);
+        tableView.setEditable(true);
 
         return tableView;
     }
@@ -490,6 +574,80 @@ public class StaffUI extends BaseUI {
 
         return staffSchedule;
     }
+    // adds a schedule to the database and stable
+    private void addScheduleToDatabase(String input) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
+            String[] parts = input.split(":");
+            if (parts.length != 2) {
+                showAlert("Invalid Input", "Please enter StaffID:ScheduleID");
+                return;
+            }
+
+            int staffID;
+            int scheduleID;
+            try {
+                staffID = Integer.parseInt(parts[0]);
+                scheduleID = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException e) {
+                showAlert("Invalid Input", "Please enter valid StaffID and ScheduleID");
+                return;
+            }
+
+            String query = "INSERT INTO StaffSchedule_StaffInfo (StaffID, ScheduleID) VALUES (?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+
+            pstmt.setInt(1, staffID);
+            pstmt.setInt(2, scheduleID);
+
+            int updatedRows = pstmt.executeUpdate();
+
+            if (updatedRows > 0) {
+                System.out.println("Schedule added to database successfully");
+            } else {
+                System.out.println("Failed to add schedule to database");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    // Method to delete schedule from database
+    private void deleteScheduleFromDatabase(String input) {
+        try (Connection conn = AdminDatabaseConnector.getConnection()) {
+            String[] parts = input.split(":");
+            if (parts.length != 2) {
+                showAlert("Invalid Input", "Please enter StaffID:ScheduleID");
+                return;
+            }
+
+            int staffID;
+            int scheduleID;
+            try {
+                staffID = Integer.parseInt(parts[0]);
+                scheduleID = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException e) {
+                showAlert("Invalid Input", "Please enter valid StaffID and ScheduleID");
+                return;
+            }
+
+            String query = "DELETE FROM StaffSchedule_StaffInfo WHERE StaffID = ? AND ScheduleID = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+
+            pstmt.setInt(1, staffID);
+            pstmt.setInt(2, scheduleID);
+
+            int updatedRows = pstmt.executeUpdate();
+
+            if (updatedRows > 0) {
+                System.out.println("Schedule deleted from database successfully");
+            } else {
+                System.out.println("Failed to delete schedule from database");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -498,4 +656,5 @@ public class StaffUI extends BaseUI {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
 }

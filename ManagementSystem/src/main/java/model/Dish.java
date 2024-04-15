@@ -22,6 +22,14 @@ public class Dish {
         this.ingredients = new ArrayList<>();
     }
 
+    public Dish(int dishID, String name, double price, String dishDescription, String allergyInfo) {
+        this.dishID = dishID;
+        this.name = name;
+        this.price = price;
+        this.dishDescription = dishDescription;
+        this.allergyInfo = allergyInfo;
+    }
+
     public int getDishID() {
         return dishID;
     }
@@ -76,5 +84,14 @@ public class Dish {
 
     public void setWineID(int wineID) {
         this.wineID = wineID;
+    }
+
+    public void setDescription(String newValue) {
+    }
+
+    public String getDescription() { return dishDescription;
+    }
+
+    public int getId() { return dishID;
     }
 }
