@@ -128,7 +128,7 @@ public class SalesUI extends BaseUI {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameColumn.setStyle("-fx-text-fill: white;");
 
-        TableColumn<SoldItem, Double> priceColumn = new TableColumn<>("Price");
+        TableColumn<SoldItem, Double> priceColumn = new TableColumn<>("Price (£)");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setStyle("-fx-text-fill: white;");
 
@@ -179,7 +179,7 @@ public class SalesUI extends BaseUI {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameColumn.setStyle("-fx-text-fill: white;");
 
-        TableColumn<SoldItem, Double> priceColumn = new TableColumn<>("Price");
+        TableColumn<SoldItem, Double> priceColumn = new TableColumn<>("Price (£)");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setStyle("-fx-text-fill: white;");
 

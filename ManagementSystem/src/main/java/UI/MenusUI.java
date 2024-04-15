@@ -183,8 +183,12 @@ public class MenusUI extends BaseUI {
         winePriceColumn.setCellValueFactory(new PropertyValueFactory<>("winePrice"));
         winePriceColumn.setStyle("-fx-text-fill: white;");
 
+        TableColumn<DishAndWineHelper, Double> profitColumn = new TableColumn<>("Profit From Dish (£)");
+        profitColumn.setCellValueFactory(new PropertyValueFactory<>("profit"));
+        profitColumn.setStyle("-fx-text-fill: white;");
+
         // Add columns to the table view
-        tableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishDescriptionColumn, allergyInfoColumn, wineNameColumn, winePriceColumn);
+        tableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishDescriptionColumn, allergyInfoColumn, wineNameColumn, winePriceColumn, profitColumn);
 
         // Set the data to the table view
         tableView.setItems(FXCollections.observableArrayList(dishAndWineList));
@@ -218,11 +222,16 @@ public class MenusUI extends BaseUI {
 
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT d.name AS dishName, d.price AS dishPrice, d.dishDescription, d.allergyInfo, w.wineName, w.winePrice " +
+                     "SELECT d.name AS dishName, d.price AS dishPrice, d.dishDescription, d.allergyInfo, w.wineName, w.winePrice, " +
+                             "(d.price - SUM(i.ingredientCost * di.ingredientQuantityUsed)) AS profit " +
                              "FROM Dish d " +
                              "JOIN Wine w ON d.wineID = w.wineID " +
                              "JOIN Menu_Dish md ON d.dishID = md.dishID " +
-                             "WHERE md.menuID = ?")) {
+                             "JOIN Dish_Ingredient di ON d.dishID = di.dishID " +
+                             "JOIN Ingredient i ON di.ingredientID = i.ingredientID " +
+                             "WHERE md.menuID = ? " +
+                             "GROUP BY d.name, d.price, d.dishDescription, d.allergyInfo, w.wineName, w.winePrice")) {
+
 
             stmt.setInt(1, menuID);
 
@@ -234,8 +243,9 @@ public class MenusUI extends BaseUI {
                     String allergyInfo = rs.getString("allergyInfo");
                     String wineName = rs.getString("wineName");
                     double winePrice = rs.getDouble("winePrice");
+                    double profit = rs.getDouble("profit");
 
-                    DishAndWineHelper dishAndWine = new DishAndWineHelper(dishName, allergyInfo, wineName, dishPrice, dishDescription, winePrice);
+                    DishAndWineHelper dishAndWine = new DishAndWineHelper(dishName, allergyInfo, wineName, dishPrice, dishDescription, winePrice, profit);
                     dishAndWineList.add(dishAndWine);
                 }
             }
