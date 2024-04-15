@@ -134,6 +134,9 @@ public class WasteUI extends BaseUI {
         box.setMinWidth(250);
         box.setMaxWidth(250);
 
+        box.setMinHeight(100);
+        box.setMinHeight(100);
+
         return box;
     }
 
