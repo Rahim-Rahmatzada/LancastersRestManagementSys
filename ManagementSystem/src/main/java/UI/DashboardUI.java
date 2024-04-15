@@ -251,6 +251,8 @@ public class DashboardUI extends BaseUI {
             uiSwitcher.preloadStaffUI();
             uiSwitcher.preloadWineUI();
             uiSwitcher.preloadStockOrdersUI();
+            uiSwitcher.preloadWasteUI();
+            uiSwitcher.preloadDishUI();
         });
         preloadThread.setDaemon(true); // Set the thread as a daemon thread
         preloadThread.start();
