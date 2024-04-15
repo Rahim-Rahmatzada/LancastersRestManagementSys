@@ -64,4 +64,13 @@ public class ScheduleForUI {
     public StringProperty getDurationProperty() {
         return duration;
     }
+
+    public void setDate(LocalDate newValue) {
+    }
+
+    public void setStartTime(Time time) {
+    }
+
+    public void setEndTime(Time time) {
+    }
 }
