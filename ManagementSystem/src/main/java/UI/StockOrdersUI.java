@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
-import model.AdminDatabaseConnector;
+import DatabaseConnections.AdminDatabaseConnector;
 import model.Ingredient;
 import model.Order;
 import java.sql.*;

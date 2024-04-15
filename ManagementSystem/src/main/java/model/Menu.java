@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +11,13 @@ public class Menu {
     private String menuStatus;
     private List<Dish> dishes;
 
-    public Menu(int menuID, LocalDate effectiveDate, String menuStatus) {
+    public Menu(int menuID, LocalDate  effectiveDate, String menuStatus) {
         this.menuID = menuID;
         this.effectiveDate = effectiveDate;
         this.menuStatus = menuStatus;
         this.dishes = new ArrayList<>();
     }
+
 
     public int getMenuID() {
         return menuID;
@@ -49,5 +51,5 @@ public class Menu {
         this.dishes = dishes;
     }
 
-    // Other methods...
+
 }

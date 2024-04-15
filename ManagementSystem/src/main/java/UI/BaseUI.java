@@ -118,11 +118,12 @@ public abstract class BaseUI {
         buttonInfo.put("Dashboard", "graph.png");
         buttonInfo.put("Inventory", "box.png");
         buttonInfo.put("Sales", "money.png");
-        buttonInfo.put("Table Overview", "calender.png");
+        buttonInfo.put("Table Overview", "table.png");
         buttonInfo.put("Menus", "book.png");
         buttonInfo.put("Staff", "staff.png");
         buttonInfo.put("Wine", "wine.png");
         buttonInfo.put("Stock Orders", "calender.png");
+        buttonInfo.put("Waste", "waste.png");
 
         for (Map.Entry<String, String> entry : buttonInfo.entrySet()) {
             buttonContainer.getChildren().add(createSideMenuButtons(entry.getKey(), 10, entry.getValue()));
@@ -237,6 +238,9 @@ public abstract class BaseUI {
             case "Staff" -> uiSwitcher.switchToStaff();
             case "Wine" -> uiSwitcher.switchToWine();
             case "Stock Orders" -> uiSwitcher.switchToStockOrders();
+            case "Waste" -> uiSwitcher.switchToWaste();
+
+
 
         }
         highlightButton(label); // Highlight the clicked button

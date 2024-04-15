@@ -19,5 +19,5 @@ public class Booking {
         this.bookingStatus = bookingStatus;
     }
 
-    // Getters and setters...
+
 }

@@ -11,7 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import model.AdminDatabaseConnector;
+import DatabaseConnections.AdminDatabaseConnector;
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -65,6 +65,8 @@ public class TableOverviewUI extends BaseUI {
 
         // Create a date picker for selecting the date
         datePicker = new DatePicker();
+        datePicker.setPromptText("Enter Date");
+
         datePicker.setOnAction(e -> updateTableAvailability());
 
         // Create a label for the selected date

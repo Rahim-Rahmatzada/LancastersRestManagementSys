@@ -1,7 +1,7 @@
 package FinalInterTeamServices.BOH;
 
 import model.*;
-import model.DataUserDatabaseConnector;
+import DatabaseConnections.DataUserDatabaseConnector;
 
 import java.sql.*;
 import java.time.LocalDate;

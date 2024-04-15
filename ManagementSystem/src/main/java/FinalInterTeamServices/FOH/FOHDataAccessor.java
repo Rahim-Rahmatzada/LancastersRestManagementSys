@@ -1,5 +1,6 @@
 package FinalInterTeamServices.FOH;
 
+import DatabaseConnections.DataUserDatabaseConnector;
 import model.*;
 
 import java.sql.*;
@@ -13,7 +14,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public List<Menu> getMenusByStatus(String status) {
         List<Menu> menus = new ArrayList<>();
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT menuID, effectiveDate, menuStatus " +
                              "FROM Menu " +
@@ -41,7 +42,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public List<Dish> getDishesByMenu(int menuID) {
         List<Dish> dishes = new ArrayList<>();
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT d.dishID, d.name, d.price, d.dishDescription, d.allergyInfo, d.wineID " +
                              "FROM Dish d " +
@@ -73,7 +74,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public Dish getDishDetails(int dishID) {
         Dish dish = null;
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT dishID, name, price, dishDescription, allergyInfo, wineID " +
                              "FROM Dish " +
@@ -103,7 +104,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public Wine getWineByDish(int dishID) {
         Wine wine = null;
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT w.wineID, w.wineName, w.wineType, w.wineVintage, w.wineQuantity " +
                              "FROM Dish d " +
@@ -133,7 +134,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public double getDishPrice(int dishID) {
         double price = 0.0;
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT price FROM Dish WHERE dishID = ?")) {
 
@@ -154,7 +155,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public double getWinePrice(int wineID) {
         double price = 0.0;
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT winePrice FROM Wine WHERE wineID = ?")) {
 
@@ -175,7 +176,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public int getWineQuantity(int wineID) {
         int quantity = 0;
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT wineQuantity FROM Wine WHERE wineID = ?")) {
 
@@ -196,7 +197,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public List<StaffInfo> getStaffByRole(String role) {
         List<StaffInfo> staffMembers = new ArrayList<>();
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT s.staffID, s.staffName, s.staffRole " +
                              "FROM StaffInfo s " +
@@ -224,7 +225,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
     public List<Schedule> getStaffSchedule(int staffID) {
         List<Schedule> schedules = new ArrayList<>();
 
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT ss.scheduleID, ss.dateWorking, ss.shiftStartingTime, ss.shiftEndingTime, ss.duration " +
                              "FROM StaffSchedule ss " +
@@ -253,7 +254,7 @@ public class FOHDataAccessor implements FOHFinalInterface {
 
     @Override
     public boolean assignWaiterToTable(String staffName, int tableID) {
-        try (Connection connection = DataUserDatabaseConnector.getConnection();
+        try (Connection connection = DatabaseConnections.DataUserDatabaseConnector.getConnection();
              PreparedStatement checkStmt = connection.prepareStatement(
                      "SELECT s.staffID " +
                              "FROM StaffInfo s " +

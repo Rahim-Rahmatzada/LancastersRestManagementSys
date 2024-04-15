@@ -1,5 +1,7 @@
 package model;
 
+import DatabaseConnections.AdminDatabaseConnector;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

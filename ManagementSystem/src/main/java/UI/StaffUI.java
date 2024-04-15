@@ -5,7 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import model.AdminDatabaseConnector;
+import DatabaseConnections.AdminDatabaseConnector;
 import model.ScheduleForUI;
 import model.StaffHolidayForUI;
 import model.StaffInfoForUI;
@@ -43,6 +43,7 @@ public class StaffUI extends BaseUI {
         mainContent.setSpacing(10);
 
         datePicker = new DatePicker();
+        datePicker.setPromptText("Enter Date");
         getScheduleButton = new Button("Get Schedule");
         getScheduleButton.setOnAction(e -> loadSchedule());
         viewHolidaysButton = new Button("View Staff Holidays");
@@ -199,6 +200,9 @@ public class StaffUI extends BaseUI {
 
         DatePicker startDatePicker = new DatePicker();
         DatePicker endDatePicker = new DatePicker();
+        startDatePicker.setPromptText("Starting Date");
+        endDatePicker.setPromptText("Ending Date");
+
         Button getHolidaysButton = new Button("Get Holidays");
         getHolidaysButton.setOnAction(e -> loadHolidays(startDatePicker.getValue(), endDatePicker.getValue()));
 
@@ -217,6 +221,7 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().clear();
 
         datePicker = new DatePicker();
+        datePicker.setPromptText("Enter Date");
         getScheduleButton = new Button("Get Schedule");
         getScheduleButton.setOnAction(e -> loadSchedule());
         viewHolidaysButton = new Button("View Staff Holidays");
