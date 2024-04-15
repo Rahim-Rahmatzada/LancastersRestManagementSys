@@ -11,7 +11,6 @@ public class DatabaseFiller {
         insertSaleData(connection);
         insertWineData(connection); // Call insertWineData before insertDishData
         insertDishData(connection);
-
     }
 
     public static void insertMenuData(Connection connection) throws SQLException {
@@ -78,6 +77,4 @@ public class DatabaseFiller {
 
         statement.close();
     }
-
-
 }

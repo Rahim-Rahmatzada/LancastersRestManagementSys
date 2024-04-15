@@ -11,11 +11,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import model.AdminDatabaseConnector;
+import DatabaseConnections.AdminDatabaseConnector;
+import model.SoldItem;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.sql.Connection;
 
 
 
@@ -31,8 +31,6 @@ public class TableOverviewUI extends BaseUI {
     private VBox capacityBox;
     protected VBox dateBox;
 
-
-
     /**
      * Constructs a new TableOverview UI instance.
      *
@@ -43,9 +41,7 @@ public class TableOverviewUI extends BaseUI {
         highlightButton("Table Overview");
         setTopText("Table Overview");
         initializeUI();
-
     }
-
 
     /**
      * Initializes the user interface components and layout.
@@ -71,6 +67,8 @@ public class TableOverviewUI extends BaseUI {
 
         // Create a date picker for selecting the date
         datePicker = new DatePicker();
+        datePicker.setPromptText("Enter Date");
+
         datePicker.setOnAction(e -> updateTableAvailability());
 
         // Create a label for the selected date
@@ -147,7 +145,7 @@ public class TableOverviewUI extends BaseUI {
     /**
      * Creates the table layout by retrieving table information from the database
      * and displaying table buttons in a grid layout and displaying waiter's name with the assigned table. Check which table is occupied or available
-     * Mouse hover affects added
+     * and highlights them in red or blue
      */
 
     public void createTableLayout(LocalDate selectedDate) {
@@ -184,7 +182,7 @@ public class TableOverviewUI extends BaseUI {
                 String bookingStatus = resultSet.getString("bookingStatus");
                 String waiterNames = resultSet.getString("waiterNames");
 
-                String buttonText = "Table " + tableId + " \n";
+                String buttonText = "Table " + tableId + " (Layout: " + resultSet.getInt("tablesLayout") + ")\n";
                 if (waiterNames != null) {
                     buttonText += "Waiters: " + waiterNames + "\n";
                 } else {
@@ -243,15 +241,6 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
-    /**
-     * Displays a table view for dish and a table view for wine with the price and quantity sold with.
-     * Separate query for Dish and Wine.
-     * Background style added to TableView.
-     *
-     * @param tableId      the ID of the selected table
-     * @param selectedDate the selected date
-     */
-
     private void showTableDetails(int tableId, LocalDate selectedDate) {
         VBox mainContent = getMainContent();
         mainContent.getChildren().clear();
@@ -304,7 +293,15 @@ public class TableOverviewUI extends BaseUI {
             dishQuantityColumn.setCellValueFactory(data -> data.getValue().dishQuantityProperty());
             dishQuantityColumn.setStyle("-fx-text-fill: white;");
 
-            dishTableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishQuantityColumn);
+            TableColumn<DishDetails, Number> dishTotalSaleColumn = new TableColumn<>("Total Sale For Item (£)");
+            dishTotalSaleColumn.setCellValueFactory(cellData -> {
+                DishDetails dishDetails = cellData.getValue();
+                double totalSale = dishDetails.getDishPrice() * dishDetails.getDishQuantity();
+                return new SimpleDoubleProperty(totalSale);
+            });
+            dishTotalSaleColumn.setStyle("-fx-text-fill: white;");
+
+            dishTableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishQuantityColumn, dishTotalSaleColumn);
 
             dishTableView.setRowFactory(tv -> {
                 TableRow<DishDetails> row = new TableRow<>();
@@ -371,7 +368,17 @@ public class TableOverviewUI extends BaseUI {
             wineQuantityColumn.setCellValueFactory(data -> data.getValue().wineQuantityProperty());
             wineQuantityColumn.setStyle("-fx-text-fill: white;");
 
-            wineTableView.getColumns().addAll(wineNameColumn, winePriceColumn, wineQuantityColumn);
+            TableColumn<WineDetails, Number> wineTotalSaleColumn = new TableColumn<>("Total Sale For Item (£)");
+            wineTotalSaleColumn.setCellValueFactory(cellData -> {
+                WineDetails wineDetails = cellData.getValue();
+                double totalSale = wineDetails.getWinePrice() * wineDetails.getWineQuantity();
+                return new SimpleDoubleProperty(totalSale);
+            });
+            wineTotalSaleColumn.setStyle("-fx-text-fill: white;");
+
+
+
+            wineTableView.getColumns().addAll(wineNameColumn, winePriceColumn, wineQuantityColumn, wineTotalSaleColumn);
 
             wineTableView.setRowFactory(tv -> {
                 TableRow<WineDetails> row = new TableRow<>();
@@ -404,6 +411,18 @@ public class TableOverviewUI extends BaseUI {
 
             tableDetailsBox.getChildren().addAll(dishTableView, wineTableView);
 
+            // Calculate and display total sales for the table
+            double totalSales = dishTableView.getItems().stream()
+                    .mapToDouble(item -> item.getDishPrice() * item.getDishQuantity())
+                    .sum() +
+                    wineTableView.getItems().stream()
+                            .mapToDouble(item -> item.getWinePrice() * item.getWineQuantity())
+                            .sum();
+
+            Label totalSalesLabel = new Label("Total Sales for Table " + tableId + ": £" + String.format("%.2f", totalSales));
+            totalSalesLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
+            tableDetailsBox.getChildren().add(totalSalesLabel);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -412,9 +431,7 @@ public class TableOverviewUI extends BaseUI {
         mainContent.getChildren().add(tableDetailsBox);
     }
 
-    /**
-     * Inner class representing a dish details.
-     */
+    // Inner classes for dish and wine details
     private static class DishDetails {
         private final SimpleStringProperty dishName;
         private final SimpleDoubleProperty dishPrice;
@@ -450,10 +467,6 @@ public class TableOverviewUI extends BaseUI {
             return dishQuantity;
         }
     }
-
-    /**
-     * Inner class representing wine details.
-     */
 
     private static class WineDetails {
         private final SimpleStringProperty wineName;
@@ -491,9 +504,6 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
-    /**
-     * Method to display UI after selecting a date and after clicking back button on table view
-     */
 
     private void showMainUI(LocalDate selectedDate) {
         // Clear the main content

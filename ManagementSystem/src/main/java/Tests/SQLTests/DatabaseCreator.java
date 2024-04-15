@@ -10,7 +10,6 @@ public class DatabaseCreator {
 
         System.out.println("Creating tables...");
 
-
         // Create the Menu table
         String createMenuTableQuery = "CREATE TABLE Menu (" +
                 "menuID INT PRIMARY KEY," +
@@ -66,8 +65,6 @@ public class DatabaseCreator {
                 "FOREIGN KEY (wineID) REFERENCES Wine(wineID)" +
                 ")";
         statement.execute(createDishTableQuery);
-
-
 
         statement.close();
 
