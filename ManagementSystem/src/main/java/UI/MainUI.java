@@ -158,8 +158,8 @@ public class MainUI extends Application implements UISwitcher {
         if (dishUI == null) {
             dishUI = new DishUI(this);
         }
-        switchScene(dishUI, "Waste UI");
-        dishUI.highlightButton("Waste");
+        switchScene(dishUI, "Dish UI");
+        dishUI.highlightButton("Dish");
     }
 
 

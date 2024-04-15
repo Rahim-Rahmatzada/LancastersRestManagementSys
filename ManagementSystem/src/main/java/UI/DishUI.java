@@ -105,7 +105,7 @@ public class DishUI extends BaseUI {
         ingredientNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         ingredientNameColumn.setStyle("-fx-text-fill: white;");
 
-        TableColumn<Ingredient, Integer> quantityColumn = new TableColumn<>("Quantity Used");
+        TableColumn<Ingredient, Integer> quantityColumn = new TableColumn<>("Quantity Of Ingredient Used For Dish");
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantityUsed"));
         quantityColumn.setStyle("-fx-text-fill: white;");
 
