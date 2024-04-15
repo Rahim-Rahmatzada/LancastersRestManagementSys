@@ -6,6 +6,7 @@ public class Ingredient {
     private double cost;
     private int quantity;
     private int threshold;
+    private int quantityUsed;
 
 
     public Ingredient(int ingredientID, String name, double cost, int quantity, int threshold) {
@@ -14,6 +15,12 @@ public class Ingredient {
         this.cost = cost;
         this.quantity = quantity;
         this.threshold = threshold;
+    }
+
+    public Ingredient(int ingredientID, String name, int quantityUsed) {
+        this.ingredientID = ingredientID;
+        this.name = name;
+        this.quantityUsed = quantityUsed;
     }
 
     public int getThreshold() {
@@ -54,6 +61,13 @@ public class Ingredient {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+    public int getQuantityUsed() {
+        return quantityUsed;
+    }
+
+    public void setQuantityUsed(int quantityUsed) {
+        this.quantityUsed = quantityUsed;
     }
 // Getters and setters...
 }

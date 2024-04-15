@@ -593,7 +593,7 @@ public class StaffUI extends BaseUI {
                 return;
             }
 
-            String query = "INSERT INTO StaffSchedule (StaffID, ScheduleID) VALUES (?, ?)";
+            String query = "INSERT INTO StaffSchedule_StaffInfo (StaffID, ScheduleID) VALUES (?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(query);
 
             pstmt.setInt(1, staffID);
@@ -630,7 +630,7 @@ public class StaffUI extends BaseUI {
                 return;
             }
 
-            String query = "DELETE FROM StaffSchedule WHERE StaffID = ? AND ScheduleID = ?";
+            String query = "DELETE FROM StaffSchedule_StaffInfo WHERE StaffID = ? AND ScheduleID = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
 
             pstmt.setInt(1, staffID);
