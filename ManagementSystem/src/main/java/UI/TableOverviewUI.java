@@ -12,6 +12,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import DatabaseConnections.AdminDatabaseConnector;
+import model.SoldItem;
+
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -247,7 +249,7 @@ public class TableOverviewUI extends BaseUI {
         tableDetailsBox.setSpacing(10);
         tableDetailsBox.setPadding(new Insets(10));
 
-        tableDetailsLabel = new Label("Table Details - Table " + tableId);
+        tableDetailsLabel = new Label("Table Details - Table " + tableId); //hereeeeeeeeeee
         tableDetailsLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         backButton = new Button("Back");
@@ -291,7 +293,15 @@ public class TableOverviewUI extends BaseUI {
             dishQuantityColumn.setCellValueFactory(data -> data.getValue().dishQuantityProperty());
             dishQuantityColumn.setStyle("-fx-text-fill: white;");
 
-            dishTableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishQuantityColumn);
+            TableColumn<DishDetails, Number> dishTotalSaleColumn = new TableColumn<>("Total Sale For Item (£)");
+            dishTotalSaleColumn.setCellValueFactory(cellData -> {
+                DishDetails dishDetails = cellData.getValue();
+                double totalSale = dishDetails.getDishPrice() * dishDetails.getDishQuantity();
+                return new SimpleDoubleProperty(totalSale);
+            });
+            dishTotalSaleColumn.setStyle("-fx-text-fill: white;");
+
+            dishTableView.getColumns().addAll(dishNameColumn, dishPriceColumn, dishQuantityColumn, dishTotalSaleColumn);
 
             dishTableView.setRowFactory(tv -> {
                 TableRow<DishDetails> row = new TableRow<>();
@@ -358,7 +368,17 @@ public class TableOverviewUI extends BaseUI {
             wineQuantityColumn.setCellValueFactory(data -> data.getValue().wineQuantityProperty());
             wineQuantityColumn.setStyle("-fx-text-fill: white;");
 
-            wineTableView.getColumns().addAll(wineNameColumn, winePriceColumn, wineQuantityColumn);
+            TableColumn<WineDetails, Number> wineTotalSaleColumn = new TableColumn<>("Total Sale For Item (£)");
+            wineTotalSaleColumn.setCellValueFactory(cellData -> {
+                WineDetails wineDetails = cellData.getValue();
+                double totalSale = wineDetails.getWinePrice() * wineDetails.getWineQuantity();
+                return new SimpleDoubleProperty(totalSale);
+            });
+            wineTotalSaleColumn.setStyle("-fx-text-fill: white;");
+
+
+
+            wineTableView.getColumns().addAll(wineNameColumn, winePriceColumn, wineQuantityColumn, wineTotalSaleColumn);
 
             wineTableView.setRowFactory(tv -> {
                 TableRow<WineDetails> row = new TableRow<>();
@@ -390,6 +410,18 @@ public class TableOverviewUI extends BaseUI {
             }
 
             tableDetailsBox.getChildren().addAll(dishTableView, wineTableView);
+
+            // Calculate and display total sales for the table
+            double totalSales = dishTableView.getItems().stream()
+                    .mapToDouble(item -> item.getDishPrice() * item.getDishQuantity())
+                    .sum() +
+                    wineTableView.getItems().stream()
+                            .mapToDouble(item -> item.getWinePrice() * item.getWineQuantity())
+                            .sum();
+
+            Label totalSalesLabel = new Label("Total Sales for Table " + tableId + ": £" + String.format("%.2f", totalSales));
+            totalSalesLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: white;");
+            tableDetailsBox.getChildren().add(totalSalesLabel);
 
         } catch (SQLException e) {
             e.printStackTrace();

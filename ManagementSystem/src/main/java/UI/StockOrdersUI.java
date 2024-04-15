@@ -255,7 +255,6 @@ public class StockOrdersUI extends BaseUI {
         orderStatusColumn.setCellValueFactory(cellData -> {
             Order order = cellData.getValue();
             String orderStatus = order.getOrderStatus();
-            System.out.println("Getting order status: " + orderStatus); // Print statement
             return new SimpleStringProperty(orderStatus);
         });
 
