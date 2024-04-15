@@ -98,7 +98,7 @@ public class TableOverviewUI extends BaseUI {
         extraInfoBox.setAlignment(Pos.TOP_LEFT);
         extraInfoBox.setPadding(new Insets(10));
 
-        Label occupiedLabel = new Label("Blue Table: Occupied");
+        Label occupiedLabel = new Label("Grey Table: Occupied");
         occupiedLabel.setTextFill(Color.WHITE);
         occupiedLabel.setStyle("-fx-font-size: 12px;");
 
@@ -508,7 +508,7 @@ public class TableOverviewUI extends BaseUI {
         extraInfoBox.setAlignment(Pos.TOP_LEFT);
         extraInfoBox.setPadding(new Insets(10));
 
-        Label occupiedLabel = new Label("Blue Table: Occupied");
+        Label occupiedLabel = new Label("Grey Table: Occupied");
         occupiedLabel.setTextFill(Color.WHITE);
         occupiedLabel.setStyle("-fx-font-size: 12px;");
 
