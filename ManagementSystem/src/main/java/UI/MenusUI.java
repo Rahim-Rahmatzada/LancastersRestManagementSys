@@ -163,7 +163,7 @@ public class MenusUI extends BaseUI {
         dishNameColumn.setCellValueFactory(new PropertyValueFactory<>("dishName"));
         dishNameColumn.setStyle("-fx-text-fill: white;");
 
-        TableColumn<DishAndWineHelper, Double> dishPriceColumn = new TableColumn<>("Dish Price");
+        TableColumn<DishAndWineHelper, Double> dishPriceColumn = new TableColumn<>("Dish Price (£)");
         dishPriceColumn.setCellValueFactory(new PropertyValueFactory<>("dishPrice"));
         dishPriceColumn.setStyle("-fx-text-fill: white;");
 
@@ -179,7 +179,7 @@ public class MenusUI extends BaseUI {
         wineNameColumn.setCellValueFactory(new PropertyValueFactory<>("wineName"));
         wineNameColumn.setStyle("-fx-text-fill: white;");
 
-        TableColumn<DishAndWineHelper, Double> winePriceColumn = new TableColumn<>("Wine Price");
+        TableColumn<DishAndWineHelper, Double> winePriceColumn = new TableColumn<>("Wine Price (£)");
         winePriceColumn.setCellValueFactory(new PropertyValueFactory<>("winePrice"));
         winePriceColumn.setStyle("-fx-text-fill: white;");
 

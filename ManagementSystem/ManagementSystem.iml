@@ -66,5 +66,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.assertj:assertj-core:3.13.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.osgi:org.osgi.core:6.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.testfx:testfx-junit:4.0.18" level="project" />
+    <orderEntry type="library" name="DataToAdmin copy" level="project" />
   </component>
 </module>

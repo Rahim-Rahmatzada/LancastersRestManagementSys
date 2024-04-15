@@ -104,7 +104,7 @@ public class WineUI extends BaseUI {
             updateWineInDatabase(wine); // Update database
         });
 
-        TableColumn<Wine, Double> priceColumn = new TableColumn<>("Price");
+        TableColumn<Wine, Double> priceColumn = new TableColumn<>("Price (£)");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter())); // Make cell editable
         priceColumn.setOnEditCommit(event -> {
@@ -168,7 +168,7 @@ public class WineUI extends BaseUI {
         HBox controlsBox = new HBox();
         controlsBox.setSpacing(20);
         controlsBox.setAlignment(Pos.CENTER_LEFT);
-        controlsBox.setPadding(new Insets(0, 0, 0, 0));
+        controlsBox.setPadding(new Insets(0, 0, 0, 50));
 
         controlsBox.getChildren().addAll(
                 createAddWineControls()

@@ -65,6 +65,8 @@ public class TableOverviewUI extends BaseUI {
 
         // Create a date picker for selecting the date
         datePicker = new DatePicker();
+        datePicker.setPromptText("Enter Date");
+
         datePicker.setOnAction(e -> updateTableAvailability());
 
         // Create a label for the selected date

@@ -13,6 +13,7 @@ public interface UISwitcher {
     void switchToStaff();
     void switchToWine();
     void switchToStockOrders();
+    void switchToWaste();
 
 
     void preloadInventoryUI();
@@ -22,4 +23,5 @@ public interface UISwitcher {
     void preloadStaffUI();
     void preloadWineUI();
     void preloadStockOrdersUI();
+    void preloadWasteUI();
 }
