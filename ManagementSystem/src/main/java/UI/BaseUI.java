@@ -124,7 +124,7 @@ public abstract class BaseUI {
         buttonInfo.put("Wine", "wine.png");
         buttonInfo.put("Stock Orders", "calender.png");
         buttonInfo.put("Waste", "waste.png");
-        buttonInfo.put("Dish", "waste.png");
+        buttonInfo.put("Dish", "dish.png");
 
         for (Map.Entry<String, String> entry : buttonInfo.entrySet()) {
             buttonContainer.getChildren().add(createSideMenuButtons(entry.getKey(), 10, entry.getValue()));
