@@ -12,7 +12,7 @@ import model.LoginManager;
 
 public class DashboardUI extends BaseUI {
     private LoginManager loginManager;
-    private boolean isLoggedIn = true;
+    private boolean isLoggedIn = false;
 
     private TextField loginUsernameField;
     private PasswordField loginPasswordField;

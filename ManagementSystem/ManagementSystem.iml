@@ -67,5 +67,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.osgi:org.osgi.core:6.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.testfx:testfx-junit:4.0.18" level="project" />
     <orderEntry type="library" name="DataToAdmin copy" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="javafx.fxml" level="project" />
+    <orderEntry type="library" name="javafx.controls" level="project" />
   </component>
 </module>

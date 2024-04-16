@@ -211,7 +211,7 @@ public class WineUI extends BaseUI {
     private void addNewWine(String wineName) {
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO Wine (wineID, wineName, wineType, wineVintage, wineQuality, winePrice) " +
+                     "INSERT INTO Wine (wineID, wineName, wineType, wineVintage, wineQuantity, winePrice) " +
                              "VALUES (?, ?, ?, ?, ?, ?)")) {
 
             int wineID;
