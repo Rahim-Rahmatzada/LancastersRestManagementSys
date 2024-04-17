@@ -10,7 +10,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Manages user authentication and account creation.
+ */
 public class LoginManager {
+
+    /**
+     * Authenticates a user based on the provided username and password.
+     *
+     * @param username The username of the user.
+     * @param password The password of the user.
+     * @return true if authentication is successful, false otherwise.
+     */
     public boolean authenticate(String username, String password) {
         String hashedPassword = hashPassword(password);
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
@@ -26,6 +37,13 @@ public class LoginManager {
         }
     }
 
+    /**
+     * Creates a new user account with the provided username and password.
+     *
+     * @param username The username of the new account.
+     * @param password The password of the new account.
+     * @return true if account creation is successful, false otherwise.
+     */
     public boolean createAccount(String username, String password) {
         String hashedPassword = hashPassword(password);
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
@@ -41,6 +59,12 @@ public class LoginManager {
         }
     }
 
+    /**
+     * Hashes the provided password using SHA-256 algorithm.
+     *
+     * @param password The password to be hashed.
+     * @return The hashed password as a hexadecimal string.
+     */
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -52,6 +76,12 @@ public class LoginManager {
         }
     }
 
+    /**
+     * Converts a byte array to a hexadecimal string.
+     *
+     * @param hash The byte array to be converted.
+     * @return The hexadecimal string representation of the byte array.
+     */
     private String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (byte b : hash) {

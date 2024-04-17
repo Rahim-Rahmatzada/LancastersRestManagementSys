@@ -8,6 +8,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The FOHDataAccessor class provides methods to access and retrieve data
+ * related to Font-of-House (FOH) operations from our team's database with only user privileges.
+ */
+
 public class FOHDataAccessor implements FOHFinalInterface {
 
     @Override

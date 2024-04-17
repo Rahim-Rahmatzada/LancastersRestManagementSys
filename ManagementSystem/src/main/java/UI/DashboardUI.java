@@ -10,6 +10,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.LoginManager;
 
+/**
+ * This class represents the user interface for the dashboard.
+ * It provides functionality for logging in, logging out, and creating a new account.
+ */
 public class DashboardUI extends BaseUI {
     private LoginManager loginManager;
     private boolean isLoggedIn = false;
@@ -26,6 +30,11 @@ public class DashboardUI extends BaseUI {
     private Button createButton;
     private Button backToLoginButton;
 
+    /**
+     * Constructs the DashboardUI with the given UISwitcher.
+     *
+     * @param uiSwitcher The UISwitcher for navigating between different views.
+     */
     public DashboardUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Dashboard");
@@ -80,6 +89,11 @@ public class DashboardUI extends BaseUI {
         preloadUIClasses();
     }
 
+    /**
+     * Handles the login action when the login button is clicked.
+     * If the user is already logged in, shows a message indicating so.
+     * Otherwise, attempts to authenticate the user using the entered credentials.
+     */
     private void handleLogin() {
         if (isLoggedIn) {
             showAlert("Already Logged In", "You are already logged in.");
@@ -96,12 +110,21 @@ public class DashboardUI extends BaseUI {
         }
     }
 
+    /**
+     * Handles the logout action when the logout button is clicked.
+     * Sets the isLoggedIn flag to false and shows a logout message.
+     */
     private void handleLogout() {
         isLoggedIn = false;
         showAlert("Logout Successful", "You have been logged out.");
         showLoginForm();
     }
 
+    /**
+     * Handles the action when the create account button is clicked.
+     * If the user is logged in, shows the create account form.
+     * Otherwise, shows a message indicating that login is required.
+     */
     private void handleCreateAccountButtonClick() {
         if (isLoggedIn) {
             showCreateAccountForm();
@@ -110,6 +133,10 @@ public class DashboardUI extends BaseUI {
         }
     }
 
+    /**
+     * Displays the create account form.
+     * Clears the main content and sets it to the create account form.
+     */
     private void showCreateAccountForm() {
         VBox createAccountForm = new VBox();
         createAccountForm.setSpacing(5);
@@ -149,6 +176,10 @@ public class DashboardUI extends BaseUI {
         getMainContent().getChildren().add(createAccountContainer);
     }
 
+    /**
+     * Handles the account creation process when the create button is clicked.
+     * Validates the entered username and password, and shows appropriate messages.
+     */
     private void handleCreateAccount() {
         String username = createUsernameField.getText().trim();
         String password = createPasswordField.getText().trim();
@@ -171,6 +202,10 @@ public class DashboardUI extends BaseUI {
         }
     }
 
+    /**
+     * Displays the login form.
+     * Clears the main content and sets it to the login form.
+     */
     private void showLoginForm() {
         loginUsernameField.clear();
         loginPasswordField.clear();
@@ -197,6 +232,10 @@ public class DashboardUI extends BaseUI {
         getMainContent().getChildren().add(loginContainer);
     }
 
+    /**
+     * Displays the view for a logged-in user.
+     * Clears the main content and sets it to the logged-in view.
+     */
     private void showLoggedInView() {
 
         loginUsernameField.clear();
@@ -224,6 +263,7 @@ public class DashboardUI extends BaseUI {
         getMainContent().getChildren().add(loginContainer);
     }
 
+
     @Override
     protected void handleButtonAction(String label) {
         if (isLoggedIn) {
@@ -233,6 +273,12 @@ public class DashboardUI extends BaseUI {
         }
     }
 
+    /**
+     * Shows an alert dialog with the given title and content.
+     *
+     * @param title   The title of the alert.
+     * @param content The content of the alert.
+     */
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -241,6 +287,9 @@ public class DashboardUI extends BaseUI {
         alert.showAndWait();
     }
 
+    /**
+     * Preloads UI classes in separate threads to improve application responsiveness.
+     */
     private void preloadUIClasses() {
         Thread preloadThread = new Thread(() -> {
             // Preload other UI classes

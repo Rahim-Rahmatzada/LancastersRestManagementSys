@@ -21,8 +21,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public class InventoryUI extends BaseUI {
 
+/**
+ * The `InventoryUI` class extends the `BaseUI` class and represents the user interface
+ * for managing ingredients in the restaurant management system.
+ */
+public class InventoryUI extends BaseUI {
 
     private Text topIngredientsText;
     private Text mostExpensiveIngredientsText;
@@ -30,12 +34,15 @@ public class InventoryUI extends BaseUI {
 
     private TableView<Ingredient> ingredientTableView; // Store a reference to the TableView
 
-
+    /**
+     * Constructs a new instance of the `InventoryUI` class.
+     *
+     * @param uiSwitcher The `UISwitcher` instance for navigating between UI screens.
+     */
     public InventoryUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Inventory");
         setTopText("Inventory Overview");
-
 
 
         // Set the main content for the InventoryUI.
@@ -45,8 +52,6 @@ public class InventoryUI extends BaseUI {
 
         // Create a TableView to display ingredient data
         ingredientTableView = createIngredientTableView(); // Store the reference to the TableView
-
-
 
         VBox topIngredientsBox = createTopIngredientsBox();
         VBox mostExpensiveIngredientsBox = createMostExpensiveIngredientsBox();
@@ -69,6 +74,11 @@ public class InventoryUI extends BaseUI {
         showHighestQuantityIngredients();
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying ingredient data.
+     *
+     * @return The configured `TableView` instance.
+     */
     private TableView<Ingredient> createIngredientTableView() {
         TableView<Ingredient> tableView = new TableView<>();
 
@@ -188,6 +198,11 @@ public class InventoryUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Creates the controls for deleting an ingredient from the inventory.
+     *
+     * @return The `HBox` containing the delete ingredient controls.
+     */
     private HBox createDeleteIngredientControls() {
         HBox deleteIngredientBox = new HBox();
         deleteIngredientBox.setSpacing(10);
@@ -211,6 +226,11 @@ public class InventoryUI extends BaseUI {
         return deleteIngredientBox;
     }
 
+    /**
+     * Deletes an ingredient from the database based on the provided ingredient name.
+     *
+     * @param ingredientName The name of the ingredient to be deleted.
+     */
     private void deleteIngredient(String ingredientName) {
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -231,6 +251,11 @@ public class InventoryUI extends BaseUI {
         }
     }
 
+    /**
+     * Creates the container for the add and delete ingredient controls.
+     *
+     * @return The `HBox` containing the add and delete ingredient controls.
+     */
     private HBox createControlsBox() {
         HBox controlsBox = new HBox();
         controlsBox.setSpacing(20);
@@ -245,6 +270,11 @@ public class InventoryUI extends BaseUI {
         return controlsBox;
     }
 
+    /**
+     * Creates the controls for adding a new ingredient to the inventory.
+     *
+     * @return The `HBox` containing the add ingredient controls.
+     */
     private HBox createAddIngredientControls() {
         HBox addIngredientBox = new HBox();
         addIngredientBox.setSpacing(10);
@@ -268,6 +298,11 @@ public class InventoryUI extends BaseUI {
         return addIngredientBox;
     }
 
+    /**
+     * Adds a new ingredient to the database with the provided ingredient name.
+     *
+     * @param ingredientName The name of the new ingredient to be added.
+     */
     private void addNewIngredient(String ingredientName) {
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -284,6 +319,11 @@ public class InventoryUI extends BaseUI {
         }
     }
 
+    /**
+     * Retrieves the highest ingredient ID from the database.
+     *
+     * @return The highest ingredient ID.
+     */
     private int getMaxIngredientID() {
         int maxID = 0;
         try (Connection conn = AdminDatabaseConnector.getConnection();
@@ -299,6 +339,13 @@ public class InventoryUI extends BaseUI {
         return maxID;
     }
 
+    /**
+     * Updates the value of a specific column for a given ingredient in the database.
+     *
+     * @param ingredient The `Ingredient` object to be updated.
+     * @param column     The column name to be updated.
+     * @param newValue   The new value to be set for the specified column.
+     */
     private void updateIngredientValue(Ingredient ingredient, String column, Object newValue) {
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -325,6 +372,11 @@ public class InventoryUI extends BaseUI {
         }
     }
 
+    /**
+     * Retrieves the ingredient data from the database and returns an `ObservableList` of `Ingredient` objects.
+     *
+     * @return An `ObservableList` containing the ingredient data.
+     */
     public ObservableList<Ingredient> getIngredientDataFromDatabase() {
         ObservableList<Ingredient> ingredientList = FXCollections.observableArrayList();
 
@@ -351,6 +403,12 @@ public class InventoryUI extends BaseUI {
     }
 
 
+    /**
+     * Shows an alert dialog with the provided title and content.
+     *
+     * @param title   The title of the alert dialog.
+     * @param content The content to be displayed in the alert dialog.
+     */
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -360,12 +418,18 @@ public class InventoryUI extends BaseUI {
         alert.showAndWait();
     }
 
+    /**
+     * Reloads the ingredient data in the `TableView`.
+     */
     private void reloadIngredientTableView() {
         // Reload the data in the table view based on the updated threshold
         ObservableList<Ingredient> ingredientData = getIngredientDataFromDatabase();
         ingredientTableView.setItems(ingredientData);
     }
 
+    /**
+     * Retrieves and displays the top 3 most used ingredients.
+     */
     private void showTopIngredients() {
         // Execute the SQL query to get the top 5 most used ingredients
         String query = "SELECT I.ingredientName, COUNT(*) as totalUsage " +
@@ -395,6 +459,9 @@ public class InventoryUI extends BaseUI {
         }
     }
 
+    /**
+     * Retrieves and displays the top 3 most expensive ingredients.
+     */
     private void showMostExpensiveIngredients() {
         String query = "SELECT ingredientName, ingredientCost " +
                 "FROM Ingredient " +
@@ -419,6 +486,9 @@ public class InventoryUI extends BaseUI {
         }
     }
 
+    /**
+     * Retrieves and displays the top 3 ingredients with the highest quantity.
+     */
     private void showHighestQuantityIngredients() {
         String query = "SELECT ingredientName, ingredientQuantity " +
                 "FROM Ingredient " +
@@ -443,6 +513,11 @@ public class InventoryUI extends BaseUI {
         }
     }
 
+    /**
+     * Creates the `VBox` container for displaying the most expensive ingredients.
+     *
+     * @return The `VBox` containing the most expensive ingredients information.
+     */
     private VBox createMostExpensiveIngredientsBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -467,6 +542,11 @@ public class InventoryUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Creates the `VBox` container for displaying the ingredients with the highest quantity.
+     *
+     * @return The `VBox` containing the highest quantity ingredients information.
+     */
     private VBox createHighestQuantityIngredientsBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -491,6 +571,11 @@ public class InventoryUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Creates the `VBox` container for displaying the top most used ingredients.
+     *
+     * @return The `VBox` containing the top most used ingredients information.
+     */
     private VBox createTopIngredientsBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");

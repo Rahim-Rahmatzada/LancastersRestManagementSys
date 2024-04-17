@@ -8,7 +8,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The BOHDataAccessor class provides methods to access and retrieve data
+ * related to Back-of-House (BOH) operations from our team's database with only user privileges.
+ */
+
+
 public class BOHDataAccessor implements BOHFinalInterface {
+
+
 
     @Override
     public List<Ingredient> getStockLevels() {

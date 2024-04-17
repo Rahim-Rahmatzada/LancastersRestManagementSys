@@ -19,9 +19,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The `MenusUI` class extends the `BaseUI` class and represents the user interface
+ * for managing menus, dishes, and wines in the restaurant management system.
+ */
 public class MenusUI extends BaseUI {
     private TableView<Menu> menuTableView;
 
+    /**
+     * Constructs a new instance of the `MenusUI` class.
+     *
+     * @param uiSwitcher The `UISwitcher` instance for navigating between UI screens.
+     */
     public MenusUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Menus");
@@ -39,6 +48,11 @@ public class MenusUI extends BaseUI {
         setMainContent(menusMainContent);
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying menu data.
+     *
+     * @return The configured `TableView` instance.
+     */
     private TableView<Menu> createMenuTableView() {
         TableView<Menu> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -121,6 +135,11 @@ public class MenusUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Displays the dish and wine details for the selected menu.
+     *
+     * @param selectedMenu The `Menu` object for which to display dish and wine details.
+     */
     private void viewDishAndWineDetails(Menu selectedMenu) {
         // Get the main content VBox
         VBox menusMainContent = (VBox) getMainContent();
@@ -152,6 +171,12 @@ public class MenusUI extends BaseUI {
         menusMainContent.getChildren().add(dishAndWineDetailsBox);
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying dish and wine details.
+     *
+     * @param dishAndWineList The list of `DishAndWineHelper` objects to be displayed in the table view.
+     * @return The configured `TableView` instance.
+     */
     private TableView<DishAndWineHelper> createDishAndWineTableView(List<DishAndWineHelper> dishAndWineList) {
         TableView<DishAndWineHelper> tableView = new TableView<>();
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -217,6 +242,12 @@ public class MenusUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Retrieves the dish and wine details from the database for the given menu ID.
+     *
+     * @param menuID The ID of the menu for which to retrieve dish and wine details.
+     * @return A list of `DishAndWineHelper` objects containing dish and wine details.
+     */
     private List<DishAndWineHelper> getDishAndWineFromDatabase(int menuID) {
         List<DishAndWineHelper> dishAndWineList = new ArrayList<>();
 
@@ -257,7 +288,11 @@ public class MenusUI extends BaseUI {
         return dishAndWineList;
     }
 
-
+    /**
+     * Retrieves the menu data from the database and returns an `ObservableList` of `Menu` objects.
+     *
+     * @return An `ObservableList` containing the menu data.
+     */
     private ObservableList<Menu> getMenuDataFromDatabase() {
         ObservableList<Menu> menuList = FXCollections.observableArrayList();
 
@@ -281,6 +316,13 @@ public class MenusUI extends BaseUI {
         return menuList;
     }
 
+    /**
+     * Updates the specified column value for a given menu in the database.
+     *
+     * @param menu   The `Menu` object for which to update the value.
+     * @param column The column name to be updated.
+     * @param newValue The new value to be set for the specified column.
+     */
     private void updateMenuValue(Menu menu, String column, Object newValue) {
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
@@ -305,12 +347,21 @@ public class MenusUI extends BaseUI {
         }
     }
 
+    /**
+     * Reloads the menu data in the `TableView`.
+     */
     private void reloadMenuTableView() {
         // Reload the data in the table view
         ObservableList<Menu> menuData = getMenuDataFromDatabase();
         menuTableView.setItems(menuData);
     }
 
+    /**
+     * Shows an alert dialog with the provided title and content.
+     *
+     * @param title   The title of the alert dialog.
+     * @param content The content to be displayed in the alert dialog.
+     */
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -319,16 +370,4 @@ public class MenusUI extends BaseUI {
         alert.showAndWait();
     }
 
-
 }
-
-
-//    Menus UI
-//    Menu Creation and Management: Create new menus, edit existing ones, and archive outdated menus.
-//        Dish Construction and Editing: Combine approved recipes into dishes; edit ingredients, preparation, and presentation details.
-//        Price Setting: Determine and update pricing for each dish based on cost and markup strategy.
-//        Allergen Information: Ensure all allergen information is up to date and clearly labeled on menu items.
-//        Menu Review: Allow management and other stakeholders to review and provide feedback on draft menus.
-//        Printable Menus: Generate printable versions of the final menus for use in the restaurant.
-
-//    Menu Costing and Review: Oversee menu pricing, ingredient cost tracking, and ensure profitability.

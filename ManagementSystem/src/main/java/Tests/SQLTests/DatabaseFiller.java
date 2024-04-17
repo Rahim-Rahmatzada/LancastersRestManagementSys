@@ -4,7 +4,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Utility class for filling database tables with sample data.
+ */
 public class DatabaseFiller {
+
+    /**
+     * Inserts sample data into all database tables that were defined.
+     *
+     * @param connection The database connection.
+     * @throws SQLException if a database access error occurs.
+     */
     public static void insertData(Connection connection) throws SQLException {
         insertMenuData(connection);
         insertIngredientData(connection);

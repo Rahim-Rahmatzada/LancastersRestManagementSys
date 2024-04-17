@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a sale.
+ */
 public class Sale {
     private int saleID;
     private Date date;
@@ -11,6 +14,13 @@ public class Sale {
     private double totalCost;
     private int numOfCovers;
 
+    /**
+     * Constructs a sale with the specified ID, date, and number of covers.
+     *
+     * @param saleID      The ID of the sale.
+     * @param date        The date of the sale.
+     * @param numOfCovers The number of covers for the sale.
+     */
     public Sale(int saleID, Date date,int numOfCovers) {
         this.saleID = saleID;
         this.date = date;

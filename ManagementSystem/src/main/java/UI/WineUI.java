@@ -1,7 +1,3 @@
-/**
- * This class represents the user interface for managing wine data.
- * It provides functionalities to view, add, edit, and delete wine records.
- */
 package UI;
 
 import javafx.collections.FXCollections;
@@ -25,6 +21,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+/**
+ * This class represents the user interface for managing wine data.
+ * It provides functionalities to view, add and edit wine records.
+ */
 public class WineUI extends BaseUI {
     private TableView<Wine> wineTableView;
 

@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Represents a wine entity.
+ */
+
 public class Wine {
     private int wineID;
     private String name;
@@ -8,7 +12,16 @@ public class Wine {
     private int quantity;
     private int vintage; // Assuming vintage is stored as integer year
 
-
+    /**
+     * Constructs a Wine object with the specified attributes.
+     *
+     * @param wineID   The ID of the wine.
+     * @param name     The name of the wine.
+     * @param type     The type of the wine.
+     * @param vintage  The vintage year of the wine.
+     * @param quantity The quantity of the wine.
+     * @param price    The price of the wine.
+     */
     public Wine(int wineID, String name, String type, int vintage, int quantity, double price) {
         this.wineID = wineID;
         this.name = name;
@@ -18,7 +31,16 @@ public class Wine {
         this.type = type;
     }
 
-    //over loading constructor for BOH interface method
+    /**
+     * Constructs a Wine object with the specified attributes except for price.
+     * This constructor is used in the BOH interface method.
+     *
+     * @param wineID   The ID of the wine.
+     * @param name     The name of the wine.
+     * @param type     The type of the wine.
+     * @param vintage  The vintage year of the wine.
+     * @param quantity The quantity of the wine.
+     */
     public Wine(int wineID, String name, String type, int vintage, int quantity) {
         this.wineID = wineID;
         this.name = name;

@@ -9,12 +9,23 @@ import javafx.beans.property.StringProperty;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a staff holiday for UI display.
+ */
 public class StaffHolidayForUI {
     private StringProperty name;
     private ObjectProperty<LocalDate> startDate;
     private ObjectProperty<LocalDate> endDate;
     private LongProperty duration;
 
+    /**
+     * Constructs a StaffHolidayForUI object with the specified details.
+     *
+     * @param name      The name of the staff member.
+     * @param startDate The start date of the holiday.
+     * @param endDate   The end date of the holiday.
+     * @param duration  The duration of the holiday.
+     */
     public StaffHolidayForUI(String name, LocalDate startDate, LocalDate endDate, long duration) {
         this.name = new SimpleStringProperty(name);
         this.startDate = new SimpleObjectProperty<>(startDate);

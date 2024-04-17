@@ -3,6 +3,9 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a dish on the menu.
+ */
 public class Dish {
     private int dishID;
     private String name;
@@ -12,6 +15,17 @@ public class Dish {
     private String allergyInfo;
     private int wineID;
 
+
+    /**
+     * Constructs a new Dish object with specified parameters.
+     *
+     * @param dishID          The ID of the dish.
+     * @param name            The name of the dish.
+     * @param price           The price of the dish.
+     * @param dishDescription The description of the dish.
+     * @param allergyInfo     Information about allergens present in the dish.
+     * @param wineID          The ID of the associated wine, if any.
+     */
     public Dish(int dishID, String name, double price, String dishDescription, String allergyInfo, int wineID) {
         this.dishID = dishID;
         this.name = name;
@@ -22,6 +36,15 @@ public class Dish {
         this.ingredients = new ArrayList<>();
     }
 
+    /**
+     * Constructs a new Dish object with specified parameters.
+     *
+     * @param dishID          The ID of the dish.
+     * @param name            The name of the dish.
+     * @param price           The price of the dish.
+     * @param dishDescription The description of the dish.
+     * @param allergyInfo     Information about allergens present in the dish.
+     */
     public Dish(int dishID, String name, double price, String dishDescription, String allergyInfo) {
         this.dishID = dishID;
         this.name = name;
@@ -29,6 +52,7 @@ public class Dish {
         this.dishDescription = dishDescription;
         this.allergyInfo = allergyInfo;
     }
+
 
     public int getDishID() {
         return dishID;

@@ -15,14 +15,27 @@ import model.Ingredient;
 
 import java.sql.*;
 
+/**
+ * The `DishUI` class extends the `BaseUI` class and represents the user interface
+ * for managing dishes and their ingredients in the restaurant management system.
+ */
 public class DishUI extends BaseUI {
 
+    /**
+     * Constructs a new instance of the `DishUI` class.
+     *
+     * @param uiSwitcher The `UISwitcher` instance for navigating between UI screens.
+     */
     public DishUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Dish");
         setTopText("Dish Overview");
         initializeUI();
     }
+
+    /**
+     * Initializes the user interface components and layout.
+     */
     private void initializeUI() {
         // Create TableView for dish details
         TableView<Dish> dishTableView = new TableView<>();
@@ -154,6 +167,12 @@ public class DishUI extends BaseUI {
         });
 
     }
+
+    /**
+     * Updates the dish details in the database.
+     *
+     * @param dish The `Dish` object containing the updated details.
+     */
     private void updateDishInDatabase(Dish dish) {
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "UPDATE dishes SET name = ?, description = ?, price = ? WHERE id = ?";
@@ -176,6 +195,12 @@ public class DishUI extends BaseUI {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Retrieves dish data from the database and returns an `ObservableList` of `Dish` objects.
+     *
+     * @return An `ObservableList` containing the dish data.
+     */
     private ObservableList<Dish> getDishDataFromDatabase() {
         ObservableList<Dish> dishList = FXCollections.observableArrayList();
 
@@ -200,6 +225,13 @@ public class DishUI extends BaseUI {
 
         return dishList;
     }
+
+    /**
+     * Retrieves the ingredients for a given dish from the database and returns an `ObservableList` of `Ingredient` objects.
+     *
+     * @param dishID The ID of the dish for which to retrieve ingredients.
+     * @return An `ObservableList` containing the ingredients for the specified dish.
+     */
     private ObservableList<Ingredient> getIngredientsForDishFromDatabase(int dishID) {
         ObservableList<Ingredient> ingredients = FXCollections.observableArrayList();
 

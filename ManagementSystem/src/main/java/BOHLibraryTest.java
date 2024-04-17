@@ -5,7 +5,17 @@ import model.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * This class is used to test the functionality of the BOHDataAccessor class we implemented, which provides
+ * methods to access and manipulate data related to Back of House (BOH) operations.
+ * It includes tests for retrieving stock levels, stock orders, menu details, and other relevant information.
+ */
 public class BOHLibraryTest {
+
+    /**
+     * The main method of the BOHLibraryTest class, which is used to execute the test cases.
+     * @param args The command-line arguments (not used).
+     */
     public static void main(String[] args) {
         // Create an instance of the BOHDataAccessor
         BOHFinalInterface bohDataAccessor = new BOHDataAccessor();

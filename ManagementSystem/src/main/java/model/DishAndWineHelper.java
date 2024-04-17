@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Helper class representing information about a dish and its associated wine.
+ */
 public class DishAndWineHelper {
     private final String dishName;
     private final String allergyInfo;
@@ -10,6 +13,17 @@ public class DishAndWineHelper {
     private final double profit;
 
 
+    /**
+     * Constructs a DishAndWineHelper object with the specified parameters.
+     *
+     * @param dishName        The name of the dish.
+     * @param allergyInfo     Information about allergens in the dish.
+     * @param wineName        The name of the associated wine.
+     * @param dishPrice       The price of the dish.
+     * @param dishDescription The description of the dish.
+     * @param winePrice       The price of the associated wine.
+     * @param profit          The profit margin for the dish.
+     */
     public DishAndWineHelper(String dishName, String allergyInfo, String wineName, double dishPrice, String dishDescription, double winePrice, double profit) {
         this.dishName = dishName;
         this.allergyInfo = allergyInfo;
@@ -24,7 +38,6 @@ public class DishAndWineHelper {
     public double getProfit() {
         return profit;
     }
-
 
 
     public String getDishName() {

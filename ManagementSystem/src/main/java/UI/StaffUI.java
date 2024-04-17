@@ -22,6 +22,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The `StaffUI` class extends the `BaseUI` class and represents the user interface
+ * for managing staff schedule and holidays.
+ */
 public class StaffUI extends BaseUI {
     private DatePicker datePicker;
     private Button getScheduleButton;
@@ -34,7 +38,11 @@ public class StaffUI extends BaseUI {
     private TableView<ScheduleForUI> scheduleTableView;
     private ScheduleForUI schedule;
 
-
+    /**
+     * Constructs a new instance of the `StaffUI` class.
+     *
+     * @param uiSwitcher The `UISwitcher` instance for navigating between UI screens.
+     */
     public StaffUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Staff");
@@ -42,6 +50,9 @@ public class StaffUI extends BaseUI {
         initializeUI();
     }
 
+    /**
+     * Initializes the user interface components and layout.
+     */
     private void initializeUI() {
         VBox mainContent = new VBox();
         mainContent.setPadding(new Insets(20));
@@ -63,6 +74,12 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().addAll(topControls, staffTableView);
         setMainContent(mainContent);
     }
+
+    /**
+     * Updates the database with the modified schedule details.
+     *
+     * @param schedule The `ScheduleForUI` object containing the updated schedule details.
+     */
     private void updateDatabase(ScheduleForUI schedule) {
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
             String query = "UPDATE YourTableName SET Date = ?, StartTime = ?, EndTime = ? WHERE ScheduleID = ?";
@@ -86,6 +103,9 @@ public class StaffUI extends BaseUI {
         }
     }
 
+    /**
+     * Displays the UI for modifying staff schedules.
+     */
     private void modifyStaffSchedule() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
@@ -126,6 +146,11 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().add(staffScheduleContent);
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying staff information.
+     *
+     * @return The configured `TableView` instance for displaying staff information.
+     */
     private TableView<StaffInfoForUI> createStaffTableView() {
         TableView<StaffInfoForUI> tableView = new TableView<>();
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -173,6 +198,11 @@ public class StaffUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Retrieves the staff information from the database.
+     *
+     * @return A list of `StaffInfoForUI` objects representing the staff information.
+     */
     private List<StaffInfoForUI> getStaffFromDatabase() {
         List<StaffInfoForUI> staff = new ArrayList<>();
 
@@ -196,6 +226,12 @@ public class StaffUI extends BaseUI {
         return staff;
     }
 
+    /**
+     * Retrieves the schedule information from the database for a specific staff member.
+     *
+     * @param staffID The ID of the staff member.
+     * @return A list of `ScheduleForUI` objects representing the schedule information.
+     */
     private List<ScheduleForUI> getScheduleFromDatabase(int staffID) {
         List<ScheduleForUI> schedules = new ArrayList<>();
 
@@ -227,13 +263,18 @@ public class StaffUI extends BaseUI {
         return schedules;
     }
 
-
+    /**
+     * Navigates back to the main view.
+     */
     private void backToMainView() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
         initializeUI();
     }
 
+    /**
+     * Displays the UI for viewing staff holidays.
+     */
     private void viewStaffHolidays() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
@@ -256,6 +297,9 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().addAll(holidayControls, holidayTableView);
     }
 
+    /**
+     * Navigates back to the schedule view.
+     */
     private void backToScheduleView() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
@@ -276,6 +320,11 @@ public class StaffUI extends BaseUI {
         mainContent.getChildren().addAll(topControls, staffTableView);
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying staff holidays.
+     *
+     * @return The configured `TableView` instance for displaying staff holidays.
+     */
     private TableView<StaffHolidayForUI> createHolidayTableView() {
         TableView<StaffHolidayForUI> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -322,6 +371,12 @@ public class StaffUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Loads the staff holidays for the specified date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     */
     private void loadHolidays(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             showAlert("Invalid Date Range", "Please select both start and end dates.");
@@ -337,6 +392,13 @@ public class StaffUI extends BaseUI {
         holidayTableView.getItems().setAll(holidays);
     }
 
+    /**
+     * Retrieves the staff holidays from the database for the specified date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @return A list of `StaffHolidayForUI` objects representing the staff holidays.
+     */
     private List<StaffHolidayForUI> getStaffHolidaysFromDatabase(LocalDate startDate, LocalDate endDate) {
         List<StaffHolidayForUI> holidays = new ArrayList<>();
 
@@ -372,6 +434,12 @@ public class StaffUI extends BaseUI {
         return holidays;
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying staff schedules.
+     *
+     * @param staffID The ID of the staff member.
+     * @return The configured `TableView` instance for displaying staff schedules.
+     */
     private TableView<ScheduleForUI> createScheduleTableView(int staffID) {
         TableView<ScheduleForUI> tableView = new TableView<>();
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -479,6 +547,11 @@ public class StaffUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying staff schedules.
+     *
+     * @return The configured `TableView` instance for displaying staff schedules.
+     */
     private TableView<StaffInfoForUI> createScheduleTableView() {
         TableView<StaffInfoForUI> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -532,6 +605,9 @@ public class StaffUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Loads the staff schedule for the selected date.
+     */
     private void loadSchedule() {
         LocalDate selectedDate = datePicker.getValue();
         if (selectedDate != null) {
@@ -542,6 +618,12 @@ public class StaffUI extends BaseUI {
         }
     }
 
+    /**
+     * Retrieves the staff schedule from the database for the specified date.
+     *
+     * @param date The date for which to retrieve the staff schedule.
+     * @return A list of `StaffInfoForUI` objects representing the staff schedule.
+     */
     private List<StaffInfoForUI> getStaffScheduleFromDatabase(LocalDate date) {
         List<StaffInfoForUI> staffSchedule = new ArrayList<>();
 
@@ -574,6 +656,12 @@ public class StaffUI extends BaseUI {
 
         return staffSchedule;
     }
+    /**
+     * Adds a new schedule to the database.
+     *
+     * @param input The input string containing the staff ID and schedule ID in the format "StaffID:ScheduleID".
+     */
+
     // adds a schedule to the database and stable
     private void addScheduleToDatabase(String input) {
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
@@ -611,6 +699,12 @@ public class StaffUI extends BaseUI {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Deletes a schedule from the database.
+     *
+     * @param input The input string containing the staff ID and schedule ID in the format "StaffID:ScheduleID".
+     */
     // Method to delete schedule from database
     private void deleteScheduleFromDatabase(String input) {
         try (Connection conn = AdminDatabaseConnector.getConnection()) {
@@ -649,6 +743,12 @@ public class StaffUI extends BaseUI {
         }
     }
 
+    /**
+     * Shows an alert dialog with the provided title and content.
+     *
+     * @param title   The title of the alert dialog.
+     * @param content The content to be displayed in the alert dialog.
+     */
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

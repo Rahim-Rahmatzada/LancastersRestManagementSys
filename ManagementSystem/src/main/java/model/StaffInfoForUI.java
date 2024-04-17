@@ -11,6 +11,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/**
+ * Represents staff information for UI display.
+ */
 public class StaffInfoForUI {
     private StringProperty name;
     private StringProperty role;
@@ -21,6 +24,16 @@ public class StaffInfoForUI {
     private IntegerProperty staffID;
 
 
+    /**
+     * Constructs a StaffInfoForUI object with the specified details.
+     *
+     * @param name       The name of the staff.
+     * @param role       The role of the staff.
+     * @param shiftStart The starting time of the staff's shift.
+     * @param shiftEnd   The ending time of the staff's shift.
+     * @param duration   The duration of the staff's shift.
+     */
+
     public StaffInfoForUI(String name, String role, String shiftStart, String shiftEnd, String duration) {
         this.name = new SimpleStringProperty(name);
         this.role = new SimpleStringProperty(role);
@@ -29,6 +42,13 @@ public class StaffInfoForUI {
         this.duration = new SimpleStringProperty(duration);
     }
 
+    /**
+     * Constructs a StaffInfoForUI object with the specified ID, name, and role.
+     *
+     * @param staffID The ID of the staff.
+     * @param name    The name of the staff.
+     * @param role    The role of the staff.
+     */
     public StaffInfoForUI(int staffID, String name, String role) {
         this.staffID = new SimpleIntegerProperty(staffID);
         this.name = new SimpleStringProperty(name);

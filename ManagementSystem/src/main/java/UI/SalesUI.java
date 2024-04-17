@@ -21,7 +21,11 @@ import java.util.List;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.SoldItem;
 
-
+/**
+ * The `SalesUI` class extends the `BaseUI` class and represents the user interface
+ * for managing sales, generating sales reports, and viewing popular items
+ * in the restaurant management system.
+ */
 public class SalesUI extends BaseUI {
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
@@ -40,6 +44,11 @@ public class SalesUI extends BaseUI {
     private TableView<SoldItem> dishTableView;
     private TableView<SoldItem> wineTableView;
 
+    /**
+     * Constructs a new instance of the `SalesUI` class.
+     *
+     * @param uiSwitcher The `UISwitcher` instance for navigating between UI screens.
+     */
     public SalesUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Sales");
@@ -120,6 +129,11 @@ public class SalesUI extends BaseUI {
         setMainContent(salesMainContent);
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying sold dish data.
+     *
+     * @return The configured `TableView` instance for displaying sold dishes.
+     */
     private TableView<SoldItem> createDishTableView() {
         TableView<SoldItem> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -171,6 +185,11 @@ public class SalesUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying sold wine data.
+     *
+     * @return The configured `TableView` instance for displaying sold wines.
+     */
     private TableView<SoldItem> createWineTableView() {
         TableView<SoldItem> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -222,7 +241,9 @@ public class SalesUI extends BaseUI {
         return tableView;
     }
 
-
+    /**
+     * Views the list of sold items based on the selected options (dish, wine, or total).
+     */
     private void viewSoldItems() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -267,6 +288,9 @@ public class SalesUI extends BaseUI {
         mainContent.getChildren().addAll(backButton);
     }
 
+    /**
+     * Shows the sales overview with the date pickers, checkboxes, and buttons.
+     */
     private void showSalesOverview() {
         VBox mainContent = (VBox) getMainContent();
         mainContent.getChildren().clear();
@@ -307,7 +331,13 @@ public class SalesUI extends BaseUI {
         );
     }
 
-
+    /**
+     * Retrieves the list of sold dishes with quantities for the given date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @return A list of `SoldItem` objects representing the sold dishes.
+     */
     private List<SoldItem> getSoldDishesWithQuantities(LocalDate startDate, LocalDate endDate) {
         List<SoldItem> soldDishes = new ArrayList<>();
 
@@ -344,6 +374,13 @@ public class SalesUI extends BaseUI {
         return soldDishes;
     }
 
+    /**
+     * Retrieves the list of sold wines with quantities for the given date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @return A list of `SoldItem` objects representing the sold wines.
+     */
     private List<SoldItem> getSoldWinesWithQuantities(LocalDate startDate, LocalDate endDate) {
         List<SoldItem> soldWines = new ArrayList<>();
 
@@ -381,6 +418,9 @@ public class SalesUI extends BaseUI {
         return soldWines;
     }
 
+    /**
+     * Generates the sales graph based on the selected options and date range.
+     */
     private void generateGraph() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
@@ -418,6 +458,14 @@ public class SalesUI extends BaseUI {
         }
     }
 
+    /**
+     * Updates the popular dish and wine items for the given date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @param conn      The database connection.
+     * @throws SQLException If an error occurs while accessing the database.
+     */
     private void updatePopularItems(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
         String popularDishQuery = "SELECT d.name AS dishName, COUNT(*) AS totalSold " +
                 "FROM Sale_Dish sd " +
@@ -442,6 +490,16 @@ public class SalesUI extends BaseUI {
         updatePopularItem(popularWineQuery, startDate, endDate, conn, popularWineText);
     }
 
+    /**
+     * Updates the popular item text with the given SQL query and date range.
+     *
+     * @param query    The SQL query to retrieve the popular item.
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @param conn      The database connection.
+     * @param itemText  The `Text` component to display the popular item name.
+     * @throws SQLException If an error occurs while accessing the database.
+     */
     private void updatePopularItem(String query, LocalDate startDate, LocalDate endDate, Connection conn, Text itemText) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDate(1, Date.valueOf(startDate));
@@ -458,6 +516,14 @@ public class SalesUI extends BaseUI {
         }
     }
 
+    /**
+     * Updates the dish sales graph for the given date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @param conn      The database connection.
+     * @throws SQLException If an error occurs while accessing the database.
+     */
     private void updateDishSalesGraph(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
         String dishQuery = "SELECT DATE(s.date) AS saleDate, SUM(d.price) AS totalDishSales " +
                 "FROM Sale s " +
@@ -467,10 +533,16 @@ public class SalesUI extends BaseUI {
                 "GROUP BY DATE(s.date)";
 
         updateSalesGraph(dishQuery, startDate, endDate, conn, "Dish Sales");
-
-
     }
 
+    /**
+     * Updates the wine sales graph for the given date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @param conn      The database connection.
+     * @throws SQLException If an error occurs while accessing the database.
+     */
     private void updateWineSalesGraph(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
         String wineQuery = "SELECT DATE(s.date) AS saleDate, SUM(w.winePrice) AS totalWineSales " +
                 "FROM Sale s " +
@@ -483,6 +555,14 @@ public class SalesUI extends BaseUI {
         updateSalesGraph(wineQuery, startDate, endDate, conn, "Wine Sales");
     }
 
+    /**
+     * Updates the total sales graph for the given date range.
+     *
+     * @param startDate The start date of the date range.
+     * @param endDate   The end date of the date range.
+     * @param conn      The database connection.
+     * @throws SQLException If an error occurs while accessing the database.
+     */
     private void updateTotalSalesGraph(LocalDate startDate, LocalDate endDate, Connection conn) throws SQLException {
         String totalQuery = "SELECT DATE(s.date) AS saleDate, SUM(d.price + COALESCE(w.winePrice, 0)) AS totalSales " +
                 "FROM Sale s " +
@@ -495,6 +575,16 @@ public class SalesUI extends BaseUI {
         updateSalesGraph(totalQuery, startDate, endDate, conn, "Total Sales");
     }
 
+    /**
+     * Updates the sales graph with the given SQL query, date range, and series name.
+     *
+     * @param query      The SQL query to retrieve the sales data.
+     * @param startDate  The start date of the date range.
+     * @param endDate    The end date of the date range.
+     * @param conn       The database connection.
+     * @param seriesName The name of the series to be added to the graph.
+     * @throws SQLException If an error occurs while accessing the database.
+     */
     private void updateSalesGraph(String query, LocalDate startDate, LocalDate endDate, Connection conn, String seriesName) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDate(1, Date.valueOf(startDate));
@@ -514,6 +604,11 @@ public class SalesUI extends BaseUI {
         }
     }
 
+    /**
+     * Creates the container for displaying the most popular dish and wine items.
+     *
+     * @return The `HBox` containing the popular dish and wine boxes.
+     */
     private HBox createPopularItemsBox() {
         HBox popularItemsBox = new HBox();
         popularItemsBox.setSpacing(20);
@@ -540,6 +635,15 @@ public class SalesUI extends BaseUI {
         return popularItemsBox;
     }
 
+    /**
+     * Creates a box for displaying a popular item (dish or wine).
+     *
+     * @param title        The title of the box.
+     * @param itemText     The `Text` component to display the popular item name.
+     * @param titleFontSize The font size for the title.
+     * @param itemFontSize  The font size for the item name.
+     * @return The `VBox` containing the popular item box.
+     */
     private VBox createPopularItemBox(String title, Text itemText, int titleFontSize, int itemFontSize) {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -560,6 +664,12 @@ public class SalesUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Shows an alert dialog with the provided title and content.
+     *
+     * @param title   The title of the alert dialog.
+     * @param content The content to be displayed in the alert dialog.
+     */
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

@@ -1,11 +1,22 @@
 import FinalInterTeamServices.FOH.FOHDataAccessor;
 import FinalInterTeamServices.FOH.FOHFinalInterface;
 import model.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * This class is used to test the functionality of the FOHDataAccessor class we implemented, which provides
+ * methods to access and manipulate data related to Front of House (FOH) operations.
+ * It includes tests for retrieving active menus, dishes for a specific menu, dish details,
+ * wine details for a dish, prices of dishes and wines, quantity of wines, staff information,
+ * staff schedules, assigning waiters to tables, and staff holidays within a date range.
+ */
 public class FOHLibraryTest {
+
+    /**
+     * The main method of the FOHLibraryTest class, which is used to execute the test cases.
+     * @param args The command-line arguments (not used).
+     */
     public static void main(String[] args) {
         // Create an instance of the FOHDataAccessor
         FOHFinalInterface fohDataAccessor = new FOHDataAccessor();

@@ -3,6 +3,9 @@ package model;
 import java.sql.Time;
 import java.util.Date;
 
+/**
+ * Represents a schedule for working shifts.
+ */
 public class Schedule {
     private int scheduleID;
     private Date dateWorking;
@@ -10,6 +13,15 @@ public class Schedule {
     private Time shiftEndingTime;
     private String duration;
 
+    /**
+     * Constructs a schedule with the specified details.
+     *
+     * @param scheduleID       The ID of the schedule.
+     * @param dateWorking      The date of the working shift.
+     * @param shiftStartingTime The starting time of the shift.
+     * @param shiftEndingTime  The ending time of the shift.
+     * @param duration         The duration of the shift.
+     */
     public Schedule(int scheduleID, Date dateWorking, Time shiftStartingTime, Time shiftEndingTime, String duration) {
         this.scheduleID = scheduleID;
         this.dateWorking = dateWorking;

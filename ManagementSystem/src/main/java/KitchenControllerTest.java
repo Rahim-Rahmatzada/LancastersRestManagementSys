@@ -4,7 +4,19 @@ import forAdmin.KitchenController;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * This class is used to test the functionality of the KitchenController class implemented by the BOH team, which provides
+ * methods to access and manipulate data related to kitchen operations.
+ * Includes tests for retrieving menus, ingredients, stock levels, low stock items,
+ * dish ingredients, allergens, ingredient usage, and waste information.
+ */
+
 public class KitchenControllerTest {
+
+    /**
+     * The main method of the KitchenControllerTest class, which is used to execute the test cases.
+     * @param args The command-line arguments (not used).
+     */
     public static void main(String[] args) {
         // Create an instance of the KitchenController
         KitchenControllerInterface kitchenController = new KitchenController();

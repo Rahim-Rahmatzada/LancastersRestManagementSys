@@ -261,6 +261,12 @@ public class StockOrdersUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Updates the order status of a stock order in the database.
+     *
+     * @param orderID   The ID of the stock order to be updated.
+     * @param newStatus The new status to be set for the stock order.
+     */
     private void updateOrderStatusInDatabase(int orderID, String newStatus) {
         try (Connection conn = AdminDatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(

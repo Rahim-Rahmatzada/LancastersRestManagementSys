@@ -4,7 +4,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Utility class for creating database tables to test SQL queries on instead of the actual database.
+ */
 public class DatabaseCreator {
+
+    /**
+     * Creates database tables.
+     *
+     * @param connection The database connection.
+     * @throws SQLException if a database access error occurs.
+     */
     public static void createTables(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
 

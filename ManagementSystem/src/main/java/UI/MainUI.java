@@ -12,8 +12,6 @@ import javafx.stage.Stage;
 
 public class MainUI extends Application implements UISwitcher {
 
-
-
     private Stage primaryStage;
     private DashboardUI dashboardUI;
     private InventoryUI inventoryUI;
@@ -117,6 +115,9 @@ public class MainUI extends Application implements UISwitcher {
         menusUI.highlightButton("Menus");
     }
 
+    /**
+     * Switches the current scene to the Staff UI.
+     */
     @Override
     public void switchToStaff() {
         if (staffUI == null) {
@@ -126,6 +127,9 @@ public class MainUI extends Application implements UISwitcher {
         staffUI.highlightButton("Staff");
     }
 
+    /**
+     * Switches the current scene to the Wine UI.
+     */
     @Override
     public void switchToWine() {
         if (wineUI == null) {
@@ -135,6 +139,9 @@ public class MainUI extends Application implements UISwitcher {
         wineUI.highlightButton("Wine");
     }
 
+    /**
+     * Switches the current scene to the Stock Orders UI.
+     */
     @Override
     public void switchToStockOrders() {
         if (stockOrdersUI == null) {
@@ -144,6 +151,9 @@ public class MainUI extends Application implements UISwitcher {
         stockOrdersUI.highlightButton("Stock Orders");
     }
 
+    /**
+     * Switches the current scene to the Waste UI.
+     */
     @Override
     public void switchToWaste() {
         if (wasteUI == null) {
@@ -153,6 +163,9 @@ public class MainUI extends Application implements UISwitcher {
         wasteUI.highlightButton("Waste");
     }
 
+    /**
+     * Switches the current scene to the Dish UI.
+     */
     @Override
     public void switchToDish() {
         if (dishUI == null) {
@@ -184,7 +197,9 @@ public class MainUI extends Application implements UISwitcher {
         primaryStage.setTitle(title);
     }
 
-
+    /**
+     * Preloads the Inventory UI to improve performance.
+     */
 
     @Override
     public void preloadInventoryUI() {
@@ -193,6 +208,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Sales UI to improve performance.
+     */
     @Override
     public void preloadSalesUI() {
         if (salesUI == null) {
@@ -200,6 +218,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Table Overview UI to improve performance.
+     */
     @Override
     public void preloadTableOverviewUI() {
         if (tableOverviewUI == null) {
@@ -207,6 +228,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Menus UI to improve performance.
+     */
     @Override
     public void preloadMenusUI() {
         if (menusUI == null) {
@@ -214,6 +238,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Staff UI to improve performance.
+     */
     @Override
     public void preloadStaffUI() {
         if (staffUI == null) {
@@ -221,6 +248,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Wine UI to improve performance.
+     */
     @Override
     public void preloadWineUI() {
         if (wineUI == null) {
@@ -228,6 +258,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Stock Orders UI to improve performance.
+     */
     @Override
     public void preloadStockOrdersUI() {
         if (stockOrdersUI == null) {
@@ -235,6 +268,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Waste UI to improve performance.
+     */
     @Override
     public void preloadWasteUI() {
         if (wasteUI == null) {
@@ -242,6 +278,9 @@ public class MainUI extends Application implements UISwitcher {
         }
     }
 
+    /**
+     * Preloads the Dish UI to improve performance.
+     */
     @Override
     public void preloadDishUI() {
         if (dishUI == null) {

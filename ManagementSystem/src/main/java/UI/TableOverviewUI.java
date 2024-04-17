@@ -17,7 +17,10 @@ import model.SoldItem;
 import java.sql.*;
 import java.time.LocalDate;
 
-
+/**
+ * The `TableOverviewUI` class extends the `BaseUI` class and represents the user interface
+ * for managing tables, table layouts, and table bookings in the restaurant management system.
+ */
 
 public class TableOverviewUI extends BaseUI {
     private GridPane tableLayout;
@@ -135,6 +138,9 @@ public class TableOverviewUI extends BaseUI {
         setMainContent(mainContent);
     }
 
+    /**
+     * Updates the table availability based on the selected date.
+     */
     void updateTableAvailability() {
         LocalDate selectedDate = datePicker.getValue();
         if (selectedDate != null) {
@@ -144,8 +150,11 @@ public class TableOverviewUI extends BaseUI {
 
     /**
      * Creates the table layout by retrieving table information from the database
-     * and displaying table buttons in a grid layout and displaying waiter's name with the assigned table. Check which table is occupied or available
-     * and highlights them in red or blue
+     * and displaying table buttons in a grid layout. It also displays the waiter's name
+     * with the assigned table, checks which table is occupied or available, and highlights
+     * them accordingly.
+     *
+     * @param selectedDate The selected date for which to display the table layout.
      */
 
     public void createTableLayout(LocalDate selectedDate) {
@@ -241,6 +250,12 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
+    /**
+     * Shows the table details for the specified table and date.
+     *
+     * @param tableId      The ID of the table for which to show details.
+     * @param selectedDate The selected date for which to show table details.
+     */
     private void showTableDetails(int tableId, LocalDate selectedDate) {
         VBox mainContent = getMainContent();
         mainContent.getChildren().clear();
@@ -432,6 +447,9 @@ public class TableOverviewUI extends BaseUI {
     }
 
     // Inner classes for dish and wine details
+    /**
+     * Inner class representing the details of a dish.
+     */
     private static class DishDetails {
         private final SimpleStringProperty dishName;
         private final SimpleDoubleProperty dishPrice;
@@ -468,6 +486,9 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
+    /**
+     * Inner class representing the details of a wine.
+     */
     private static class WineDetails {
         private final SimpleStringProperty wineName;
         private final SimpleDoubleProperty winePrice;
@@ -504,7 +525,11 @@ public class TableOverviewUI extends BaseUI {
         }
     }
 
-
+    /**
+     * Shows the main UI with the updated table layout for the specified date.
+     *
+     * @param selectedDate The selected date for which to show the main UI.
+     */
     private void showMainUI(LocalDate selectedDate) {
         // Clear the main content
         VBox mainContent = getMainContent();

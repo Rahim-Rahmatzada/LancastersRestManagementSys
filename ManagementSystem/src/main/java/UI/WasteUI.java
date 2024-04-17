@@ -1,6 +1,6 @@
 package UI;
 
-import DatabaseConnections.AdminDatabaseConnector;
+
 import forAdmin.KitchenController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,21 +17,25 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import model.WasteEntry;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The `WasteUI` class extends the `BaseUI` class and represents the user interface
+ * for managing and displaying waste information in the restaurant management system.
+ */
 public class WasteUI extends BaseUI {
 
     private TableView<WasteEntry> wasteTableView;
     private Text highestWasteIngredientText;
     private Text biggestReasonForWasteText;
 
+    /**
+     * Constructs a new instance of the `WasteUI` class.
+     *
+     * @param uiSwitcher The `UISwitcher` instance for navigating between UI screens.
+     */
     public WasteUI(UISwitcher uiSwitcher) {
         super(uiSwitcher);
         highlightButton("Waste");
@@ -62,6 +66,9 @@ public class WasteUI extends BaseUI {
 
     }
 
+    /**
+     * Displays the ingredient with the highest waste amount.
+     */
     private void showHighestWasteIngredient() {
         KitchenController kitchenController = new KitchenController();
         HashMap<String, String> wasteInfo = kitchenController.getWasteInfo();
@@ -81,6 +88,9 @@ public class WasteUI extends BaseUI {
         }
     }
 
+    /**
+     * Displays the biggest reason for waste and the total waste quantity associated with that reason.
+     */
     private void showBiggestReasonForWaste() {
         KitchenController kitchenController = new KitchenController();
         HashMap<String, String> wasteInfo = kitchenController.getWasteInfo();
@@ -102,17 +112,34 @@ public class WasteUI extends BaseUI {
         }
     }
 
+    /**
+     * Extracts the quantity value from the waste data string.
+     *
+     * @param wasteData The waste data string in the format "Quantity: value, Reason: reason".
+     * @return The quantity value as a double.
+     */
     private double extractQuantity(String wasteData) {
         String[] parts = wasteData.split(", ");
         String quantityPart = parts[0].split(": ")[1];
         return Double.parseDouble(quantityPart);
     }
 
+    /**
+     * Extracts the reason from the waste data string.
+     *
+     * @param wasteData The waste data string in the format "Quantity: value, Reason: reason".
+     * @return The reason string.
+     */
     private String extractReason(String wasteData) {
         String[] parts = wasteData.split(", ");
         return parts[1].split(": ")[1];
     }
 
+    /**
+     * Creates the VBox container for displaying the ingredient with the highest waste amount.
+     *
+     * @return The VBox container.
+     */
     private VBox createHighestWasteIngredientBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -140,6 +167,11 @@ public class WasteUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Creates the VBox container for displaying the biggest reason for waste.
+     *
+     * @return The VBox container.
+     */
     private VBox createBiggestReasonForWasteBox() {
         VBox box = new VBox();
         box.setStyle("-fx-background-color: #D3D3D3; -fx-background-radius: 10;");
@@ -164,6 +196,11 @@ public class WasteUI extends BaseUI {
         return box;
     }
 
+    /**
+     * Creates and configures the `TableView` for displaying waste data.
+     *
+     * @return The configured `TableView` instance.
+     */
     private TableView<WasteEntry> createWasteTableView() {
         TableView<WasteEntry> tableView = new TableView<>();
         tableView.setStyle("-fx-background-color: #1A1A1A;");
@@ -217,6 +254,11 @@ public class WasteUI extends BaseUI {
         return tableView;
     }
 
+    /**
+     * Retrieves the waste data from the KitchenController and returns an `ObservableList` of `WasteEntry` objects.
+     *
+     * @return An `ObservableList` containing the waste data.
+     */
     private ObservableList<WasteEntry> getWasteDataFromKitchenController() {
         ObservableList<WasteEntry> wasteList = FXCollections.observableArrayList();
 

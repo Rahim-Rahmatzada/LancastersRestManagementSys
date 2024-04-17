@@ -5,10 +5,16 @@ import javafx.scene.paint.Color;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * This class is responsible for creating and managing line charts and bar charts.
+ */
 public class GraphCreator {
     private LineChart<String, Number> lineChart;
     private BarChart<String, Number> barChart;
 
+    /**
+     * Constructs a new GraphCreator and initializes lineChart and barChart.
+     */
     public GraphCreator() {
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Date");
@@ -52,6 +58,14 @@ public class GraphCreator {
         return lineChart;
     }
 
+    /**
+     * Adds a series to the line chart.
+     *
+     * @param data         The data points for the series.
+     * @param seriesName   The name of the series.
+     * @param startDate    The start date for the x-axis.
+     * @param variableType The type of variable for the y-axis.
+     */
     public void addSeriesToGraph(List<Double> data, String seriesName, LocalDate startDate, String variableType) {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName(seriesName);
@@ -67,6 +81,14 @@ public class GraphCreator {
         yAxis.setLabel(variableType);
     }
 
+    /**
+     * Adds a series to the bar chart.
+     *
+     * @param data    The data points for the series.
+     * @param seriesName The name of the series.
+     * @param startDate The start date for the x-axis.
+     * @param yLabel  The label for the y-axis.
+     */
     public void addBarSeriesToGraph(List<Double> data, String seriesName, LocalDate startDate, String yLabel) {
         barChart.getData().clear();
 
@@ -84,6 +106,9 @@ public class GraphCreator {
         yAxis.setLabel(yLabel);
     }
 
+    /**
+     * Clears both the line chart and the bar chart.
+     */
     public void clearGraph() {
         lineChart.getData().clear();
         barChart.getData().clear();
@@ -91,6 +116,9 @@ public class GraphCreator {
         resetAxisRanges();
     }
 
+    /**
+     * Resets the axis ranges for both charts to auto-ranging.
+     */
     public void resetAxisRanges() {
         NumberAxis yAxisLineChart = (NumberAxis) lineChart.getYAxis();
         yAxisLineChart.setAutoRanging(true);

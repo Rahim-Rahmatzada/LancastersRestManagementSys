@@ -2,13 +2,23 @@ package model;
 
 import java.time.LocalDate;
 
+/**
+ * Represents an order.
+ */
 public class Order {
     private int orderID;
     private LocalDate dateOrdered;
     private LocalDate expectedDeliveryDate;
     private String orderStatus;
 
-
+    /**
+     * Constructs an order with the specified ID, date ordered, expected delivery date, and status.
+     *
+     * @param orderID              The ID of the order.
+     * @param dateOrdered          The date when the order was placed.
+     * @param expectedDeliveryDate The expected delivery date of the order.
+     * @param orderStatus          The status of the order.
+     */
     public Order(int orderID, LocalDate dateOrdered, LocalDate expectedDeliveryDate, String orderStatus) {
         this.orderID = orderID;
         this.dateOrdered = dateOrdered;

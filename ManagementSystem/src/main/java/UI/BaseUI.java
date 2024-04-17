@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * This abstract class serves as a base for creating UI components in the application.
- * It provides common UI elements and functionalities such as side menu and top text.
+ * Provides common UI elements and functionalities such as side menu and top text.
  */
 
 public abstract class BaseUI {

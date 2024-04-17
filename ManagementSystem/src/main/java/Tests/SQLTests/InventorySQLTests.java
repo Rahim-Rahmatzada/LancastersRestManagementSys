@@ -10,9 +10,17 @@ import org.junit.Test;
 
 import java.sql.*;
 
+/**
+ * Test class for verifying SQL operations related to inventory management.
+ */
 public class InventorySQLTests {
     private static Connection staticConnection;
 
+    /**
+     * Sets up the database connection and initializes the database with tables and sample data before all tests.
+     *
+     * @throws SQLException if a database access error occurs.
+     */
     @BeforeClass
     public static void setupClass() throws SQLException {
         // Create an in-memory H2 database for testing
@@ -33,6 +41,11 @@ public class InventorySQLTests {
         // No code needed here
     }
 
+    /**
+     * Closes the database connection after all tests have been executed.
+     *
+     * @throws SQLException if a database access error occurs.
+     */
     @AfterClass
     public static void tearDownClass() throws SQLException {
         // Close the database connection after all tests
@@ -41,6 +54,9 @@ public class InventorySQLTests {
         }
     }
 
+    /**
+     * Tests the retrieval of ingredient data from the database.
+     */
     @Test
     public void testGetIngredientDataFromDatabase() {
         ObservableList<Ingredient> ingredientList = FXCollections.observableArrayList();
@@ -83,6 +99,11 @@ public class InventorySQLTests {
         }
     }
 
+    /**
+     * Tests the retrieval of menu data from the database.
+     *
+     * @throws SQLException if a database access error occurs.
+     */
     @Test
     public void testGetMenuData() throws SQLException {
         try (Statement stmt = staticConnection.createStatement();

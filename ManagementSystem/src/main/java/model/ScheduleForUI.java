@@ -10,6 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/**
+ * Represents a schedule designed for UI display.
+ */
 public class ScheduleForUI {
     private final IntegerProperty scheduleID;
     private final ObjectProperty<LocalDate> date;
@@ -17,6 +20,15 @@ public class ScheduleForUI {
     private final ObjectProperty<Time> endTime;
     private final StringProperty duration;
 
+    /**
+     * Constructs a ScheduleForUI object with the specified details.
+     *
+     * @param scheduleID The ID of the schedule.
+     * @param date       The date of the schedule.
+     * @param startTime  The starting time of the schedule.
+     * @param endTime    The ending time of the schedule.
+     * @param duration   The duration of the schedule.
+     */
     public ScheduleForUI(int scheduleID, LocalDate date, Time startTime, Time endTime, String duration) {
         this.scheduleID = new SimpleIntegerProperty(scheduleID);
         this.date = new SimpleObjectProperty<>(date);

@@ -10,8 +10,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Test class for verifying SQL operations related to Sales UI.
+ */
 public class SalesSQLTests {
     private static Connection staticConnection;
+
 
     @BeforeClass
     public static void setupClass() throws SQLException {
@@ -41,6 +45,9 @@ public class SalesSQLTests {
         }
     }
 
+    /**
+     * Tests the retrieval of sale data from the database.
+     */
     @Test
     public void testGetSaleDataFromDatabase() {
         List<Sale> saleList = new ArrayList<>();
