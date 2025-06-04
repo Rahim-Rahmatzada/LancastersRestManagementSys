@@ -27,8 +27,13 @@ Lancaster's Restaurant Management System is a comprehensive Java-based applicati
 ## Usage
 Refer to the [User Documentation](https://docs.google.com/document/d/154WBw_870j5fL0SBWJP58FGZxGR6P7Ll/edit?usp=sharing&ouid=109368107061434312365&rtpof=true&sd=true) for detailed instructions on how to use the system.
 
-## API Documentation
-JavaDoc documentation is available in the `LancastersRestManagementSys/ManagementSystem/JavaDoc/index.html` file. Open this file in a web browser to view the full API documentation.
+## Images 
+![](Images/res1.png)
+![](Images/res4.png)
+
+## Contributions
+![](Images/res3.png)
+
 
 ## License
 This project is licensed under the MIT License.
